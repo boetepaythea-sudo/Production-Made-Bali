@@ -197,7 +197,7 @@
                     <a href="#" onclick="showMaster('satuan')">- Satuan</a>
                     <a href="#" onclick="showMaster('supplier')">- Supplier</a>
                     <a href="#" onclick="showMaster('bahan')">- Bahan Baku</a>
-                    <a href="#" onclick="showMaster('recipe')">- Recipe</a>
+                    <a href="#" onclick="showProductionRecipe()">- Forecast Produk</a>
                 </div>
 
                 <a href="#" onclick="showPage('purchasing')">
@@ -333,6 +333,122 @@
 
                         <!-- INI TEMPAT FORM MUNCUL -->
                         <div id="masterContent"></div>
+                    </div>
+                </div>
+
+                <div id="forecastproduk" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-warning mb-4">
+                            Forecast Produk / Recipe
+                        </h3>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Kode Produk</label>
+                                <input type="text" id="recipeCode" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-9">
+                                <label>Nama Kue</label>
+                                <input type="text" id="recipeProductName" class="form-control">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label>Bahan Baku</label>
+                                <select id="recipeMaterial" class="form-control">
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Gramasi</label>
+                                <input type="number" step="0.0001" id="recipeQty" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Satuan</label>
+                                <select id="recipeUnit" class="form-control">
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-warning w-100" onclick="addRecipeItem()">
+                                    Tambah
+                                </button>
+                            </div>
+                        </div>
+                        <table class="table table-dark table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Bahan</th>
+                                    <th>Gramasi</th>
+                                    <th>Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipeTable"></tbody>
+                        </table>
+                        <button class="btn btn-success w-100 mt-3" onclick="saveRecipe()">
+                            Simpan Forecast Produk
+                        </button>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mt-4 text-warning">Data Forecast Produk</h5>
+
+                    <table class="table table-dark table-striped mt-2">
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Nama Produk</th>
+                                <th>Jumlah Bahan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="forecastList"></tbody>
+                    </table>
+                </div>
+                <div id="forecastdetail" class="menu-page">
+
+                    <div class="card-custom">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <h3 class="text-warning">
+                                Detail Forecast Produk
+                            </h3>
+
+                            <button class="btn btn-secondary" onclick="backForecast()">
+
+                                <i class="fa fa-arrow-left"></i>
+                                Back
+
+                            </button>
+
+                        </div>
+
+                        <h4 id="forecastTitle"></h4>
+
+                        <table class="table table-dark table-striped mt-4">
+
+                            <thead>
+                                <tr>
+                                    <th>Kode Bahan</th>
+                                    <th>Nama Bahan Baku</th>
+                                    <th>Gramasi</th>
+                                    <th>Weight</th>
+                                    <th>Harga</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="forecastDetailTable"></tbody>
+
+                        </table>
+
+                        <div class="text-end mt-3">
+                            <h4 class="text-warning">
+                                Total Cost :
+                                <span id="forecastTotal"></span>
+                            </h4>
+                        </div>
 
                     </div>
 
@@ -466,6 +582,8 @@
 
                 </div>
 
+
+
                 <!-- MARKETING -->
                 <div id="marketing" class="menu-page">
 
@@ -592,6 +710,7 @@
             const db = getFirestore(app);
 
             let currentMaster = "";
+            let recipeItems = [];
 
             /* ================= LOGIN ================= */
             async function login() {
@@ -600,10 +719,11 @@
 
                 try {
                     const user = await signInWithEmailAndPassword(auth, email, password);
+                    document.getElementById('userEmail').innerHTML = user.user.email;
 
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('dashboardPage').style.display = 'block';
-                    document.getElementById('userEmail').innerHTML = user.user.email;
+
 
                 } catch (error) {
                     document.getElementById('error').innerHTML = error.message;
@@ -616,13 +736,14 @@
                 document.getElementById('loginPage').style.display = 'flex';
             }
 
+
             /* ================= MASTER MENU ================= */
             function toggleMaster() {
                 const menu = document.getElementById("masterSubMenu");
                 menu.style.display = (menu.style.display === "block") ? "none" : "block";
             }
 
-            function showMaster(type) {
+            async function showMaster(type) {
 
                 currentMaster = type;
 
@@ -800,7 +921,7 @@
                 loadAll();
 
                 if (type === "bahan") {
-                    loadUnitOptions();
+                    await loadUnitOptions();
                 }
             }
 
@@ -815,13 +936,13 @@
                 if (!name) return alert("Wajib isi");
 
                 const snap = await getDocs(collection(db, "units"));
-                const code = genCode("UNT", snap.size);
+                const code = "UNT-" + Date.now();
 
                 await addDoc(collection(db, "units"), {
                     code, name, createdAt: serverTimestamp()
                 });
 
-                loadUnits();
+                await loadUnits();
             }
 
             async function loadUnits() {
@@ -865,8 +986,12 @@
 
                 if (!confirmDelete) return;
 
-                await deleteDoc(doc(db, "units", id));
-
+                try {
+                    await deleteDoc(doc(db, "units", id));
+                    await loadUnits();
+                } catch (e) {
+                    alert("Gagal hapus data");
+                }
                 loadUnits();
 
                 alert("Data berhasil dihapus");
@@ -1052,15 +1177,10 @@
 
                 alert("Bahan berhasil dihapus");
             }
-
             async function loadUnitOptions() {
-
                 const snap = await getDocs(collection(db, "units"));
-
                 let html = `<option value="">Pilih Satuan</option>`;
-
                 snap.forEach(d => {
-
                     html += `
         <option value="${d.data().name}">
             ${d.data().name}
@@ -1074,7 +1194,288 @@
             }
 
             /* ================= RECIPE ================= */
+            async function showProductionRecipe() {
 
+                showPage('forecastproduk');
+
+                recipeItems = [];
+
+                document.getElementById("recipeTable").innerHTML = "";
+
+                // generate kode otomatis
+                const snap = await getDocs(collection(db, "products"));
+
+                const code = genCode("KUE", snap.size);
+
+                document.getElementById("recipeCode").value = code;
+
+                loadRecipeMaterials();
+                loadRecipeUnits();
+                loadForecast();
+            }
+            async function loadRecipeMaterials() {
+
+                const snap = await getDocs(collection(db, "materials"));
+
+                let html = "";
+
+                snap.forEach(d => {
+
+                    html += `
+        <option value="${d.data().name}">
+            ${d.data().name}
+        </option>
+        `;
+                });
+
+                document.getElementById("recipeMaterial").innerHTML = html;
+            }
+            async function loadRecipeUnits() {
+
+                const snap = await getDocs(collection(db, "units"));
+
+                let html = "";
+
+                snap.forEach(d => {
+
+                    html += `
+        <option value="${d.data().name}">
+            ${d.data().name}
+        </option>
+        `;
+                });
+
+                document.getElementById("recipeUnit").innerHTML = html;
+            }
+            function addRecipeItem() {
+
+                const material =
+                    document.getElementById("recipeMaterial").value;
+
+                const qty =
+                    document.getElementById("recipeQty").value;
+
+                const unit =
+                    document.getElementById("recipeUnit").value;
+
+                if (!material || !qty || !unit) {
+
+                    alert("Lengkapi data bahan");
+
+                    return;
+                }
+
+                recipeItems.push({
+                    material,
+                    qty,
+                    unit
+                });
+
+                document.getElementById("recipeQty").value = "";
+                renderRecipeTable();
+            }
+            function renderRecipeTable() {
+
+                let html = "";
+
+                recipeItems.forEach((item, index) => {
+
+                    html += `
+        <tr>
+
+            <td>${item.material}</td>
+
+            <td>${item.qty}</td>
+
+            <td>${item.unit}</td>
+
+        </tr>
+        `;
+                });
+
+                document.getElementById("recipeTable").innerHTML = html;
+            }
+            async function saveRecipe() {
+
+                const code = document.getElementById("recipeCode").value;
+                const name = document.getElementById("recipeProductName").value;
+
+                if (!name) {
+
+                    alert("Nama produk wajib diisi");
+
+                    return;
+                }
+                // save produk
+                await addDoc(collection(db, "products"), {
+                    code,
+                    name,
+                    createdAt: serverTimestamp()
+
+                });
+
+                // save detail recipe
+                for (const item of recipeItems) {
+
+                    await addDoc(collection(db, "product_recipes"), {
+
+                        productCode: code,
+                        productName: name,
+                        material: item.material,
+                        qty: item.qty,
+                        unit: item.unit,
+                        createdAt: serverTimestamp()
+                    });
+                }
+
+                alert("Forecast produk berhasil disimpan");
+
+                // reset form
+                recipeItems = [];
+                renderRecipeTable();
+
+                document.getElementById("recipeProductName").value = "";
+                document.getElementById("recipeQty").value = "";
+
+                // reload data forecast
+                loadForecast();
+            }
+            async function loadForecast() {
+                const snap = await getDocs(collection(db, "products"));
+
+                let html = "";
+
+                for (const docItem of snap.docs) {
+
+                    const data = docItem.data();
+
+                    // hitung jumlah recipe item
+                    const recipeSnap = await getDocs(collection(db, "product_recipes"));
+
+                    let count = 0;
+
+                    recipeSnap.forEach(r => {
+                        if (r.data().productCode === data.code) {
+                            count++;
+                        }
+                    });
+
+                    html += `
+        <tr>
+            <td>${data.code}</td>
+            <td>${data.name}</td>
+            <td>${count} bahan</td>
+            <td>
+                <button class="btn btn-info btn-sm"
+                    onclick="viewForecast('${data.code}')">
+                    Detail
+                </button>
+            </td>
+        </tr>
+        `;
+                }
+
+                const el = document.getElementById("forecastList");
+                if (el) el.innerHTML = html;
+            }
+            async function viewForecast(code) {
+
+                showPage('forecastdetail');
+
+                // ambil produk
+                const productSnap = await getDocs(collection(db, "products"));
+
+                let productName = "";
+
+                productSnap.forEach(d => {
+
+                    if (d.data().code === code) {
+                        productName = d.data().name;
+                    }
+                });
+
+                document.getElementById("forecastTitle").innerHTML =
+                    `Forecast Produk : ${productName}`;
+
+                // ambil recipe
+                const recipeSnap =
+                    await getDocs(collection(db, "product_recipes"));
+
+                // ambil bahan baku
+                const materialSnap =
+                    await getDocs(collection(db, "materials"));
+
+                let html = "";
+                let grandTotal = 0;
+
+                recipeSnap.forEach(recipe => {
+
+                    const r = recipe.data();
+
+                    if (r.productCode === code) {
+
+                        let materialCode = "";
+                        let materialPrice = 0;
+
+                        materialSnap.forEach(mat => {
+
+                            const m = mat.data();
+
+                            if (m.name === r.material) {
+
+                                materialCode = m.code;
+
+                                materialPrice = Number(m.price);
+                            }
+                        });
+
+                        // hitung harga
+                        const qty = Number(r.qty);
+
+                        const totalPrice = qty * materialPrice;
+
+                        grandTotal += totalPrice;
+
+                        html += `
+            <tr>
+
+                <td>${materialCode}</td>
+
+                <td>${r.material}</td>
+
+                <td>${qty}</td>
+
+                <td>${r.unit}</td>
+
+                <td>
+                    Rp ${totalPrice.toLocaleString()}
+                </td>
+
+            </tr>
+            `;
+                    }
+                });
+
+                document.getElementById("forecastDetailTable").innerHTML = html;
+
+                document.getElementById("forecastTotal").innerHTML =
+                    `Rp ${grandTotal.toLocaleString()}`;
+            }
+
+            function backForecast() {
+                showPage('forecastproduk');
+            }
+
+            function loadAll() {
+                loadUnits();
+                loadSuppliers();
+                loadMaterials();
+            }
+
+            window.addEventListener("DOMContentLoaded", () => {
+                loadAll();
+                loadForecast();
+            });
 
             /* ================= GLOBAL EXPORT ================= */
             window.login = login;
@@ -1095,14 +1496,11 @@
             window.deleteSupplier = deleteSupplier;
             window.deleteMaterial = deleteMaterial;
 
-            function loadAll() {
-                loadUnits();
-                loadSuppliers();
-                loadMaterials();
-                loadProducts();
-            }
-
-            window.addEventListener("DOMContentLoaded", loadAll);
+            window.showProductionRecipe = showProductionRecipe;
+            window.addRecipeItem = addRecipeItem;
+            window.saveRecipe = saveRecipe;
+            window.viewForecast = viewForecast;
+            window.backForecast = backForecast;
 
         </script>
 
