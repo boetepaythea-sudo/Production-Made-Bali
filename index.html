@@ -138,7 +138,7 @@
                 color: #cbd5e1;
             }
         </style>
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </head>
 
     <body>
@@ -692,7 +692,7 @@
         <script type="module">
 
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-            import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+            import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
             import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
             const firebaseConfig = {
@@ -708,6 +708,68 @@
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
+
+            /* ================= SESSION LOGIN ================= */
+
+            onAuthStateChanged(auth, (user) => {
+
+                if (user) {
+
+                    document.getElementById('loginPage').style.display = 'none';
+
+                    document.getElementById('dashboardPage').style.display = 'block';
+
+                    document.getElementById('userEmail').innerHTML = user.email;
+
+                    startIdleTimer();
+
+                } else {
+
+                    document.getElementById('dashboardPage').style.display = 'none';
+
+                    document.getElementById('loginPage').style.display = 'flex';
+                }
+
+            });
+            /* ================= AUTO LOGOUT ================= */
+
+            let idleTimer;
+
+            function resetIdleTimer() {
+
+                clearTimeout(idleTimer);
+
+                idleTimer = setTimeout(async () => {
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Session Expired',
+                        text: 'Anda logout otomatis karena idle 30 menit'
+                    });
+
+                    await logout();
+
+                }, 30 * 60 * 1000); // 30 menit
+            }
+
+            function startIdleTimer() {
+
+                // event aktivitas user
+                const events = [
+                    "mousemove",
+                    "keydown",
+                    "click",
+                    "scroll",
+                    "touchstart"
+                ];
+
+                events.forEach(event => {
+
+                    document.addEventListener(event, resetIdleTimer);
+                });
+
+                resetIdleTimer();
+            }
 
             let currentMaster = "";
             let recipeItems = [];
@@ -731,11 +793,15 @@
             }
 
             async function logout() {
+
+                clearTimeout(idleTimer);
+
                 await signOut(auth);
+
                 document.getElementById('dashboardPage').style.display = 'none';
+
                 document.getElementById('loginPage').style.display = 'flex';
             }
-
 
             /* ================= MASTER MENU ================= */
             function toggleMaster() {
@@ -1620,10 +1686,6 @@
 
             setInterval(updateDateTime, 1000);
             updateDateTime();
-
-
         </script>
-
     </body>
-
 </html>
