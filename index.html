@@ -5,8 +5,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Made Bali ERP - Produksi</title>
-
-
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -142,42 +140,31 @@
     </head>
 
     <body>
-
         <!-- LOGIN -->
         <div class="login-page" id="loginPage">
-
             <div class="login-box">
-
                 <div class="text-center mb-4">
                     <img src="https://tse1.mm.bing.net/th/id/OIP.3joavlcgavPwgPw71eLUbwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
                         class="app-logo" alt="Logo">
                     <h2 class="text-warning mt-2">Made Bali ERP</h2>
                 </div>
-
                 <div class="mb-3">
                     <label>Email</label>
                     <input type="email" id="email" class="form-control">
                 </div>
-
                 <div class="mb-3">
                     <label>Password</label>
                     <input type="password" id="password" class="form-control">
                 </div>
-
                 <button class="btn btn-warning w-100" onclick="login()">
                     LOGIN
                 </button>
-
                 <div id="error" class="text-danger mt-3"></div>
-
             </div>
-
         </div>
 
         <!-- DASHBOARD -->
-
         <div class="dashboard" id="dashboardPage">
-
             <!-- SIDEBAR -->
             <div class="sidebar">
                 <img src="https://tse1.mm.bing.net/th/id/OIP.3joavlcgavPwgPw71eLUbwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
@@ -265,9 +252,7 @@
 
                 <!-- DASHBOARD -->
                 <div id="dashboard" class="menu-page active-page">
-
                     <div class="row mb-4">
-
                         <div class="col-md-3">
                             <div class="stat-card">
                                 <h6>Total Sales</h6>
@@ -331,9 +316,7 @@
                                 <canvas id="expenseChart"></canvas>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
                 <!-- MASTER DATA -->
                 <div id="masterdata" class="menu-page">
@@ -395,6 +378,7 @@
                                     <th>Bahan</th>
                                     <th>Gramasi</th>
                                     <th>Satuan</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="recipeTable"></tbody>
@@ -424,22 +408,19 @@
                                 Detail Forecast Produk
                             </h3>
                             <button class="btn btn-secondary" onclick="backForecast()">
-
                                 <i class="fa fa-arrow-left"></i>
                                 Back
                             </button>
                         </div>
                         <h4 id="forecastTitle"></h4>
-
                         <table class="table table-dark table-striped mt-4">
-
                             <thead>
                                 <tr>
                                     <th>Kode Bahan</th>
                                     <th>Nama Bahan Baku</th>
-                                    <th>Gramasi</th>
                                     <th>Weight</th>
-                                    <th>Harga</th>
+                                    <th>UOM</th>
+                                    <th>Price</th>
                                 </tr>
                             </thead>
                             <tbody id="forecastDetailTable"></tbody>
@@ -452,41 +433,71 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- PURCHASING -->
-                <div id="purchasing" class="menu-page">
-
+                <!-- COGS PRODUKSI -->
+                <div id="productioncogs" class="menu-page">
                     <div class="card-custom">
 
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="text-warning">
+                                Detail COGS Produksi
+                            </h3>
+
+                            <button class="btn btn-secondary" onclick="backProduction()">
+                                <i class="fa fa-arrow-left"></i>
+                                Back
+                            </button>
+                        </div>
+
+                        <h4 id="productionCogsTitle"></h4>
+
+                        <table class="table table-dark table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Kode Bahan</th>
+                                    <th>Nama Bahan</th>
+                                    <th>UOM</th>
+                                    <th>Weight Recipe</th>
+                                    <th>Price Average</th>
+                                    <th>Weight Production</th>
+                                    <th>Cost Production</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="productionCogsTable"></tbody>
+                        </table>
+
+                        <div class="text-end mt-3">
+                            <h4 class="text-warning">
+                                Total Cost :
+                                <span id="productionCogsTotal"></span>
+                            </h4>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- PURCHASING -->
+                <div id="purchasing" class="menu-page">
+                    <div class="card-custom">
                         <h3 class="text-warning mb-4">
                             <i class="fa-solid fa-cart-shopping"></i>
                             Purchasing Bahan Baku
                         </h3>
-
                         <div class="row">
-
                             <!-- BAHAN -->
                             <div class="col-md-3">
                                 <label>Bahan Baku</label>
-
                                 <select id="purchaseMaterial" class="form-control">
-
                                 </select>
                             </div>
-
                             <!-- QTY -->
                             <div class="col-md-2">
                                 <label>Qty</label>
-
                                 <input type="number" id="purchaseQty" class="form-control" oninput="calculateAverage()">
                             </div>
-
                             <!-- SATUAN -->
                             <div class="col-md-2">
                                 <label>Satuan</label>
-
                                 <select id="purchaseUnit" class="form-control">
-
                                 </select>
                             </div>
 
@@ -504,34 +515,22 @@
 
                                 <input type="text" id="purchaseAverage" class="form-control" readonly>
                             </div>
-
                         </div>
-
                         <div class="row mt-3">
-
                             <!-- SUPPLIER -->
                             <div class="col-md-4">
-
                                 <label>Supplier</label>
-
                                 <select id="purchaseSupplier" class="form-control">
-
                                 </select>
                             </div>
-
                             <!-- TANGGAL -->
                             <div class="col-md-4">
-
                                 <label>Tanggal Pembelian</label>
-
                                 <input type="date" id="purchaseDate" class="form-control">
                             </div>
-
                             <!-- BUTTON -->
                             <div class="col-md-4 d-flex align-items-end">
-
                                 <button class="btn btn-warning w-100" onclick="savePurchase()">
-
                                     <i class="fa-solid fa-save"></i>
                                     Simpan Purchasing
                                 </button>
@@ -539,13 +538,10 @@
                         </div>
                         <!-- TABEL PURCHASING -->
                         <div class="card-custom mt-4">
-
                             <h4 class="text-warning">
                                 Data Purchasing
                             </h4>
-
                             <table class="table table-dark table-striped mt-3">
-
                                 <thead>
                                     <tr>
                                         <th>Kode</th>
@@ -564,30 +560,44 @@
                         </div>
                     </div>
                 </div>
-                <!-- PRODUKSI -->
+                <!-- PRODUKSI PAGE -->
                 <div id="produksi" class="menu-page">
-
                     <div class="card-custom">
-
-                        <h3 class="text-warning mb-3">
-                            Produksi Management
-                        </h3>
-
+                        <h3 class="text-warning">Produksi</h3>
+                        <!-- SUB MENU -->
+                        <div class="mb-3">
+                            <button class="btn btn-sm btn-warning" onclick="showProduksi('input')">Input
+                                Produksi</button>
+                            <button class="btn btn-sm btn-secondary" onclick="showProduksi('hasil')">Hasil
+                                Produksi</button>
+                            <button class="btn btn-sm btn-danger" onclick="showProduksi('waste_fg')">Waste FG</button>
+                            <button class="btn btn-sm btn-info" onclick="showProduksi('waste_bahan')">Waste
+                                Bahan</button>
+                        </div>
                         <div id="produksiContent"></div>
-
                     </div>
-
+                    <!-- LIST PRODUKSI -->
+                    <div class="card-custom mt-3">
+                        <h4>Data Produksi</h4>
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Produk</th>
+                                    <th>Qty</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productionList"></tbody>
+                        </table>
+                    </div>
                 </div>
-
                 <!-- MARKETING -->
                 <div id="marketing" class="menu-page">
-
                     <div class="card-custom">
-
                         <h4>Sales Penjualan</h4>
-
                         <table class="table table-dark table-striped mt-3">
-
                             <thead>
                                 <tr>
                                     <th>Tanggal</th>
@@ -596,7 +606,6 @@
                                     <th>Total</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 <tr>
                                     <td>14 Mei 2026</td>
@@ -606,18 +615,25 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <table class="table table-dark table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Produk</th>
+                                    <th>Qty</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marketingList"></tbody>
+                        </table>
                     </div>
                 </div>
-
                 <!-- GUDANG -->
                 <div id="gudang" class="menu-page">
-
                     <div class="card-custom">
-
                         <h4>Stok Gudang</h4>
-
                         <table class="table table-dark table-striped mt-3">
-
                             <thead>
                                 <tr>
                                     <th>Barang</th>
@@ -636,16 +652,11 @@
                         </table>
                     </div>
                 </div>
-
                 <!-- ACCOUNTING -->
                 <div id="accounting" class="menu-page">
-
                     <div class="card-custom">
-
                         <h4>Accounting</h4>
-
                         <table class="table table-dark table-striped mt-3">
-
                             <thead>
                                 <tr>
                                     <th>Keterangan</th>
@@ -673,12 +684,11 @@
                 </div>
             </div>
         </div>
-
         <script type="module">
 
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
             const firebaseConfig = {
                 apiKey: "AIzaSyCqmojmZagGLMpxpemlhf3L0u42lShW6NM",
@@ -695,37 +705,26 @@
             const db = getFirestore(app);
 
             /* ================= SESSION LOGIN ================= */
-
             onAuthStateChanged(auth, (user) => {
-
                 if (user) {
 
                     document.getElementById('loginPage').style.display = 'none';
-
                     document.getElementById('dashboardPage').style.display = 'block';
-
                     document.getElementById('userEmail').innerHTML = user.email;
-
                     startIdleTimer();
 
                 } else {
 
                     document.getElementById('dashboardPage').style.display = 'none';
-
                     document.getElementById('loginPage').style.display = 'flex';
                 }
-
             });
             /* ================= AUTO LOGOUT ================= */
 
             let idleTimer;
-
             function resetIdleTimer() {
-
                 clearTimeout(idleTimer);
-
                 idleTimer = setTimeout(async () => {
-
                     Swal.fire({
                         icon: 'warning',
                         title: 'Session Expired',
@@ -733,7 +732,6 @@
                     });
 
                     await logout();
-
                 }, 30 * 60 * 1000); // 30 menit
             }
 
@@ -747,17 +745,15 @@
                     "scroll",
                     "touchstart"
                 ];
-
                 events.forEach(event => {
-
                     document.addEventListener(event, resetIdleTimer);
                 });
-
                 resetIdleTimer();
             }
 
             let currentMaster = "";
             let recipeItems = [];
+            let forecastSource = "forecast";
 
             /* ================= LOGIN ================= */
             async function login() {
@@ -776,18 +772,13 @@
                     document.getElementById('error').innerHTML = error.message;
                 }
             }
-
             async function logout() {
 
                 clearTimeout(idleTimer);
-
                 await signOut(auth);
-
                 document.getElementById('dashboardPage').style.display = 'none';
-
                 document.getElementById('loginPage').style.display = 'flex';
             }
-
             /* ================= MASTER MENU ================= */
             function toggleMaster() {
                 const menu = document.getElementById("masterSubMenu");
@@ -795,9 +786,7 @@
             }
 
             async function showMaster(type) {
-
                 currentMaster = type;
-
                 let html = "";
 
                 /* ================= SATUAN ================= */
@@ -808,29 +797,21 @@
         <h4 class="mb-3 text-warning">
             Master Satuan
         </h4>
-
         <div class="row mb-3">
-
             <div class="col-md-8">
                 <input type="text"
                     id="unitName"
                     class="form-control"
                     placeholder="Contoh : Kg, Gram, Pcs, Liter">
             </div>
-
             <div class="col-md-4">
                 <button class="btn btn-warning w-100"
                     onclick="addUnit()">
-
                     Simpan Satuan
-
                 </button>
             </div>
-
         </div>
-
         <table class="table table-dark table-striped">
-
             <thead>
                 <tr>
                     <th>Kode</th>
@@ -838,9 +819,7 @@
                     <th>Aksi</th>
                 </tr>
             </thead>
-
             <tbody id="unitList"></tbody>
-
         </table>
         `;
                 }
@@ -853,41 +832,31 @@
         <h4 class="mb-3 text-warning">
             Master Supplier
         </h4>
-
         <div class="row">
-
             <div class="col-md-4">
                 <input type="text"
                     id="supplierName"
                     class="form-control mb-2"
                     placeholder="Nama Supplier">
             </div>
-
             <div class="col-md-4">
                 <input type="text"
                     id="supplierAddress"
                     class="form-control mb-2"
                     placeholder="Alamat">
             </div>
-
             <div class="col-md-4">
                 <input type="text"
                     id="supplierPhone"
                     class="form-control mb-2"
                     placeholder="Nomor Telepon">
             </div>
-
         </div>
-
         <button class="btn btn-warning w-100 mb-3"
             onclick="addSupplier()">
-
             Simpan Supplier
-
         </button>
-
         <table class="table table-dark table-striped">
-
             <thead>
                 <tr>
                     <th>Kode</th>
@@ -897,9 +866,7 @@
                     <th>Aksi</th>
                 </tr>
             </thead>
-
             <tbody id="supplierList"></tbody>
-
         </table>
         `;
                 }
@@ -912,43 +879,31 @@
         <h4 class="mb-3 text-warning">
             Master Bahan Baku
         </h4>
-
         <div class="row">
-
             <div class="col-md-4">
                 <input type="text"
                     id="materialName"
                     class="form-control mb-2"
                     placeholder="Nama Bahan">
             </div>
-
             <div class="col-md-4">
                 <select id="materialUnit"
                     class="form-control mb-2">
-
                     <option value="">Pilih Satuan</option>
-
                 </select>
             </div>
-
             <div class="col-md-4">
                 <input type="number"
                     id="materialPrice"
                     class="form-control mb-2"
                     placeholder="Harga">
             </div>
-
         </div>
-
         <button class="btn btn-warning w-100 mb-3"
             onclick="addMaterial()">
-
             Simpan Bahan
-
         </button>
-
         <table class="table table-dark table-striped">
-
             <thead>
                 <tr>
                     <th>Kode</th>
@@ -958,9 +913,7 @@
                     <th>Aksi</th>
                 </tr>
             </thead>
-
             <tbody id="materialList"></tbody>
-
         </table>
         `;
                 }
@@ -986,57 +939,61 @@
                 const name = document.getElementById("unitName").value;
                 if (!name) return alert("Wajib isi");
 
-                const snap = await getDocs(collection(db, "units"));
-                const code = "UNT-" + Date.now();
-
+                const code = await generateCode("units", "UNT");
                 await addDoc(collection(db, "units"), {
                     code, name, createdAt: serverTimestamp()
                 });
 
                 await loadUnits();
             }
+            /* ================= AUTO NUMBER CODE ================= */
 
+            async function generateCode(collectionName, prefix) {
+
+                const q = query(
+                    collection(db, collectionName),
+                    orderBy("code", "desc")
+                );
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    return prefix + "001";
+                }
+                const lastCode = snap.docs[0].data().code;
+
+                const lastNumber = parseInt(
+                    lastCode.replace(prefix, "")
+                );
+                const newNumber = lastNumber + 1;
+                return prefix + String(newNumber).padStart(3, "0");
+            }
             async function loadUnits() {
-
-                const snap = await getDocs(collection(db, "units"));
-
+                const q = query(
+                    collection(db, "units"),
+                    orderBy("code", "asc")
+                );
+                const snap = await getDocs(q);
                 let html = "";
-
                 snap.forEach(d => {
-
                     html += `
         <tr>
-
             <td>${d.data().code}</td>
-
             <td>${d.data().name}</td>
-
             <td width="120">
-
                 <button
                     class="btn btn-danger btn-sm w-100"
                     onclick="deleteUnit('${d.id}')">
-
                     Hapus
-
                 </button>
-
             </td>
-
         </tr>
         `;
                 });
-
                 const el = document.getElementById("unitList");
-
                 if (el) el.innerHTML = html;
             }
             async function deleteUnit(id) {
-
                 const confirmDelete = confirm("Hapus data satuan ?");
-
                 if (!confirmDelete) return;
-
                 try {
                     await deleteDoc(doc(db, "units", id));
                     await loadUnits();
@@ -1044,192 +1001,158 @@
                     alert("Gagal hapus data");
                 }
                 loadUnits();
-
                 alert("Data berhasil dihapus");
             }
 
             /* ================= SUPPLIER ================= */
             async function addSupplier() {
-
                 const name = document.getElementById("supplierName").value;
                 const address = document.getElementById("supplierAddress").value;
                 const phone = document.getElementById("supplierPhone").value;
-
                 if (!name || !address || !phone) {
                     alert("Lengkapi data supplier");
                     return;
                 }
-
                 // ambil jumlah data supplier
-                const snap = await getDocs(collection(db, "suppliers"));
+                const q = query(
+                    collection(db, "suppliers"),
+                    orderBy("code", "asc")
+                );
 
+                const snap = await getDocs(q);
                 // generate kode otomatis
-                const code = genCode("SUP", snap.size);
-
+                const code = await generateCode("suppliers", "SUP");
                 await addDoc(collection(db, "suppliers"), {
 
                     code,
                     name,
                     address,
                     phone,
-
                     createdAt: serverTimestamp()
-
                 });
-
                 // reset form
                 document.getElementById("supplierName").value = "";
                 document.getElementById("supplierAddress").value = "";
                 document.getElementById("supplierPhone").value = "";
-
                 loadSuppliers();
-
                 alert("Supplier berhasil disimpan");
             }
-
             async function loadSuppliers() {
+                const q = query(
+                    collection(db, "suppliers"),
+                    orderBy("code", "asc")
+                );
 
-                const snap = await getDocs(collection(db, "suppliers"));
-
+                const snap = await getDocs(q);
                 let html = "";
-
                 snap.forEach(d => {
-
                     html += `
         <tr>
-
             <td>${d.data().code}</td>
             <td>${d.data().name}</td>
             <td>${d.data().address}</td>
             <td>${d.data().phone}</td>
-
             <td width="120">
-
                 <button
                     class="btn btn-danger btn-sm w-100"
                     onclick="deleteSupplier('${d.id}')">
-
                     Hapus
-
                 </button>
-
             </td>
-
         </tr>
         `;
                 });
 
                 const el = document.getElementById("supplierList");
-
                 if (el) el.innerHTML = html;
             }
             async function deleteSupplier(id) {
-
                 const confirmDelete = confirm("Hapus supplier ?");
-
                 if (!confirmDelete) return;
-
                 await deleteDoc(doc(db, "suppliers", id));
-
                 loadSuppliers();
-
                 alert("Supplier berhasil dihapus");
             }
             /* ================= BAHAN ================= */
             async function addMaterial() {
-
                 const name = document.getElementById("materialName").value;
-
                 const unit = document.getElementById("materialUnit").value;
-
                 const price = document.getElementById("materialPrice").value;
-
                 if (!name || !unit || !price) {
                     alert("Lengkapi data bahan");
                     return;
                 }
 
                 // hitung jumlah bahan
-                const snap = await getDocs(collection(db, "materials"));
+                const q = query(
+                    collection(db, "materials"),
+                    orderBy("code", "asc")
+                );
+
+                const snap = await getDocs(q);
 
                 // generate kode
-                const code = genCode("MAT", snap.size);
-
+                const code = await generateCode("materials", "MAT");
                 await addDoc(collection(db, "materials"), {
-
                     code,
                     name,
                     unit,
                     price,
-
                     createdAt: serverTimestamp()
-
                 });
 
                 // reset
                 document.getElementById("materialName").value = "";
                 document.getElementById("materialPrice").value = "";
-
                 loadMaterials();
-
                 alert("Bahan berhasil disimpan");
             }
 
             async function loadMaterials() {
+                const q = query(
+                    collection(db, "materials"),
+                    orderBy("code", "asc")
+                );
 
-                const snap = await getDocs(collection(db, "materials"));
-
+                const snap = await getDocs(q);
                 let html = "";
-
                 snap.forEach(d => {
-
                     html += `
         <tr>
-
             <td>${d.data().code}</td>
-
             <td>${d.data().name}</td>
-
             <td>${d.data().unit}</td>
-
             <td>
                 Rp ${Number(d.data().price).toLocaleString()}
             </td>
-
             <td width="120">
-
                 <button
                     class="btn btn-danger btn-sm w-100"
                     onclick="deleteMaterial('${d.id}')">
-
                     Hapus
-
                 </button>
-
             </td>
-
         </tr>
         `;
                 });
 
                 const el = document.getElementById("materialList");
-
                 if (el) el.innerHTML = html;
             }
             async function deleteMaterial(id) {
-
                 const confirmDelete = confirm("Hapus bahan baku ?");
-
                 if (!confirmDelete) return;
-
                 await deleteDoc(doc(db, "materials", id));
-
                 loadMaterials();
-
                 alert("Bahan berhasil dihapus");
             }
             async function loadUnitOptions() {
-                const snap = await getDocs(collection(db, "units"));
+                const q = query(
+                    collection(db, "units"),
+                    orderBy("code", "asc")
+                );
+
+                const snap = await getDocs(q);
                 let html = `<option value="">Pilih Satuan</option>`;
                 snap.forEach(d => {
                     html += `
@@ -1240,36 +1163,35 @@
                 });
 
                 const el = document.getElementById("materialUnit");
-
                 if (el) el.innerHTML = html;
             }
 
             /* ================= RECIPE ================= */
             async function showProductionRecipe() {
-
                 showPage('forecastproduk');
-
                 recipeItems = [];
-
                 document.getElementById("recipeTable").innerHTML = "";
-
                 // generate kode otomatis
-                const snap = await getDocs(collection(db, "products"));
+                const q = query(
+                    collection(db, "products"),
+                    orderBy("code", "asc")
+                );
 
-                const code = genCode("KUE", snap.size);
-
+                const snap = await getDocs(q);
+                const code = genCode("PKMB", snap.size);
                 document.getElementById("recipeCode").value = code;
-
                 loadRecipeMaterials();
                 loadRecipeUnits();
                 loadForecast();
             }
             async function loadRecipeMaterials() {
+                const q = query(
+                    collection(db, "materials"),
+                    orderBy("code", "asc")
+                );
 
-                const snap = await getDocs(collection(db, "materials"));
-
+                const snap = await getDocs(q);
                 let html = "";
-
                 snap.forEach(d => {
 
                     html += `
@@ -1282,13 +1204,13 @@
                 document.getElementById("recipeMaterial").innerHTML = html;
             }
             async function loadRecipeUnits() {
-
-                const snap = await getDocs(collection(db, "units"));
-
+                const q = query(
+                    collection(db, "units"),
+                    orderBy("code", "asc")
+                );
+                const snap = await getDocs(q);
                 let html = "";
-
                 snap.forEach(d => {
-
                     html += `
         <option value="${d.data().name}">
             ${d.data().name}
@@ -1299,23 +1221,16 @@
                 document.getElementById("recipeUnit").innerHTML = html;
             }
             function addRecipeItem() {
-
                 const material =
                     document.getElementById("recipeMaterial").value;
-
                 const qty =
                     document.getElementById("recipeQty").value;
-
                 const unit =
                     document.getElementById("recipeUnit").value;
-
                 if (!material || !qty || !unit) {
-
                     alert("Lengkapi data bahan");
-
                     return;
                 }
-
                 recipeItems.push({
                     material,
                     qty,
@@ -1333,13 +1248,16 @@
 
                     html += `
         <tr>
-
             <td>${item.material}</td>
-
             <td>${item.qty}</td>
-
             <td>${item.unit}</td>
 
+            <td width="120">
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteRecipeItem(${index})">
+                    Hapus
+                </button>
+            </td>
         </tr>
         `;
                 });
@@ -1347,10 +1265,8 @@
                 document.getElementById("recipeTable").innerHTML = html;
             }
             async function saveRecipe() {
-
                 const code = document.getElementById("recipeCode").value;
                 const name = document.getElementById("recipeProductName").value;
-
                 if (!name) {
 
                     alert("Nama produk wajib diisi");
@@ -1362,14 +1278,12 @@
                     code,
                     name,
                     createdAt: serverTimestamp()
-
                 });
 
                 // save detail recipe
                 for (const item of recipeItems) {
 
                     await addDoc(collection(db, "product_recipes"), {
-
                         productCode: code,
                         productName: name,
                         material: item.material,
@@ -1392,33 +1306,35 @@
                 loadForecast();
             }
             async function loadForecast() {
-                const snap = await getDocs(collection(db, "products"));
+
+                const productSnap = await getDocs(
+                    query(collection(db, "products"), orderBy("code", "asc"))
+                );
+
+                const recipeSnap = await getDocs(
+                    collection(db, "product_recipes")
+                );
+
+                const recipes = recipeSnap.docs.map(d => d.data());
 
                 let html = "";
 
-                for (const docItem of snap.docs) {
+                for (const productDoc of productSnap.docs) {
 
-                    const data = docItem.data();
+                    const product = productDoc.data();
 
-                    // hitung jumlah recipe item
-                    const recipeSnap = await getDocs(collection(db, "product_recipes"));
-
-                    let count = 0;
-
-                    recipeSnap.forEach(r => {
-                        if (r.data().productCode === data.code) {
-                            count++;
-                        }
-                    });
+                    const count = recipes.filter(r =>
+                        r.productCode === product.code
+                    ).length;
 
                     html += `
         <tr>
-            <td>${data.code}</td>
-            <td>${data.name}</td>
+            <td>${product.code}</td>
+            <td>${product.name}</td>
             <td>${count} bahan</td>
             <td>
                 <button class="btn btn-info btn-sm"
-                    onclick="viewForecast('${data.code}')">
+                    onclick="viewForecast('${product.code}')">
                     Detail
                 </button>
             </td>
@@ -1430,14 +1346,11 @@
                 if (el) el.innerHTML = html;
             }
             async function viewForecast(code) {
-
+                forecastSource = "forecast";
                 showPage('forecastdetail');
-
                 // ambil produk
                 const productSnap = await getDocs(collection(db, "products"));
-
                 let productName = "";
-
                 productSnap.forEach(d => {
 
                     if (d.data().code === code) {
@@ -1456,11 +1369,10 @@
                 const materialSnap =
                     await getDocs(collection(db, "materials"));
 
-                let html = "";
                 let grandTotal = 0;
+                let rows = [];
 
                 recipeSnap.forEach(recipe => {
-
                     const r = recipe.data();
 
                     if (r.productCode === code) {
@@ -1469,66 +1381,64 @@
                         let materialPrice = 0;
 
                         materialSnap.forEach(mat => {
-
                             const m = mat.data();
 
-                            if (m.name === r.material) {
-
+                            if (
+                                m.name?.toLowerCase().trim() ===
+                                r.material?.toLowerCase().trim()
+                            ) {
                                 materialCode = m.code;
-
                                 materialPrice = Number(m.price);
                             }
                         });
 
-                        // hitung harga
-                        const qty = Number(r.qty);
-
+                        const qty = Number(r.qty || 0);
                         const totalPrice = qty * materialPrice;
 
                         grandTotal += totalPrice;
 
-                        html += `
-            <tr>
-
-                <td>${materialCode}</td>
-
-                <td>${r.material}</td>
-
-                <td>${qty}</td>
-
-                <td>${r.unit}</td>
-
-                <td>
-                    Rp ${totalPrice.toLocaleString()}
-                </td>
-
-            </tr>
-            `;
+                        rows.push({
+                            code: materialCode || "UNKNOWN",
+                            html: `
+<tr>
+    <td>${materialCode}</td>
+    <td>${r.material}</td>
+    <td>${qty}</td>
+    <td>${r.unit}</td>
+    <td>Rp ${totalPrice.toLocaleString()}</td>
+</tr>
+`
+                        });
                     }
                 });
 
-                document.getElementById("forecastDetailTable").innerHTML = html;
+                rows.sort((a, b) =>
+                    (a.code || "").localeCompare(b.code || "")
+                );
 
+                let html = "";
+                rows.forEach(r => html += r.html);
+
+                document.getElementById("forecastDetailTable").innerHTML = html;
                 document.getElementById("forecastTotal").innerHTML =
                     `Rp ${grandTotal.toLocaleString()}`;
             }
 
             function backForecast() {
-                showPage('forecastproduk');
+                if (forecastSource === "produksi") {
+                    showPage("produksi");
+                } else {
+                    showPage("forecastproduk");
+                }
             }
             /* ================= PURCHASING ================= */
-
             async function loadPurchaseOptions() {
-
                 // LOAD MATERIAL
                 const materialSnap =
                     await getDocs(collection(db, "materials"));
-
                 let materialHtml =
                     `<option value="">Pilih Bahan</option>`;
-
                 materialSnap.forEach(d => {
-
                     materialHtml += `
         <option value="${d.data().name}">
             ${d.data().name}
@@ -1538,108 +1448,79 @@
 
                 document.getElementById("purchaseMaterial").innerHTML =
                     materialHtml;
-
                 // LOAD UNIT
                 const unitSnap =
                     await getDocs(collection(db, "units"));
-
                 let unitHtml =
                     `<option value="">Pilih Satuan</option>`;
-
                 unitSnap.forEach(d => {
-
                     unitHtml += `
         <option value="${d.data().name}">
             ${d.data().name}
         </option>
         `;
                 });
-
                 document.getElementById("purchaseUnit").innerHTML =
                     unitHtml;
-
                 // LOAD SUPPLIER
-                const supplierSnap =
-                    await getDocs(collection(db, "suppliers"));
-
+                const q = query(
+                    collection(db, "suppliers"),
+                    orderBy("code", "asc")
+                );
+                const snap = await getDocs(q);
                 let supplierHtml =
                     `<option value="">Pilih Supplier</option>`;
-
-                supplierSnap.forEach(d => {
-
+                snap.forEach(d => {
                     supplierHtml += `
         <option value="${d.data().name}">
             ${d.data().name}
         </option>
         `;
                 });
-
                 document.getElementById("purchaseSupplier").innerHTML =
                     supplierHtml;
             }
-
             /* ================= HITUNG AVERAGE ================= */
-
             function calculateAverage() {
-
                 const qty =
                     Number(document.getElementById("purchaseQty").value);
-
                 const price =
                     Number(document.getElementById("purchasePrice").value);
-
                 if (qty <= 0 || price <= 0) {
-
                     document.getElementById("purchaseAverage").value = "";
-
                     return;
                 }
-
                 const average = price / qty;
-
                 document.getElementById("purchaseAverage").value =
                     average.toFixed(2);
             }
 
             /* ================= SAVE PURCHASING ================= */
-
             async function savePurchase() {
-
                 const material =
                     document.getElementById("purchaseMaterial").value;
-
                 const qty =
                     document.getElementById("purchaseQty").value;
-
                 const unit =
                     document.getElementById("purchaseUnit").value;
-
                 const price =
                     document.getElementById("purchasePrice").value;
-
                 const average =
                     document.getElementById("purchaseAverage").value;
-
                 const supplier =
                     document.getElementById("purchaseSupplier").value;
-
                 const date =
                     document.getElementById("purchaseDate").value;
-
                 if (!material || !qty || !unit || !price || !supplier || !date) {
-
                     alert("Lengkapi data purchasing");
-
                     return;
                 }
 
                 // GENERATE CODE
                 const snap =
                     await getDocs(collection(db, "purchasing"));
-
                 const code =
                     genCode("PUR", snap.size);
-
                 await addDoc(collection(db, "purchasing"), {
 
                     code,
@@ -1666,23 +1547,15 @@
             }
 
             /* ================= LOAD PURCHASING ================= */
-
             async function loadPurchases() {
-
                 const snap =
                     await getDocs(collection(db, "purchasing"));
-
                 const materialSnap =
                     await getDocs(collection(db, "materials"));
-
                 let html = "";
-
                 snap.forEach(d => {
-
                     const data = d.data();
-
                     let materialCode = "";
-
                     materialSnap.forEach(m => {
 
                         if (m.data().name === data.material) {
@@ -1693,39 +1566,25 @@
 
                     html += `
         <tr>
-
             <td>${materialCode}</td>
-
             <td>${data.material}</td>
-
             <td>${data.qty}</td>
-
             <td>${data.unit}</td>
-
             <td>
                 Rp ${Number(data.price).toLocaleString()}
             </td>
-
             <td>
                 Rp ${Number(data.average).toLocaleString()}
             </td>
-
             <td>${data.supplier}</td>
-
             <td>${data.date}</td>
-
             <td width="100">
-
                 <button
                     class="btn btn-danger btn-sm w-100"
                     onclick="deletePurchase('${d.id}')">
-
                     Hapus
-
                 </button>
-
             </td>
-
         </tr>
         `;
                 });
@@ -1735,32 +1594,26 @@
             }
 
             /* ================= DELETE ================= */
-
             async function deletePurchase(id) {
-
                 const confirmDelete =
                     confirm("Hapus purchasing ?");
-
                 if (!confirmDelete) return;
-
                 await deleteDoc(doc(db, "purchasing", id));
-
                 loadPurchases();
-
                 alert("Purchasing berhasil dihapus");
             }
-
             function loadAll() {
                 loadUnits();
                 loadSuppliers();
                 loadMaterials();
             }
 
-            /* ================= LOAD PURCHASING ================= */
+            /* ================= LOAD PRODUKSI ================= */
             function toggleProduksi() {
                 const menu = document.getElementById("produksiSubMenu");
                 menu.style.display = (menu.style.display === "block") ? "none" : "block";
             }
+
             function showProduksi(type) {
 
                 let html = "";
@@ -1768,33 +1621,33 @@
                 if (type === "input") {
 
                     html = `
-            <h4>Input Produksi</h4>
+    <h4 class="text-warning">Input Produksi</h4>
 
-            <div class="row">
+    <div class="row">
 
-                <div class="col-md-4">
-                    <label>Produk</label>
-                    <select class="form-control"></select>
-                </div>
+        <div class="col-md-4">
+            <label>Produk</label>
+            <select id="prodProduct" class="form-control"></select>
+        </div>
 
-                <div class="col-md-3">
-                    <label>Qty Produksi</label>
-                    <input type="number" class="form-control">
-                </div>
+        <div class="col-md-3">
+            <label>Qty Produksi</label>
+            <input type="number" id="prodQty" class="form-control">
+        </div>
 
-                <div class="col-md-3">
-                    <label>Tanggal</label>
-                    <input type="date" class="form-control">
-                </div>
+        <div class="col-md-3">
+            <label>Tanggal</label>
+            <input type="date" id="prodDate" class="form-control">
+        </div>
 
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-warning w-100">
-                        Simpan
-                    </button>
-                </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-warning w-100" onclick="saveProduction()">
+                Simpan
+            </button>
+        </div>
 
-            </div>
-        `;
+    </div>
+    `;
                 }
 
                 if (type === "hasil") {
@@ -1811,7 +1664,7 @@
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="productionResultList"></tbody>
             </table>
         `;
                 }
@@ -1829,7 +1682,7 @@
                         <th>Keterangan</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="wasteFGList"></tbody>
             </table>
         `;
                 }
@@ -1848,18 +1701,187 @@
                         <th>Keterangan</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="wasteMaterialList"></tbody>
             </table>
         `;
                 }
 
                 document.getElementById("produksiContent").innerHTML = html;
-
+                if (type === "input") {
+                    loadProductionProducts();
+                }
                 showPage("produksi");
             }
 
-            window.addEventListener("DOMContentLoaded", () => {
+            async function loadProductionProducts() {
 
+                const q = query(
+                    collection(db, "products"),
+                    orderBy("code", "asc")
+                );
+
+                const snap = await getDocs(q);
+
+                let html = `<option value="">Pilih Produk</option>`;
+
+                snap.forEach(d => {
+
+                    html += `
+            <option value="${d.data().code}">
+                ${d.data().name}
+            </option>
+        `;
+                });
+
+                document.getElementById("prodProduct").innerHTML = html;
+            }
+            async function saveProduction() {
+
+                const productCode = document.getElementById("prodProduct").value;
+                const qty = Number(document.getElementById("prodQty").value);
+                const date = document.getElementById("prodDate").value;
+
+                if (!productCode || !qty || !date) {
+                    alert("Lengkapi data");
+                    return;
+                }
+
+                // ambil nama produk
+                const productSnap = await getDocs(collection(db, "products"));
+
+                let productName = "";
+
+                productSnap.forEach(d => {
+                    if (d.data().code === productCode) {
+                        productName = d.data().name;
+                    }
+                });
+                const code = await generateCode(
+                    "production_orders",
+                    "PRD"
+                );
+
+                await addDoc(collection(db, "production_orders"), {
+                    code,
+                    productCode,
+                    productName,
+                    qtyProduction: qty,
+                    date,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("Produksi tersimpan");
+
+                loadProductionList();
+            }
+            async function loadProductionList() {
+                const q = query(
+                    collection(db, "production_orders"),
+                    orderBy("code", "asc")
+                );
+                const snap = await getDocs(q);
+                let html = "";
+                snap.forEach(d => {
+                    const data = d.data();
+                    html += `
+        <tr>
+            <td>${data.code}</td>
+            <td>${data.productName}</td>
+            <td>${data.qtyProduction}</td>
+            <td>${data.date}</td>
+            <td>
+                <button class="btn btn-info btn-sm"
+                    onclick="viewProductionDetail('${data.productCode}','${data.productName}',${data.qtyProduction})">
+                    Detail
+                </button>
+            </td>
+        </tr>
+        `;
+                });
+
+                document.getElementById("productionList").innerHTML = html;
+            }
+            async function viewProductionDetail(code, name, qtyProd) {
+
+                forecastSource = "produksi";
+                showPage("productioncogs");
+
+                document.getElementById("productionCogsTitle").innerHTML =
+                    `COGS Produksi : ${name} | Qty : ${qtyProd}`;
+
+                const recipeSnap =
+                    await getDocs(collection(db, "product_recipes"));
+
+                const materialSnap = await getDocs(
+                    query(collection(db, "materials"), orderBy("code", "asc"))
+                );
+
+                let html = "";
+                let grandTotal = 0;
+
+                materialSnap.forEach(m => {
+
+                    const material = m.data();
+
+                    const recipe = recipeSnap.docs
+                        .map(r => r.data())
+                        .find(r =>
+                            r.productCode === code &&
+                            r.material === material.name
+                        );
+
+                    if (!recipe) return;
+
+                    const recipeQty = Number(recipe.qty);
+                    const materialPrice = Number(material.price);
+
+                    const totalMaterialQty = recipeQty * qtyProd;
+                    const totalCost = totalMaterialQty * materialPrice;
+
+                    grandTotal += totalCost;
+
+                    html += `
+                <tr>
+                    <td>${material.code}</td>
+                    <td>${material.name}</td>
+                    <td>${material.unit || "-"}</td>
+                    <td>${recipeQty}</td>
+                    <td>${materialPrice}</td>
+                    <td>${totalMaterialQty}</td>
+                    <td>${totalCost.toLocaleString()}</td>
+                </tr>
+                `;
+                });
+
+                document.getElementById("productionCogsTable").innerHTML = html;
+                document.getElementById("productionCogsTotal").innerHTML =
+                    `Rp ${grandTotal.toLocaleString()}`;
+            }
+            function backProduction() {
+                showPage('produksi');
+            }
+            function showPage(pageId) {
+                document.querySelectorAll('.menu-page')
+                    .forEach(page => page.classList.remove('active-page'));
+
+                const el = document.getElementById(pageId);
+                if (el) {
+                    el.classList.add('active-page');
+                } else {
+                    console.error("Page tidak ditemukan:", pageId);
+                }
+            }
+
+            function deleteRecipeItem(index) {
+
+                recipeItems.splice(index, 1);
+
+                renderRecipeTable();
+            }
+
+            window.addEventListener("DOMContentLoaded", () => {
+                loadProductionProducts();
+                loadProductionList();
                 loadAll();
                 loadForecast();
                 loadPurchaseOptions();
@@ -1888,6 +1910,7 @@
             window.showProductionRecipe = showProductionRecipe;
             window.addRecipeItem = addRecipeItem;
             window.saveRecipe = saveRecipe;
+            window.deleteRecipeItem = deleteRecipeItem;
             window.viewForecast = viewForecast;
             window.backForecast = backForecast;
             window.calculateAverage = calculateAverage;
@@ -1896,6 +1919,11 @@
 
             window.toggleProduksi = toggleProduksi;
             window.showProduksi = showProduksi;
+            window.saveProduction = saveProduction;
+            window.loadProductionList = loadProductionList;
+            window.viewProductionDetail = viewProductionDetail;
+            window.loadProductionProducts = loadProductionProducts;
+            window.backProduction = backProduction;
 
         </script>
 
@@ -1993,12 +2021,10 @@
 
             function updateDateTime() {
                 const now = new Date();
-
                 const hariList = [
                     "Minggu", "Senin", "Selasa", "Rabu",
                     "Kamis", "Jumat", "Sabtu"
                 ];
-
                 const hari = hariList[now.getDay()];
                 const tanggal = now.toLocaleDateString('id-ID', {
                     year: 'numeric',
