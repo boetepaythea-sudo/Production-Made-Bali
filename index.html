@@ -105,6 +105,10 @@
                 display: block;
             }
 
+            .menu-page.active-page {
+                display: block;
+            }
+
             .app-logo {
                 height: 110px;
                 object-fit: contain;
@@ -198,16 +202,16 @@
                 </a>
 
                 <div id="produksiSubMenu" style="display:none; padding-left:20px;">
-                    <a href="#" onclick="showProduksi('input')">
+                    <a href="#" onclick="showPage('produksi_input')">
                         - Input Produksi
                     </a>
-                    <a href="#" onclick="showProduksi('hasil')">
+                    <a href="#" onclick="showPage('produksi_hasil'); loadProductionResult()">
                         - Hasil Produksi
                     </a>
-                    <a href="#" onclick="showProduksi('waste_fg')">
+                    <a href="#" onclick="showPage('produksi_waste_fg'); loadWasteFG()">
                         - Waste FG
                     </a>
-                    <a href="#" onclick="showProduksi('waste_bahan')">
+                    <a href="#" onclick="showPage('produksi_waste_bahan'); loadWasteMaterial()">
                         - Waste Bahan Baku
                     </a>
                 </div>
@@ -441,15 +445,12 @@
                             <h3 class="text-warning">
                                 Detail COGS Produksi
                             </h3>
-
                             <button class="btn btn-secondary" onclick="backProduction()">
                                 <i class="fa fa-arrow-left"></i>
                                 Back
                             </button>
                         </div>
-
                         <h4 id="productionCogsTitle"></h4>
-
                         <table class="table table-dark table-striped mt-4">
                             <thead>
                                 <tr>
@@ -462,17 +463,14 @@
                                     <th>Cost Production</th>
                                 </tr>
                             </thead>
-
                             <tbody id="productionCogsTable"></tbody>
                         </table>
-
                         <div class="text-end mt-3">
                             <h4 class="text-warning">
                                 Total Cost :
                                 <span id="productionCogsTotal"></span>
                             </h4>
                         </div>
-
                     </div>
                 </div>
                 <!-- PURCHASING -->
@@ -560,22 +558,33 @@
                         </div>
                     </div>
                 </div>
-                <!-- PRODUKSI PAGE -->
-                <div id="produksi" class="menu-page">
+                <!-- PRODUKSI -->
+                <div id="produksi_input" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-warning">Produksi</h3>
-                        <!-- SUB MENU -->
-                        <div class="mb-3">
-                            <button class="btn btn-sm btn-warning" onclick="showProduksi('input')">Input
-                                Produksi</button>
-                            <button class="btn btn-sm btn-secondary" onclick="showProduksi('hasil')">Hasil
-                                Produksi</button>
-                            <button class="btn btn-sm btn-danger" onclick="showProduksi('waste_fg')">Waste FG</button>
-                            <button class="btn btn-sm btn-info" onclick="showProduksi('waste_bahan')">Waste
-                                Bahan</button>
+                        <h3 class="text-warning">
+                            Input Produksi
+                        </h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Produk</label>
+                                <select id="prodProduct" class="form-control"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Qty Produksi</label>
+                                <input type="number" id="prodQty" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Tanggal</label>
+                                <input type="date" id="prodDate" class="form-control">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="saveProduction()">
+                                    Simpan
+                                </button>
+                            </div>
                         </div>
-                        <div id="produksiContent"></div>
                     </div>
+
                     <!-- LIST PRODUKSI -->
                     <div class="card-custom mt-3">
                         <h4>Data Produksi</h4>
@@ -590,6 +599,103 @@
                                 </tr>
                             </thead>
                             <tbody id="productionList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="produksi_hasil" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-success">Hasil Produksi</h3>
+                        <!-- INPUT -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label>Produk (dari Produksi Order)</label>
+                                <select id="resProduct" class="form-control"></select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>FG PCS</label>
+                                <input type="number" id="resFgPcs" class="form-control">
+                            </div>
+                            <div class="col-md-2">
+                                <label>FG BOX</label>
+                                <input type="number" id="resFgBox" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Tanggal Produksi</label>
+                                <input type="date" id="resDate" class="form-control">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="saveProductionResult()">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FILTER -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <input type="date" id="filterFrom" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" id="filterTo" class="form-control">
+                            </div>
+
+                            <div class="col-md-2">
+                                <button class="btn btn-info w-100" onclick="loadProductionResult()">
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
+                        <!-- TABLE -->
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Kode Produk</th>
+                                    <th>Nama Produk</th>
+                                    <th>FG PCS</th>
+                                    <th>FG BOX</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productionResultList"></tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <div id="produksi_waste_fg" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-danger">
+                            Waste Finished Goods
+                        </h3>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Qty Waste</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wasteFGList"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="produksi_waste_bahan" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-info">
+                            Waste Bahan Baku
+                        </h3>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Bahan</th>
+                                    <th>Qty Waste</th>
+                                    <th>Supplier</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wasteMaterialList"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1608,7 +1714,7 @@
                 loadMaterials();
             }
 
-            /* ================= LOAD PRODUKSI ================= */
+            /* ================= PRODUKSI ================= */
             function toggleProduksi() {
                 const menu = document.getElementById("produksiSubMenu");
                 menu.style.display = (menu.style.display === "block") ? "none" : "block";
@@ -1616,64 +1722,110 @@
 
             function showProduksi(type) {
 
-                let html = "";
+                document.querySelectorAll(".produksi-subpage")
+                    .forEach(el => el.style.display = "none");
 
+                let targetId = "";
+
+                /* ================= INPUT PRODUKSI ================= */
                 if (type === "input") {
 
-                    html = `
-    <h4 class="text-warning">Input Produksi</h4>
+                    targetId = "produksi_input";
 
-    <div class="row">
+                    document.getElementById(targetId).innerHTML = `
+            <h4 class="text-warning">Input Produksi</h4>
 
-        <div class="col-md-4">
-            <label>Produk</label>
-            <select id="prodProduct" class="form-control"></select>
-        </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Produk</label>
+                    <select id="prodProduct" class="form-control"></select>
+                </div>
 
-        <div class="col-md-3">
-            <label>Qty Produksi</label>
-            <input type="number" id="prodQty" class="form-control">
-        </div>
+                <div class="col-md-3">
+                    <label>Qty Produksi</label>
+                    <input type="number" id="prodQty" class="form-control">
+                </div>
 
-        <div class="col-md-3">
-            <label>Tanggal</label>
-            <input type="date" id="prodDate" class="form-control">
-        </div>
+                <div class="col-md-3">
+                    <label>Tanggal</label>
+                    <input type="date" id="prodDate" class="form-control">
+                </div>
 
-        <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-warning w-100" onclick="saveProduction()">
-                Simpan
-            </button>
-        </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-warning w-100" onclick="saveProduction()">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        `;
 
-    </div>
-    `;
+                    requestAnimationFrame(() => {
+                        loadProductionProducts();
+                    });
                 }
 
+                /* ================= HASIL PRODUKSI ================= */
                 if (type === "hasil") {
 
-                    html = `
+                    targetId = "produksi_hasil";
+
+                    document.getElementById(targetId).innerHTML = `
             <h4>Hasil Produksi</h4>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label>Produk</label>
+                    <select id="resProduct" class="form-control"></select>
+                </div>
+
+                <div class="col-md-2">
+                    <label>FG PCS</label>
+                    <input type="number" id="resFgPcs" class="form-control">
+                </div>
+
+                <div class="col-md-2">
+                    <label>FG BOX</label>
+                    <input type="number" id="resFgBox" class="form-control">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Tanggal</label>
+                    <input type="date" id="resDate" class="form-control">
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-warning w-100" onclick="saveProductionResult()">
+                        Save
+                    </button>
+                </div>
+            </div>
 
             <table class="table table-dark table-striped">
                 <thead>
                     <tr>
-                        <th>Produk</th>
-                        <th>Qty</th>
+                        <th>Kode Produk</th>
+                        <th>Nama Produk</th>
+                        <th>FG PCS</th>
+                        <th>FG BOX</th>
                         <th>Tanggal</th>
-                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="productionResultList"></tbody>
             </table>
         `;
+
+                    setTimeout(async () => {
+                        await loadProductionOrdersToResultSelect();
+                        await loadProductionResult();
+                    }, 150);
                 }
 
+                /* ================= WASTE FG ================= */
                 if (type === "waste_fg") {
-
-                    html = `
+                    targetId = "produksi_waste_fg";
+                    document.getElementById(targetId).innerHTML = `
             <h4>Waste Finished Goods</h4>
-
             <table class="table table-dark table-striped">
                 <thead>
                     <tr>
@@ -1685,11 +1837,16 @@
                 <tbody id="wasteFGList"></tbody>
             </table>
         `;
+
+                    loadWasteFG();
                 }
 
+                /* ================= WASTE BAHAN ================= */
                 if (type === "waste_bahan") {
 
-                    html = `
+                    targetId = "produksi_waste_bahan";
+
+                    document.getElementById(targetId).innerHTML = `
             <h4>Waste Bahan Baku</h4>
 
             <table class="table table-dark table-striped">
@@ -1704,63 +1861,48 @@
                 <tbody id="wasteMaterialList"></tbody>
             </table>
         `;
+
+                    loadWasteMaterial();
                 }
 
-                document.getElementById("produksiContent").innerHTML = html;
-                if (type === "input") {
-                    loadProductionProducts();
-                }
+                document.getElementById(targetId).style.display = "block";
                 showPage("produksi");
             }
 
+
+            /* ================= DROPDOWN PRODUK ================= */
             async function loadProductionProducts() {
-
-                const q = query(
-                    collection(db, "products"),
-                    orderBy("code", "asc")
-                );
-
+                const q = query(collection(db, "products"), orderBy("code", "asc"));
                 const snap = await getDocs(q);
-
+                const select = document.getElementById("prodProduct");
+                if (!select) return;
                 let html = `<option value="">Pilih Produk</option>`;
-
                 snap.forEach(d => {
-
-                    html += `
-            <option value="${d.data().code}">
-                ${d.data().name}
-            </option>
-        `;
+                    const data = d.data();
+                    html += `<option value="${data.code}">${data.name}</option>`;
                 });
-
-                document.getElementById("prodProduct").innerHTML = html;
+                select.innerHTML = html;
             }
-            async function saveProduction() {
 
+
+            /* ================= SAVE PRODUKSI ================= */
+            async function saveProduction() {
                 const productCode = document.getElementById("prodProduct").value;
                 const qty = Number(document.getElementById("prodQty").value);
                 const date = document.getElementById("prodDate").value;
-
                 if (!productCode || !qty || !date) {
                     alert("Lengkapi data");
                     return;
                 }
 
-                // ambil nama produk
-                const productSnap = await getDocs(collection(db, "products"));
-
+                const snap = await getDocs(collection(db, "products"));
                 let productName = "";
-
-                productSnap.forEach(d => {
+                snap.forEach(d => {
                     if (d.data().code === productCode) {
                         productName = d.data().name;
                     }
                 });
-                const code = await generateCode(
-                    "production_orders",
-                    "PRD"
-                );
-
+                const code = await generateCode("production_orders", "PRD");
                 await addDoc(collection(db, "production_orders"), {
                     code,
                     productCode,
@@ -1771,18 +1913,21 @@
                 });
 
                 alert("Produksi tersimpan");
-
                 loadProductionList();
             }
+
+
+            /* ================= LIST PRODUKSI ================= */
             async function loadProductionList() {
-                const q = query(
-                    collection(db, "production_orders"),
-                    orderBy("code", "asc")
-                );
+
+                const q = query(collection(db, "production_orders"), orderBy("code", "asc"));
                 const snap = await getDocs(q);
+
                 let html = "";
+
                 snap.forEach(d => {
                     const data = d.data();
+
                     html += `
         <tr>
             <td>${data.code}</td>
@@ -1790,39 +1935,76 @@
             <td>${data.qtyProduction}</td>
             <td>${data.date}</td>
             <td>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteProduction('${d.id}')">
+                    Hapus
+                </button>
+                
                 <button class="btn btn-info btn-sm"
-                    onclick="viewProductionDetail('${data.productCode}','${data.productName}',${data.qtyProduction})">
+                onclick="viewProductionDetail('${data.productCode}','${data.productName}',${data.qtyProduction})">
                     Detail
                 </button>
             </td>
         </tr>
+    `;
+                });
+                const el = document.getElementById("productionList");
+                if (el) el.innerHTML = html;
+            }
+            async function deleteProduction(id) {
+                if (!confirm("Hapus data produksi ini?")) return;
+                await deleteDoc(doc(db, "production_orders", id));
+                loadProductionList();
+            }
+
+
+            /* ================= HASIL PRODUKSI ================= */
+            async function loadProductionOrdersToResultSelect() {
+                const select = document.getElementById("resProduct");
+                if (!select) return;
+                const snap = await getDocs(
+                    query(collection(db, "production_orders"), orderBy("code", "asc"))
+                );
+
+                const map = new Map();
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (data.productCode && !map.has(data.productCode)) {
+                        map.set(data.productCode, {
+                            code: data.productCode,
+                            name: data.productName
+                        });
+                    }
+                });
+
+                let html = `<option value="">Pilih Produk</option>`;
+
+                map.forEach(p => {
+                    html += `
+            <option value="${p.code}">
+                ${p.code} - ${p.name}
+            </option>
         `;
                 });
 
-                document.getElementById("productionList").innerHTML = html;
+                select.innerHTML = html;
             }
-            async function viewProductionDetail(code, name, qtyProd) {
 
+            async function viewProductionDetail(code, name, qtyProd) {
                 forecastSource = "produksi";
                 showPage("productioncogs");
-
                 document.getElementById("productionCogsTitle").innerHTML =
                     `COGS Produksi : ${name} | Qty : ${qtyProd}`;
-
                 const recipeSnap =
                     await getDocs(collection(db, "product_recipes"));
-
                 const materialSnap = await getDocs(
                     query(collection(db, "materials"), orderBy("code", "asc"))
                 );
 
                 let html = "";
                 let grandTotal = 0;
-
                 materialSnap.forEach(m => {
-
                     const material = m.data();
-
                     const recipe = recipeSnap.docs
                         .map(r => r.data())
                         .find(r =>
@@ -1831,10 +2013,8 @@
                         );
 
                     if (!recipe) return;
-
                     const recipeQty = Number(recipe.qty);
                     const materialPrice = Number(material.price);
-
                     const totalMaterialQty = recipeQty * qtyProd;
                     const totalCost = totalMaterialQty * materialPrice;
 
@@ -1846,7 +2026,7 @@
                     <td>${material.name}</td>
                     <td>${material.unit || "-"}</td>
                     <td>${recipeQty}</td>
-                    <td>${materialPrice}</td>
+                    <td>${materialPrice.toLocaleString()}</td>
                     <td>${totalMaterialQty}</td>
                     <td>${totalCost.toLocaleString()}</td>
                 </tr>
@@ -1857,26 +2037,93 @@
                 document.getElementById("productionCogsTotal").innerHTML =
                     `Rp ${grandTotal.toLocaleString()}`;
             }
-            function backProduction() {
-                showPage('produksi');
-            }
-            function showPage(pageId) {
-                document.querySelectorAll('.menu-page')
-                    .forEach(page => page.classList.remove('active-page'));
 
-                const el = document.getElementById(pageId);
-                if (el) {
-                    el.classList.add('active-page');
-                } else {
-                    console.error("Page tidak ditemukan:", pageId);
-                }
+            function backProduction() {
+                console.log("BACK clicked");
+                showPage('produksi_input');
+
+                console.log(document.getElementById('produksi'));
             }
 
             function deleteRecipeItem(index) {
-
                 recipeItems.splice(index, 1);
-
                 renderRecipeTable();
+            }
+            async function loadProductionResult() {
+
+                const snap = await getDocs(
+                    collection(db, "production_orders")
+                );
+
+                let html = "";
+                snap.forEach(d => {
+
+                    const data = d.data();
+
+                    html += `
+            <tr>
+                <td>${data.productName}</td>
+                <td>${data.qtyProduction}</td>
+                <td>${data.date}</td>
+                <td>Selesai</td>
+            </tr>
+        `;
+                });
+
+                document.getElementById(
+                    "productionResultList"
+                ).innerHTML = html;
+            }
+            async function loadWasteFG() {
+
+                const snap = await getDocs(
+                    collection(db, "waste_fg")
+                );
+
+                let html = "";
+
+                snap.forEach(d => {
+
+                    const data = d.data();
+
+                    html += `
+            <tr>
+                <td>${data.product}</td>
+                <td>${data.qty}</td>
+                <td>${data.note}</td>
+            </tr>
+        `;
+                });
+
+                document.getElementById(
+                    "wasteFGList"
+                ).innerHTML = html;
+            }
+            async function loadWasteMaterial() {
+
+                const snap = await getDocs(
+                    collection(db, "waste_material")
+                );
+
+                let html = "";
+
+                snap.forEach(d => {
+
+                    const data = d.data();
+
+                    html += `
+            <tr>
+                <td>${data.material}</td>
+                <td>${data.qty}</td>
+                <td>${data.supplier}</td>
+                <td>${data.note}</td>
+            </tr>
+        `;
+                });
+
+                document.getElementById(
+                    "wasteMaterialList"
+                ).innerHTML = html;
             }
 
             window.addEventListener("DOMContentLoaded", () => {
@@ -1901,6 +2148,7 @@
             window.loadUnits = loadUnits;
             window.loadSuppliers = loadSuppliers;
             window.loadMaterials = loadMaterials;
+            window.deleteProduction = deleteProduction;
 
 
             window.deleteUnit = deleteUnit;
@@ -1925,22 +2173,25 @@
             window.loadProductionProducts = loadProductionProducts;
             window.backProduction = backProduction;
 
+            window.loadProductionOrdersToResultSelect = loadProductionOrdersToResultSelect;
+            window.saveProductionResult = saveProductionResult;
+            window.loadProductionResult = loadProductionResult;
+            window.deleteProductionResult = deleteProductionResult;
+
         </script>
 
         <script>
 
             function showPage(id) {
-
-                let pages = document.querySelectorAll('.menu-page');
-
-                pages.forEach(page => {
-                    page.classList.remove('active-page');
-                });
-
-                document.getElementById(id).classList.add('active-page');
-
+                document.querySelectorAll('.menu-page')
+                    .forEach(page => page.classList.remove('active-page'));
+                const el = document.getElementById(id);
+                if (!el) {
+                    console.error("Page tidak ditemukan:", id);
+                    return;
+                }
+                el.classList.add('active-page');
             }
-
             // CHART SALES
             new Chart(document.getElementById('salesChart'), {
 
