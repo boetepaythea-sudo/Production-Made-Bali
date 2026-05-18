@@ -212,10 +212,21 @@
                         Baku</a>
                 </div>
 
-                <a href="#" onclick="showPage('marketing')">
+                <a href="#" onclick="toggleMarketing()">
                     <i class="fa-solid fa-bullhorn"></i>
                     Marketing
                 </a>
+                <div id="marketingSubMenu" style="display:none; padding-left:20px;">
+                    <a href="#" onclick="showPage('marketing_toko')">
+                        - Input Data Toko
+                    </a>
+                    <a href="#" onclick="openMarketingSales()">
+                        - Input Sales
+                    </a>
+                    <a href="#" onclick="showPage('marketing_report'); loadSalesReport()">
+                        - Report Sales
+                    </a>
+                </div>
 
                 <a href="#" onclick="showPage('gudang')">
                     <i class="fa-solid fa-warehouse"></i>
@@ -748,39 +759,121 @@
                         </table>
                     </div>
                 </div>
+
                 <!-- MARKETING -->
-                <div id="marketing" class="menu-page">
+                <div id="marketing_toko" class="menu-page">
                     <div class="card-custom">
-                        <h4>Sales Penjualan</h4>
-                        <table class="table table-dark table-striped mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Produk</th>
-                                    <th>Qty</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>14 Mei 2026</td>
-                                    <td>Roti Sosis</td>
-                                    <td>300</td>
-                                    <td>Rp 3.000.000</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="table table-dark table-striped mt-4">
+                        <h3 class="text-warning">
+                            Input Data Toko
+                        </h3>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Kode Toko</label>
+                                <input type="text" id="storeCode" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Nama Toko</label>
+                                <input type="text" id="storeName" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Alamat</label>
+                                <input type="text" id="storeAddress" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>No HP</label>
+                                <input type="text" id="storePhone" class="form-control">
+                            </div>
+                        </div>
+                        <button class="btn btn-warning mt-3 w-100" onclick="saveStore()">
+                            Save
+                        </button>
+                        <table class="table table-dark mt-4">
                             <thead>
                                 <tr>
                                     <th>Kode</th>
-                                    <th>Produk</th>
-                                    <th>Qty</th>
+                                    <th>Nama</th>
+                                    <th>Alamat</th>
+                                    <th>HP</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="storeList"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="marketing_sales" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-success">
+                            Input Sales
+                        </h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Toko</label>
+                                <select id="salesStore" class="form-control">
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Sales Value</label>
+                                <input type="number" id="salesValue" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Tanggal</label>
+                                <input type="date" id="salesDate" class="form-control">
+                            </div>
+                        </div>
+                        <button class="btn btn-warning mt-3 w-100" onclick="saveSales()">
+                            Save Sales
+                        </button>
+                        <h4 class="mt-3">Data Sales</h4>
+                        <div id="salesTotal" style="margin-bottom:10px; font-size:18px; color:#facc15;">
+                            Total Sales: Rp 0
+                        </div>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Toko</th>
+                                    <th>Nama</th>
+                                    <th>Value</th>
                                     <th>Tanggal</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="marketingList"></tbody>
+                            <tbody id="salesList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="marketing_report" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-info">
+                            Report Sales
+                        </h3>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="date" id="salesStartDate" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" id="salesEndDate" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-warning w-100" onclick="loadSalesReport()">
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
+                        <div id="salesReportTotal" style="margin-bottom:10px; font-size:18px; color:#facc15;">
+                            Total Sales: Rp 0
+                        </div>
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Kode Toko</th>
+                                    <th>Nama Toko</th>
+                                    <th>Sales</th>
+                                    <th>Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesReportList"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1586,140 +1679,123 @@
                     showPage("forecastproduk");
                 }
             }
-            /* ================= PURCHASING ================= */
+
+            /* ================= PURCHASING FIXED ================= */
+
             function togglePurchasing() {
                 const menu = document.getElementById("purchasingSubMenu");
                 menu.style.display = (menu.style.display === "block") ? "none" : "block";
             }
+
+            /* ================= LOAD OPTIONS ================= */
             async function loadPurchaseOptions() {
-                // LOAD MATERIAL
-                const materialSnap =
-                    await getDocs(collection(db, "materials"));
-                let materialHtml =
-                    `<option value="">Pilih Bahan</option>`;
+
+                const materialSnap = await getDocs(collection(db, "materials"));
+                let materialHtml = `<option value="">Pilih Bahan</option>`;
                 materialSnap.forEach(d => {
                     materialHtml += `
-        <option value="${d.data().name}">
-            ${d.data().name}
-        </option>
-        `;
+            <option value="${d.data().name}">
+                ${d.data().name}
+            </option>`;
                 });
+                document.getElementById("purchaseMaterial").innerHTML = materialHtml;
 
-                document.getElementById("purchaseMaterial").innerHTML =
-                    materialHtml;
-                // LOAD UNIT
-                const unitSnap =
-                    await getDocs(collection(db, "units"));
-                let unitHtml =
-                    `<option value="">Pilih Satuan</option>`;
+                const unitSnap = await getDocs(collection(db, "units"));
+                let unitHtml = `<option value="">Pilih Satuan</option>`;
                 unitSnap.forEach(d => {
                     unitHtml += `
-        <option value="${d.data().name}">
-            ${d.data().name}
-        </option>
-        `;
+            <option value="${d.data().name}">
+                ${d.data().name}
+            </option>`;
                 });
-                document.getElementById("purchaseUnit").innerHTML =
-                    unitHtml;
-                // LOAD SUPPLIER
-                const q = query(
-                    collection(db, "suppliers"),
-                    orderBy("code", "asc")
+                document.getElementById("purchaseUnit").innerHTML = unitHtml;
+
+                const supplierSnap = await getDocs(
+                    query(collection(db, "suppliers"), orderBy("code", "asc"))
                 );
-                const snap = await getDocs(q);
-                let supplierHtml =
-                    `<option value="">Pilih Supplier</option>`;
-                snap.forEach(d => {
+
+                let supplierHtml = `<option value="">Pilih Supplier</option>`;
+                supplierSnap.forEach(d => {
                     supplierHtml += `
-        <option value="${d.data().name}">
-            ${d.data().name}
-        </option>
-        `;
+            <option value="${d.data().name}">
+                ${d.data().name}
+            </option>`;
                 });
-                document.getElementById("purchaseSupplier").innerHTML =
-                    supplierHtml;
+                document.getElementById("purchaseSupplier").innerHTML = supplierHtml;
             }
-            /* ================= HITUNG AVERAGE ================= */
+
+            /* ================= AVERAGE ================= */
             function calculateAverage() {
-                const qty =
-                    Number(document.getElementById("purchaseQty").value);
-                const price =
-                    Number(document.getElementById("purchasePrice").value);
+                const qty = Number(document.getElementById("purchaseQty").value);
+                const price = Number(document.getElementById("purchasePrice").value);
+
                 if (qty <= 0 || price <= 0) {
                     document.getElementById("purchaseAverage").value = "";
                     return;
                 }
-                const average = price / qty;
-                document.getElementById("purchaseAverage").value =
-                    average.toFixed(2);
+
+                document.getElementById("purchaseAverage").value = (price / qty).toFixed(2);
             }
 
-            /* ================= SAVE PURCHASING ================= */
+            /* ================= SAVE ================= */
             async function savePurchase() {
-                const material =
-                    document.getElementById("purchaseMaterial").value;
-                const qty =
-                    document.getElementById("purchaseQty").value;
-                const unit =
-                    document.getElementById("purchaseUnit").value;
-                const price =
-                    document.getElementById("purchasePrice").value;
-                const average =
-                    document.getElementById("purchaseAverage").value;
-                const supplier =
-                    document.getElementById("purchaseSupplier").value;
-                const date =
-                    document.getElementById("purchaseDate").value;
+
+                const material = document.getElementById("purchaseMaterial").value;
+                const qty = document.getElementById("purchaseQty").value;
+                const unit = document.getElementById("purchaseUnit").value;
+                const price = document.getElementById("purchasePrice").value;
+                const average = document.getElementById("purchaseAverage").value;
+                const supplier = document.getElementById("purchaseSupplier").value;
+                const date = document.getElementById("purchaseDate").value;
+
                 if (!material || !qty || !unit || !price || !supplier || !date) {
                     alert("Lengkapi data purchasing");
                     return;
                 }
 
-                // GENERATE CODE
-                const snap =
-                    await getDocs(collection(db, "purchasing"));
-                const code =
-                    genCode("PUR", snap.size);
-                await addDoc(collection(db, "purchasing"), {
+                const snap = await getDocs(collection(db, "purchasing"));
+                const code = genCode("PUR", snap.size);
 
+                await addDoc(collection(db, "purchasing"), {
                     code,
                     material,
-                    qty,
+                    qty: Number(qty),
                     unit,
-                    price,
-                    average,
+                    price: Number(price),
+                    average: Number(average),
                     supplier,
                     date,
-
                     createdAt: serverTimestamp()
                 });
 
                 alert("Purchasing berhasil disimpan");
 
-                // RESET
                 document.getElementById("purchaseQty").value = "";
                 document.getElementById("purchasePrice").value = "";
                 document.getElementById("purchaseAverage").value = "";
                 document.getElementById("purchaseDate").value = "";
 
-                loadPurchases();
-                loadPurchasesData();
+                await loadPurchases();
+                await loadPurchasesData();
             }
 
-            /* ================= LOAD PURCHASING ================= */
+            /* ================= LIST TABLE ================= */
             async function loadPurchases() {
-                const snap =
-                    await getDocs(collection(db, "purchasing"));
-                const materialSnap =
-                    await getDocs(collection(db, "materials"));
+
+                const snap = await getDocs(
+                    query(collection(db, "purchasing"), orderBy("date", "desc"))
+                );
+
+                const materialSnap = await getDocs(collection(db, "materials"));
+
                 let html = "";
+
                 snap.forEach(d => {
                     const data = d.data();
+
                     let materialCode = "";
                     materialSnap.forEach(m => {
-
                         if (m.data().name === data.material) {
-
                             materialCode = m.data().code;
                         }
                     });
@@ -1730,115 +1806,107 @@
             <td>${data.material}</td>
             <td>${data.qty}</td>
             <td>${data.unit}</td>
-            <td>
-                Rp ${Number(data.price).toLocaleString()}
-            </td>
-            <td>
-                Rp ${Number(data.average).toLocaleString()}
-            </td>
+            <td>Rp ${Number(data.price).toLocaleString()}</td>
+            <td>Rp ${Number(data.average).toLocaleString()}</td>
             <td>${data.supplier}</td>
             <td>${data.date}</td>
-            <td width="100">
-                <button
-                    class="btn btn-danger btn-sm w-100"
+            <td>
+                <button class="btn btn-danger btn-sm w-100"
                     onclick="deletePurchase('${d.id}')">
                     Hapus
                 </button>
             </td>
-        </tr>
-        `;
+        </tr>`;
                 });
 
-                document.getElementById("purchaseList").innerHTML =
-                    html;
+                document.getElementById("purchaseList").innerHTML = html;
             }
 
             /* ================= DELETE ================= */
             async function deletePurchase(id) {
-                const confirmDelete =
-                    confirm("Hapus purchasing ?");
-                if (!confirmDelete) return;
+                if (!confirm("Hapus purchasing?")) return;
+
                 await deleteDoc(doc(db, "purchasing", id));
-                loadPurchases();
-                alert("Purchasing berhasil dihapus");
+
+                await loadPurchases();
+                await loadPurchasesData();
+
+                alert("Berhasil dihapus");
             }
 
-            /* ================= View Purchasing Data ================= */
+            /* ================= SUMMARY + FILTER (FIXED) ================= */
             async function loadPurchasesData(startDate = "", endDate = "") {
-                const q = query(
-                    collection(db, "purchasing"),
-                    orderBy("date", "desc")
-                );
-                const snap = await getDocs(q);
-                const materialSnap =
-                    await getDocs(collection(db, "materials"));
-                let html = "";
-                let totalValue = 0;
-                // UBAH SNAP KE ARRAY
-                const purchaseData = [];
-                snap.forEach(d => {
-                    purchaseData.push({
-                        id: d.id,
-                        ...d.data()
-                    });
-                });
 
-                // FILTER DATA
-                let filteredData = purchaseData;
+                const snap = await getDocs(
+                    query(collection(db, "purchasing"), orderBy("date", "desc"))
+                );
+
+                const materialSnap = await getDocs(collection(db, "materials"));
+
+                let dataArr = [];
+                let total = 0;
+
+                snap.forEach(d => dataArr.push({ id: d.id, ...d.data() }));
+
                 if (startDate && endDate) {
-                    filteredData = purchaseData.filter(item => {
-                        return (
-                            item.date >= startDate &&
-                            item.date <= endDate
-                        );
+                    const start = startDate;
+                    const end = endDate;
+
+                    dataArr = dataArr.filter(item => {
+                        return item.date >= start && item.date <= end;
                     });
                 }
 
-                // RENDER DATA
-                filteredData.forEach(data => {
+                let html = "";
+
+                dataArr.forEach(data => {
+
                     let materialCode = "";
                     materialSnap.forEach(m => {
                         if (m.data().name === data.material) {
                             materialCode = m.data().code;
                         }
                     });
-                    totalValue += Number(data.price);
+
+                    total += Number(data.price);
+
                     html += `
         <tr>
             <td>${materialCode}</td>
             <td>${data.material}</td>
             <td>${data.qty}</td>
             <td>${data.unit}</td>
-            <td>
-                Rp ${Number(data.price).toLocaleString()}
-            </td>
-            <td>
-                Rp ${Number(data.average).toLocaleString()}
-            </td>
+            <td>Rp ${Number(data.price).toLocaleString()}</td>
+            <td>Rp ${Number(data.average).toLocaleString()}</td>
             <td>${data.supplier}</td>
             <td>${data.date}</td>
-        </tr>
-        `;
+        </tr>`;
                 });
 
-                document.getElementById("purchaseViewList").innerHTML =
-                    html;
-
+                document.getElementById("purchaseViewList").innerHTML = html;
                 document.getElementById("purchaseTotalValue").innerHTML =
-                    `Rp ${totalValue.toLocaleString()}`;
+                    "Rp " + total.toLocaleString();
             }
-            async function filterPurchaseData() {
-                const startDate =
-                    document.getElementById("purchaseStartDate").value;
-                const endDate =
-                    document.getElementById("purchaseEndDate").value;
-                console.log("FILTER:", startDate, endDate);
-                if (!startDate || !endDate) {
-                    alert("Pilih rentang tanggal");
+
+            /* ================= FILTER BUTTON ================= */
+            function filterPurchaseData() {
+                const start = document.getElementById("purchaseStartDate").value;
+                const end = document.getElementById("purchaseEndDate").value;
+
+                if (!start || !end) {
+                    alert("Pilih tanggal dulu");
                     return;
                 }
-                await loadPurchasesData(startDate, endDate);
+
+                loadPurchasesData(start, end);
             }
+
+            /* ================= INIT ================= */
+            window.addEventListener("DOMContentLoaded", async () => {
+                await loadPurchases();
+                await loadPurchasesData();
+                await loadPurchaseOptions();
+            });
 
             function loadAll() {
                 loadUnits();
@@ -2184,24 +2252,77 @@
                 recipeItems.splice(index, 1);
                 renderRecipeTable();
             }
+
+            async function openProductionResult() {
+                showPage('produksi_hasil');
+                await loadProductionOrdersToResultSelect();
+                await loadProductionResult();
+            }
+
+            async function saveProductionResult() {
+                const productCode =
+                    document.getElementById("resProduct").value;
+                const fgPcs =
+                    document.getElementById("resFgPcs").value;
+                const fgBox =
+                    document.getElementById("resFgBox").value;
+                const date =
+                    document.getElementById("resDate").value;
+                if (!productCode || !fgPcs || !fgBox || !date) {
+                    alert("Lengkapi data");
+                    return;
+                }
+
+                let productName = "";
+                const prodSnap =
+                    await getDocs(collection(db, "products"));
+                prodSnap.forEach(d => {
+                    if (d.data().code === productCode) {
+                        productName = d.data().name;
+                    }
+                });
+                const code =
+                    await generateCode("production_results", "FG");
+                await addDoc(collection(db, "production_results"), {
+                    code,
+                    productCode,
+                    productName,
+                    fgPcs,
+                    fgBox,
+                    date,
+                    createdAt: serverTimestamp()
+                });
+                alert("Hasil produksi berhasil disimpan");
+                loadProductionResult();
+            }
+
             async function loadProductionResult() {
 
                 const snap = await getDocs(
-                    collection(db, "production_orders")
+                    query(collection(db, "production_results"),
+                        orderBy("date", "desc"))
                 );
 
                 let html = "";
+
                 snap.forEach(d => {
 
                     const data = d.data();
 
                     html += `
-            <tr>
-                <td>${data.productName}</td>
-                <td>${data.qtyProduction}</td>
-                <td>${data.date}</td>
-                <td>Selesai</td>
-            </tr>
+        <tr>
+            <td>${data.productCode}</td>
+            <td>${data.productName}</td>
+            <td>${data.fgPcs}</td>
+            <td>${data.fgBox}</td>
+            <td>${data.date}</td>
+            <td>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteProductionResult('${d.id}')">
+                    Hapus
+                </button>
+            </td>
+        </tr>
         `;
                 });
 
@@ -2209,6 +2330,12 @@
                     "productionResultList"
                 ).innerHTML = html;
             }
+            async function deleteProductionResult(id) {
+                if (!confirm("Hapus hasil produksi?")) return;
+                await deleteDoc(doc(db, "production_results", id));
+                loadProductionResult();
+            }
+
             async function loadWasteFG() {
 
                 const snap = await getDocs(
@@ -2261,9 +2388,308 @@
                 ).innerHTML = html;
             }
 
+
+            /* ================= MARKETING CODE (FIXED FULL) ================= */
+
+            /* TOGGLE MENU */
+            function toggleMarketing() {
+                const menu = document.getElementById("marketingSubMenu");
+                if (!menu) return;
+                menu.style.display = (menu.style.display === "block") ? "none" : "block";
+            }
+
+            /* ================= STORE CODE ================= */
+            async function generateStoreCode() {
+                const snap = await getDocs(
+                    query(collection(db, "stores"), orderBy("code", "desc"))
+                );
+
+                if (snap.empty) return "ST001";
+
+                const last = snap.docs[0].data().code;
+                const num = parseInt(last.replace("ST", "")) + 1;
+
+                return "ST" + String(num).padStart(3, "0");
+            }
+
+            /* SET STORE CODE INPUT */
+            async function setStoreCode() {
+                const el = document.getElementById("storeCode");
+                if (!el) return;
+
+                el.value = await generateStoreCode();
+            }
+
+            /* SAVE STORE */
+            async function saveStore() {
+                const code = document.getElementById("storeCode").value;
+                const name = document.getElementById("storeName").value;
+                const address = document.getElementById("storeAddress").value;
+                const phone = document.getElementById("storePhone").value;
+
+                if (!name || !address || !phone) {
+                    alert("Lengkapi data toko");
+                    return;
+                }
+
+                await addDoc(collection(db, "stores"), {
+                    code,
+                    name,
+                    address,
+                    phone,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("Toko berhasil disimpan");
+
+                await loadStores();
+                await setStoreCode();
+
+                document.getElementById("storeName").value = "";
+                document.getElementById("storeAddress").value = "";
+                document.getElementById("storePhone").value = "";
+            }
+
+            /* LOAD STORES */
+            async function loadStores() {
+                const snap = await getDocs(collection(db, "stores"));
+
+                let data = [];
+
+                snap.forEach(d => {
+                    data.push({ id: d.id, ...d.data() });
+                });
+
+                // 🔥 URUTKAN BENAR
+                data.sort((a, b) => {
+                    const numA = parseInt(a.code.replace("ST", ""));
+                    const numB = parseInt(b.code.replace("ST", ""));
+                    return numA - numB;
+                });
+
+                let html = "";
+
+                data.forEach(d => {
+                    html += `
+<tr>
+    <td>${d.code}</td>
+    <td>${d.name}</td>
+    <td>${d.address}</td>
+    <td>${d.phone}</td>
+    <td>
+        <button class="btn btn-danger btn-sm w-100"
+            onclick="deleteStore('${d.id}')">
+            Hapus
+        </button>
+    </td>
+</tr>
+`;
+                });
+
+                document.getElementById("storeList").innerHTML = html;
+
+                await setStoreCode();
+            }
+
+            /* DELETE STORE */
+            async function deleteStore(id) {
+                if (!confirm("Hapus data toko ini?")) return;
+
+                await deleteDoc(doc(db, "stores", id));
+                await loadStores();
+                alert("Toko berhasil dihapus");
+            }
+
+            /* ================= SALES ================= */
+
+            /* OPEN SALES PAGE */
+            async function openMarketingSales() {
+                showPage("marketing_sales");
+
+                // dropdown store
+                const snap = await getDocs(collection(db, "stores"));
+
+                let html = `<option value="">Pilih Toko</option>`;
+                snap.forEach(d => {
+                    const data = d.data();
+                    html += `
+<option value="${data.code}">
+    ${data.code} - ${data.name}
+</option>`;
+                });
+
+                const select = document.getElementById("salesStore");
+                if (select) select.innerHTML = html;
+
+                await loadSalesTable();
+            }
+
+            /* SAVE SALES */
+            async function saveSales() {
+                const storeCode = document.getElementById("salesStore").value;
+                const value = document.getElementById("salesValue").value;
+                const date = document.getElementById("salesDate").value;
+
+                if (!storeCode || !value || !date) {
+                    alert("Lengkapi data sales");
+                    return;
+                }
+
+                let storeName = "";
+                const snap = await getDocs(collection(db, "stores"));
+
+                snap.forEach(d => {
+                    if (d.data().code === storeCode) {
+                        storeName = d.data().name;
+                    }
+                });
+
+                await addDoc(collection(db, "sales"), {
+                    storeCode,
+                    storeName,
+                    value: Number(value),
+                    date,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("Sales berhasil disimpan");
+
+                await loadSalesTable();
+
+                document.getElementById("salesValue").value = "";
+                document.getElementById("salesDate").value = "";
+            }
+
+            /* LOAD SALES TABLE (INPUT PAGE) */
+            async function loadSalesTable() {
+                const snap = await getDocs(collection(db, "sales"));
+
+                let data = [];
+
+                snap.forEach(d => {
+                    data.push({ id: d.id, ...d.data() });
+                });
+
+                // 🔥 SORT BY STORE CODE NUMBER
+                data.sort((a, b) => {
+                    const numA = parseInt(a.storeCode.replace("ST", ""));
+                    const numB = parseInt(b.storeCode.replace("ST", ""));
+                    return numA - numB;
+                });
+
+                let html = "";
+
+                let totalSales = 0;
+
+                data.forEach(d => {
+                    totalSales += Number(d.value);
+
+                    html += `
+<tr>
+    <td>${d.storeCode}</td>
+    <td>${d.storeName}</td>
+    <td>Rp ${Number(d.value).toLocaleString()}</td>
+    <td>${d.date}</td>
+    <td>
+        <button class="btn btn-danger btn-sm w-100"
+            onclick="deleteSales('${d.id}')">
+            Hapus
+        </button>
+    </td>
+</tr>
+`;
+                });
+
+                document.getElementById("salesList").innerHTML = html;
+
+                // 🔥 TOTAL SALES DISPLAY
+                const totalEl = document.getElementById("salesTotal");
+                if (totalEl) {
+                    totalEl.innerHTML = `
+            <b>Total Sales: Rp ${totalSales.toLocaleString()}</b>
+        `;
+                }
+            }
+
+            /* DELETE SALES */
+            async function deleteSales(id) {
+                if (!confirm("Hapus data sales ini?")) return;
+
+                await deleteDoc(doc(db, "sales", id));
+
+                await loadSalesTable();
+                await loadSalesReport();
+
+                alert("Sales berhasil dihapus");
+            }
+
+            /* SALES REPORT */
+            async function loadSalesReport() {
+                const start = document.getElementById("salesStartDate").value;
+                const end = document.getElementById("salesEndDate").value;
+
+                const snap = await getDocs(collection(db, "sales"));
+
+                let data = [];
+
+                snap.forEach(d => {
+                    data.push({ id: d.id, ...d.data() });
+                });
+
+                // 🔥 SORT BERDASARKAN KODE TOKO (ST001, ST002, DST)
+                data.sort((a, b) => {
+                    const numA = parseInt(a.storeCode.replace("ST", "")) || 0;
+                    const numB = parseInt(b.storeCode.replace("ST", "")) || 0;
+                    return numA - numB;
+                });
+
+                let html = "";
+                let total = 0;
+
+                data.forEach(d => {
+
+                    // filter tanggal (tetap kamu pakai)
+                    if (start && end) {
+                        const itemDate = new Date(d.date);
+                        const startDate = new Date(start);
+                        const endDate = new Date(end);
+
+                        if (itemDate < startDate || itemDate > endDate) return;
+                    }
+
+                    total += Number(d.value);
+
+                    html += `
+<tr>
+    <td>${d.storeCode}</td>
+    <td>${d.storeName}</td>
+    <td>Rp ${Number(d.value).toLocaleString()}</td>
+    <td>${d.date}</td>
+</tr>
+`;
+                });
+
+                document.getElementById("salesReportList").innerHTML = html;
+
+                // 🔥 OPTIONAL: total di report
+                const totalEl = document.getElementById("salesReportTotal");
+                if (totalEl) {
+                    totalEl.innerHTML = `Total Sales: Rp ${total.toLocaleString()}`;
+                }
+            }
+
+            /* ================= INIT ================= */
+            window.addEventListener("DOMContentLoaded", async () => {
+                await loadStores();
+                await setStoreCode();
+                await loadSalesTable();
+            });
+
+            /* ================= INIT ================= */
             window.addEventListener("DOMContentLoaded", () => {
                 loadProductionProducts();
                 loadProductionList();
+
                 loadAll();
                 loadForecast();
                 loadPurchaseOptions();
@@ -2313,6 +2739,15 @@
             window.saveProductionResult = saveProductionResult;
             window.loadProductionResult = loadProductionResult;
             window.deleteProductionResult = deleteProductionResult;
+
+            window.toggleMarketing = toggleMarketing;
+            window.saveStore = saveStore;
+            window.openMarketingSales = openMarketingSales;
+            window.saveSales = saveSales;
+            window.loadSalesReport = loadSalesReport;
+            window.deleteStore = deleteStore;
+            window.deleteSales = deleteSales;
+            window.loadSalesTable = loadSalesTable;
 
         </script>
 
