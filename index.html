@@ -128,6 +128,29 @@
                 object-fit: contain;
             }
 
+            .section-subtitle {
+                color: #facc15;
+                font-size: 24px;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+                margin-top: 15px;
+            }
+
+            .section-subtitle {
+                color: #facc15;
+                font-size: 24px;
+                font-weight: 700;
+                margin-top: 10px;
+            }
+
+            .section-divider {
+                height: 1px;
+                background: #80807ff1;
+                opacity: 0.6;
+                margin: 5px 0 10px 0;
+                border-radius: 2px;
+            }
+
             #jam {
                 font-size: 18px;
                 color: #facc15;
@@ -173,7 +196,7 @@
             <div class="sidebar">
                 <img src="https://tse1.mm.bing.net/th/id/OIP.3joavlcgavPwgPw71eLUbwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
                     class="sidebar-logo" alt="Logo">
-                <h2>Made Bali</h2>
+                <h2>ERP Made Bali</h2>
 
                 <a href="#" onclick="showPage('dashboard')">
                     <i class="fa-solid fa-chart-line"></i>
@@ -205,8 +228,14 @@
                     Produksi
                 </a>
                 <div id="produksiSubMenu" style="display:none; padding-left:20px;">
-                    <a href="#" onclick="showPage('produksi_input')">- Input Produksi</a>
-                    <a href="#" onclick="showPage('produksi_hasil'); loadProductionResult()">- Hasil Produksi</a>
+                    <a href="#" onclick="showPage('produksi_input')">- Input Recipe Produksi</a>
+                    <a href="#" onclick="
+                    showPage('produksi_hasil');
+                    loadProductionOrdersToResultSelect();
+                    loadProductionResult();
+                    ">
+                        - Input Hasil Produksi
+                    </a>
                     <a href="#" onclick="showPage('produksi_waste_fg'); loadWasteFG()">- Waste FG</a>
                     <a href="#" onclick="showPage('produksi_waste_bahan'); loadWasteMaterial()">- Waste Bahan
                         Baku</a>
@@ -270,48 +299,39 @@
                                 <h2>Rp 120 JT</h2>
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="stat-card">
                                 <h6>Total Produksi</h6>
                                 <h2>8.250</h2>
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="stat-card">
                                 <h6>Stok Gudang</h6>
                                 <h2>1.500</h2>
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="stat-card">
                                 <h6>Laba Bersih</h6>
                                 <h2>Rp 48 JT</h2>
                             </div>
                         </div>
-
                     </div>
-
                     <div class="row">
-
                         <div class="col-md-6">
                             <div class="card-custom">
                                 <h5>Chart Penjualan</h5>
                                 <canvas id="salesChart"></canvas>
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="card-custom">
                                 <h5>Chart Produksi</h5>
                                 <canvas id="productionChart"></canvas>
                             </div>
                         </div>
-
                     </div>
-
                     <div class="row">
 
                         <div class="col-md-6">
@@ -337,9 +357,7 @@
                             <i class="fa-solid fa-database"></i>
                             Master Data
                         </h3>
-
                         <hr>
-
                         <!-- INI TEMPAT FORM MUNCUL -->
                         <div id="masterContent"></div>
                     </div>
@@ -485,8 +503,12 @@
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
                             <i class="fa-solid fa-cart-shopping"></i>
-                            Purchasing Bahan Baku
+                            Purchasing
                         </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Summary PO BB
+                        </div>
                         <div class="row">
                             <!-- BAHAN -->
                             <div class="col-md-3">
@@ -568,10 +590,13 @@
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
                             <i class="fa-solid fa-cart-shopping"></i>
-                            Purchasing Bahan Baku
+                            Purchasing
                         </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Summary Data PO BB
+                        </div>
                         <div class="row">
-
                             <div class="col-md-4">
                                 <label>Dari Tanggal</label>
                                 <input type="date" id="purchaseStartDate" class="form-control">
@@ -620,9 +645,14 @@
                 <!-- PRODUKSI -->
                 <div id="produksi_input" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-warning">
-                            Input Produksi
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-industry"></i>
+                            Produksi
                         </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Input Recipe Produksi
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Produk</label>
@@ -665,11 +695,18 @@
                 <!-- LIST HASIL PRODUKSI -->
                 <div id="produksi_hasil" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-success">Hasil Produksi</h3>
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-industry"></i>
+                            Produksi
+                        </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Input Hasil Produksi
+                        </div>
                         <!-- INPUT -->
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <label>Produk (dari Produksi Order)</label>
+                                <label>Select Produk</label>
                                 <select id="resProduct" class="form-control"></select>
                             </div>
                             <div class="col-md-2">
@@ -691,15 +728,14 @@
                             </div>
                         </div>
 
-                        <!-- FILTER -->
+                        <!-- FILTER PRODUKSI RESULT -->
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <input type="date" id="filterFrom" class="form-control">
+                                <input type="date" id="prodStartDate" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <input type="date" id="filterTo" class="form-control">
+                                <input type="date" id="prodEndDate" class="form-control">
                             </div>
-
                             <div class="col-md-2">
                                 <button class="btn btn-info w-100" onclick="loadProductionResult()">
                                     Filter
@@ -720,10 +756,8 @@
                             </thead>
                             <tbody id="productionResultList"></tbody>
                         </table>
-
                     </div>
                 </div>
-
                 <div id="produksi_waste_fg" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-danger">
@@ -763,9 +797,14 @@
                 <!-- MARKETING -->
                 <div id="marketing_toko" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-warning">
-                            Input Data Toko
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            Marketing
                         </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Input Data Store
+                        </div>
                         <div class="row">
                             <div class="col-md-3">
                                 <label>Kode Toko</label>
@@ -803,9 +842,14 @@
                 </div>
                 <div id="marketing_sales" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-success">
-                            Input Sales
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            Marketing
                         </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Input Data Sales
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Toko</label>
@@ -845,9 +889,17 @@
 
                 <div id="marketing_report" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-info">
-                            Report Sales
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            Marketing
                         </h3>
+                        <div class="section-divider"></div>
+                        <div class="section-subtitle">
+                            Summary Report Sales
+                        </div>
+                        <div class="col-md-4">
+                            <label>Select date</label>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <input type="date" id="salesStartDate" class="form-control">
@@ -1835,57 +1887,62 @@
             }
 
             /* ================= SUMMARY + FILTER (FIXED) ================= */
-            async function loadPurchasesData(startDate = "", endDate = "") {
+            async function loadPurchasesData() {
+
+                const start = document.getElementById("purchaseStartDate").value;
+                const end = document.getElementById("purchaseEndDate").value;
 
                 const snap = await getDocs(
-                    query(collection(db, "purchasing"), orderBy("date", "desc"))
+                    query(collection(db, "purchasing"), orderBy("date", "desc")) // 🔥 PASTIKAN INI BENAR
                 );
 
-                const materialSnap = await getDocs(collection(db, "materials"));
+                let data = [];
 
-                let dataArr = [];
-                let total = 0;
-
-                snap.forEach(d => dataArr.push({ id: d.id, ...d.data() }));
-
-                if (startDate && endDate) {
-                    const start = startDate;
-                    const end = endDate;
-
-                    dataArr = dataArr.filter(item => {
-                        return item.date >= start && item.date <= end;
-                    });
-                }
+                snap.forEach(d => {
+                    data.push({ id: d.id, ...d.data() });
+                });
 
                 let html = "";
+                let total = 0;
 
-                dataArr.forEach(data => {
+                data.forEach(item => {
 
-                    let materialCode = "";
-                    materialSnap.forEach(m => {
-                        if (m.data().name === data.material) {
-                            materialCode = m.data().code;
-                        }
-                    });
+                    // 🔥 DEBUG SAFETY FILTER
+                    if (start && end) {
 
-                    total += Number(data.price);
+                        if (!item.date) return;
+
+                        const itemDate = new Date(item.date);
+                        const startDate = new Date(start);
+                        const endDate = new Date(end);
+
+                        if (isNaN(itemDate)) return; // 🔥 penting banget
+
+                        if (itemDate < startDate || itemDate > endDate) return;
+                    }
+
+                    const qty = Number(item.qty || 0);
+                    const price = Number(item.price || 0);
+
+                    total += qty * price;
 
                     html += `
         <tr>
-            <td>${materialCode}</td>
-            <td>${data.material}</td>
-            <td>${data.qty}</td>
-            <td>${data.unit}</td>
-            <td>Rp ${Number(data.price).toLocaleString()}</td>
-            <td>Rp ${Number(data.average).toLocaleString()}</td>
-            <td>${data.supplier}</td>
-            <td>${data.date}</td>
-        </tr>`;
+            <td>${item.code || "-"}</td>
+            <td>${item.materialName || item.material || "-"}</td>
+            <td>${qty}</td>
+            <td>${item.unit || "-"}</td>
+            <td>${price.toLocaleString()}</td>
+            <td>${item.avg || "-"}</td>
+            <td>${item.supplier || "-"}</td>
+            <td>${item.date || "-"}</td>
+        </tr>
+        `;
                 });
 
                 document.getElementById("purchaseViewList").innerHTML = html;
                 document.getElementById("purchaseTotalValue").innerHTML =
-                    "Rp " + total.toLocaleString();
+                    `Rp ${total.toLocaleString()}`;
             }
 
             /* ================= FILTER BUTTON ================= */
@@ -1899,22 +1956,6 @@
                 }
 
                 loadPurchasesData(start, end);
-            }
-
-            /* ================= INIT ================= */
-            window.addEventListener("DOMContentLoaded", async () => {
-                await loadPurchases();
-                await loadPurchasesData();
-                await loadPurchaseOptions();
-            });
-
-            function loadAll() {
-                loadUnits();
-                loadSuppliers();
-                loadMaterials();
-                loadPurchases();
-                loadPurchasesData();
-                loadPurchaseOptions();
             }
 
             /* ================= PRODUKSI ================= */
@@ -1974,28 +2015,23 @@
 
                     document.getElementById(targetId).innerHTML = `
             <h4>Hasil Produksi</h4>
-
             <div class="row mb-3">
                 <div class="col-md-3">
                     <label>Produk</label>
                     <select id="resProduct" class="form-control"></select>
                 </div>
-
                 <div class="col-md-2">
                     <label>FG PCS</label>
                     <input type="number" id="resFgPcs" class="form-control">
                 </div>
-
                 <div class="col-md-2">
                     <label>FG BOX</label>
                     <input type="number" id="resFgBox" class="form-control">
                 </div>
-
                 <div class="col-md-3">
                     <label>Tanggal</label>
                     <input type="date" id="resDate" class="form-control">
                 </div>
-
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-warning w-100" onclick="saveProductionResult()">
                         Save
@@ -2166,28 +2202,21 @@
                 const select = document.getElementById("resProduct");
                 if (!select) return;
                 const snap = await getDocs(
-                    query(collection(db, "production_orders"), orderBy("code", "asc"))
+                    query(collection(db, "production_orders"),
+                        orderBy("code", "asc"))
                 );
-
-                const map = new Map();
+                let html = `<option value="">Pilih Produk</option>`;
+                const added = [];
                 snap.forEach(d => {
                     const data = d.data();
-                    if (data.productCode && !map.has(data.productCode)) {
-                        map.set(data.productCode, {
-                            code: data.productCode,
-                            name: data.productName
-                        });
+                    if (!added.includes(data.productCode)) {
+                        added.push(data.productCode);
+                        html += `
+                <option value="${data.productCode}">
+                    ${data.productCode} - ${data.productName}
+                </option>
+            `;
                     }
-                });
-
-                let html = `<option value="">Pilih Produk</option>`;
-
-                map.forEach(p => {
-                    html += `
-            <option value="${p.code}">
-                ${p.code} - ${p.name}
-            </option>
-        `;
                 });
 
                 select.innerHTML = html;
@@ -2260,62 +2289,84 @@
             }
 
             async function saveProductionResult() {
-                const productCode =
-                    document.getElementById("resProduct").value;
-                const fgPcs =
-                    document.getElementById("resFgPcs").value;
-                const fgBox =
-                    document.getElementById("resFgBox").value;
-                const date =
-                    document.getElementById("resDate").value;
-                if (!productCode || !fgPcs || !fgBox || !date) {
+
+                const productCode = document.getElementById("resProduct").value;
+                const fgPcs = document.getElementById("resFgPcs").value;
+                const fgBox = document.getElementById("resFgBox").value;
+                const date = document.getElementById("resDate").value;
+
+                if (!productCode || fgPcs === "" || fgBox === "" || !date) {
                     alert("Lengkapi data");
                     return;
                 }
 
                 let productName = "";
-                const prodSnap =
-                    await getDocs(collection(db, "products"));
+                const prodSnap = await getDocs(collection(db, "products"));
+
                 prodSnap.forEach(d => {
                     if (d.data().code === productCode) {
                         productName = d.data().name;
                     }
                 });
-                const code =
-                    await generateCode("production_results", "FG");
+
+                const code = await generateCode("production_results", "FG");
+
                 await addDoc(collection(db, "production_results"), {
                     code,
                     productCode,
                     productName,
-                    fgPcs,
-                    fgBox,
+                    fgPcs: Number(fgPcs),
+                    fgBox: Number(fgBox),
                     date,
                     createdAt: serverTimestamp()
                 });
+
                 alert("Hasil produksi berhasil disimpan");
+
+                // 🔥 RESET FORM (WAJIB)
+                document.getElementById("resProduct").value = "";
+                document.getElementById("resFgPcs").value = "";
+                document.getElementById("resFgBox").value = "";
+                document.getElementById("resDate").value = "";
+
+                // 🔥 AUTO REFRESH LIST
                 loadProductionResult();
             }
 
             async function loadProductionResult() {
+                const start = document.getElementById("prodStartDate").value;
+                const end = document.getElementById("prodEndDate").value;
 
                 const snap = await getDocs(
-                    query(collection(db, "production_results"),
-                        orderBy("date", "desc"))
+                    query(collection(db, "production_results"))
                 );
+
+                let data = [];
+
+                snap.forEach(d => {
+                    data.push({ id: d.id, ...d.data() });
+                });
 
                 let html = "";
 
-                snap.forEach(d => {
+                data.forEach(d => {
 
-                    const data = d.data();
+                    // 🔥 FILTER MODEL SALES REPORT (AMAN)
+                    if (start && end) {
+                        const itemDate = new Date(d.date);
+                        const startDate = new Date(start);
+                        const endDate = new Date(end);
+
+                        if (itemDate < startDate || itemDate > endDate) return;
+                    }
 
                     html += `
         <tr>
-            <td>${data.productCode}</td>
-            <td>${data.productName}</td>
-            <td>${data.fgPcs}</td>
-            <td>${data.fgBox}</td>
-            <td>${data.date}</td>
+            <td>${d.productCode}</td>
+            <td>${d.productName}</td>
+            <td>${d.fgPcs}</td>
+            <td>${d.fgBox}</td>
+            <td>${d.date}</td>
             <td>
                 <button class="btn btn-danger btn-sm"
                     onclick="deleteProductionResult('${d.id}')">
@@ -2326,10 +2377,9 @@
         `;
                 });
 
-                document.getElementById(
-                    "productionResultList"
-                ).innerHTML = html;
+                document.getElementById("productionResultList").innerHTML = html;
             }
+
             async function deleteProductionResult(id) {
                 if (!confirm("Hapus hasil produksi?")) return;
                 await deleteDoc(doc(db, "production_results", id));
@@ -2679,21 +2729,24 @@
             }
 
             /* ================= INIT ================= */
-            window.addEventListener("DOMContentLoaded", async () => {
-                await loadStores();
-                await setStoreCode();
-                await loadSalesTable();
-            });
-
-            /* ================= INIT ================= */
-            window.addEventListener("DOMContentLoaded", () => {
+            function loadAll() {
+                loadUnits();
+                loadSuppliers();
+                loadMaterials();
+                loadPurchases();
+                loadPurchasesData();
+                loadPurchaseOptions();
                 loadProductionProducts();
                 loadProductionList();
-
-                loadAll();
                 loadForecast();
-                loadPurchaseOptions();
-                loadPurchases();
+                loadStores();
+                setStoreCode();
+                loadSalesTable();
+            }
+
+            window.addEventListener("DOMContentLoaded", async () => {
+                await loadAll();
+
             });
 
             /* ================= GLOBAL EXPORT ================= */
@@ -2710,7 +2763,6 @@
             window.loadSuppliers = loadSuppliers;
             window.loadMaterials = loadMaterials;
             window.deleteProduction = deleteProduction;
-
 
             window.deleteUnit = deleteUnit;
             window.deleteSupplier = deleteSupplier;
@@ -2823,9 +2875,7 @@
 
             // CHART EXPENSE
             new Chart(document.getElementById('expenseChart'), {
-
                 type: 'pie',
-
                 data: {
                     labels: ['Tepung', 'Gula', 'Mentega', 'Telur'],
                     datasets: [{
@@ -2843,7 +2893,6 @@
 
             function updateDateTime() {
                 const now = new Date();
-
                 const hariList = [
                     "Minggu", "Senin", "Selasa", "Rabu",
                     "Kamis", "Jumat", "Sabtu"
@@ -2857,7 +2906,6 @@
                 });
 
                 const jam = now.toLocaleTimeString('id-ID');
-
                 document.getElementById("hari").innerText = hari;
                 document.getElementById("tanggal").innerText = tanggal;
                 document.getElementById("jam").innerText = jam;
@@ -2867,5 +2915,4 @@
             updateDateTime();
         </script>
     </body>
-
 </html>
