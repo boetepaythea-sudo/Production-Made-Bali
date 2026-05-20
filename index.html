@@ -164,6 +164,9 @@
             }
         </style>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     </head>
 
     <body>
@@ -246,15 +249,9 @@
                     Marketing
                 </a>
                 <div id="marketingSubMenu" style="display:none; padding-left:20px;">
-                    <a href="#" onclick="showPage('marketing_toko')">
-                        - Input Data Toko
-                    </a>
-                    <a href="#" onclick="openMarketingSales()">
-                        - Input Sales
-                    </a>
-                    <a href="#" onclick="showPage('marketing_report'); loadSalesReport()">
-                        - Report Sales
-                    </a>
+                    <a href="#" onclick="showPage('marketing_toko')">- Input Data Toko</a>
+                    <a href="#" onclick="openMarketingSales()">- Input Sales</a>
+                    <a href="#" onclick="showPage('marketing_report'); loadSalesReport()">- Report Sales</a>
                 </div>
 
                 <a href="#" onclick="showPage('gudang')">
@@ -351,7 +348,6 @@
                 </div>
                 <!-- MASTER DATA -->
                 <div id="masterdata" class="menu-page">
-
                     <div class="card-custom">
                         <h3 class="text-warning mb-3">
                             <i class="fa-solid fa-database"></i>
@@ -362,9 +358,14 @@
                         <div id="masterContent"></div>
                     </div>
                 </div>
-
+                <!-- Forecast Produk -->
                 <div id="forecastproduk" class="menu-page">
                     <div class="card-custom">
+                        <h3 class="text-warning mb-3">
+                            <i class="fa-solid fa-database"></i>
+                            Master Data
+                        </h3>
+                        <div class="section-divider"></div>
                         <h3 class="text-warning mb-4">
                             Forecast Produk / Recipe
                         </h3>
@@ -501,59 +502,50 @@
                 <!-- PURCHASING -->
                 <div id="purchasing" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-warning mb-4">
+                        <h3 class="text-warning mb-3">
                             <i class="fa-solid fa-cart-shopping"></i>
                             Purchasing
                         </h3>
                         <div class="section-divider"></div>
                         <div class="section-subtitle">
-                            Summary PO BB
+                            Input Purchase Order Bahan Baku
                         </div>
+                        <!-- FORM INPUT -->
                         <div class="row">
-                            <!-- BAHAN -->
                             <div class="col-md-3">
                                 <label>Bahan Baku</label>
-                                <select id="purchaseMaterial" class="form-control">
-                                </select>
+                                <select id="purchaseMaterial" class="form-control"></select>
                             </div>
-                            <!-- QTY -->
                             <div class="col-md-2">
                                 <label>Qty</label>
                                 <input type="number" id="purchaseQty" class="form-control" oninput="calculateAverage()">
                             </div>
-                            <!-- SATUAN -->
                             <div class="col-md-2">
                                 <label>Satuan</label>
-                                <select id="purchaseUnit" class="form-control">
-                                </select>
+                                <select id="purchaseUnit" class="form-control"></select>
                             </div>
-                            <!-- HARGA -->
+
                             <div class="col-md-2">
                                 <label>Harga Beli</label>
                                 <input type="number" id="purchasePrice" class="form-control"
                                     oninput="calculateAverage()">
                             </div>
-
-                            <!-- AVERAGE -->
                             <div class="col-md-3">
                                 <label>Average</label>
-
                                 <input type="text" id="purchaseAverage" class="form-control" readonly>
                             </div>
                         </div>
+
                         <div class="row mt-3">
-                            <!-- SUPPLIER -->
                             <div class="col-md-4">
                                 <label>Supplier</label>
-                                <select id="purchaseSupplier" class="form-control">
-                                </select>
+                                <select id="purchaseSupplier" class="form-control"></select>
                             </div>
-                            <!-- TANGGAL -->
                             <div class="col-md-4">
                                 <label>Tanggal Pembelian</label>
                                 <input type="date" id="purchaseDate" class="form-control">
                             </div>
-                            <!-- BUTTON -->
+
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="savePurchase()">
                                     <i class="fa-solid fa-save"></i>
@@ -561,12 +553,9 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- TABEL PURCHASING -->
-                        <div class="card-custom mt-4">
-                            <h4 class="text-warning">
-                                Data Purchasing
-                            </h4>
-                            <table class="table table-dark table-striped mt-3">
+                        <!-- TABLE -->
+                        <div class="table-responsive mt-3">
+                            <table class="table table-dark table-striped w-100 align-middle">
                                 <thead>
                                     <tr>
                                         <th>Kode</th>
@@ -585,18 +574,19 @@
                         </div>
                     </div>
                 </div>
-                <!-- TABEL VIEW DATA SUMMARY PURCHASING -->
+                <!-- VIEW DATA (SUMMARY PAGE) -->
                 <div id="purchasing_viewdata" class="menu-page">
                     <div class="card-custom">
-                        <h3 class="text-warning mb-4">
+                        <h3 class="text-warning mb-3">
                             <i class="fa-solid fa-cart-shopping"></i>
-                            Purchasing
+                            Purchasing Report
                         </h3>
                         <div class="section-divider"></div>
-                        <div class="section-subtitle">
-                            Summary Data PO BB
-                        </div>
-                        <div class="row">
+
+                        <h5 class="text-warning mb-3">
+                            Summary Report PO Bahan Baku
+                        </h5>
+                        <div class="row mb-3">
                             <div class="col-md-4">
                                 <label>Dari Tanggal</label>
                                 <input type="date" id="purchaseStartDate" class="form-control">
@@ -607,16 +597,12 @@
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="filterPurchaseData()">
-                                    <i class="fa-solid fa-search"></i>
-                                    Cari Data
+                                    Filter Data
                                 </button>
                             </div>
                         </div>
-                        <div class="card-custom mt-4">
-                            <h4 class="text-warning">
-                                Data Purchasing
-                            </h4>
-                            <table class="table table-dark table-striped mt-3">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-dark table-striped w-100 align-middle">
                                 <thead>
                                     <tr>
                                         <th>Kode</th>
@@ -631,18 +617,16 @@
                                 </thead>
                                 <tbody id="purchaseViewList"></tbody>
                             </table>
-                            <div class="mt-3 text-end">
-                                <h5 class="text-warning">
-                                    Total Pembelian :
-                                    <span id="purchaseTotalValue">
-                                        Rp 0
-                                    </span>
-                                </h5>
-                            </div>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <h5 class="text-warning">
+                                Total Pembelian :
+                                <span id="purchaseTotalValue">Rp 0</span>
+                            </h5>
                         </div>
                     </div>
                 </div>
-                <!-- PRODUKSI -->
+                <!-- PRODUKSI INPUT -->
                 <div id="produksi_input" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -653,6 +637,7 @@
                         <div class="section-subtitle">
                             Input Recipe Produksi
                         </div>
+
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Produk</label>
@@ -673,11 +658,10 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- LIST PRODUKSI -->
                     <div class="card-custom mt-3">
                         <h4>Data Produksi</h4>
-                        <table class="table table-dark">
+                        <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
                                     <th>Kode</th>
@@ -692,7 +676,7 @@
                     </div>
                 </div>
 
-                <!-- LIST HASIL PRODUKSI -->
+                <!-- INPUT HASIL PRODUKSI -->
                 <div id="produksi_hasil" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -700,11 +684,13 @@
                             Produksi
                         </h3>
                         <div class="section-divider"></div>
+
                         <div class="section-subtitle">
                             Input Hasil Produksi
                         </div>
-                        <!-- INPUT -->
-                        <div class="row mb-3">
+
+                        <!-- FORM INPUT -->
+                        <div class="row mb-4">
                             <div class="col-md-3">
                                 <label>Select Produk</label>
                                 <select id="resProduct" class="form-control"></select>
@@ -727,22 +713,33 @@
                                 </button>
                             </div>
                         </div>
-
-                        <!-- FILTER PRODUKSI RESULT -->
-                        <div class="row mb-3">
+                        <!-- FILTER -->
+                        <div class="row mb-4">
                             <div class="col-md-3">
+                                <label>Dari Tanggal</label>
                                 <input type="date" id="prodStartDate" class="form-control">
                             </div>
                             <div class="col-md-3">
+                                <label>Sampai Tanggal</label>
                                 <input type="date" id="prodEndDate" class="form-control">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-info w-100" onclick="loadProductionResult()">
                                     Filter
                                 </button>
                             </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="viewForecastProduction()">
+                                    View Forecast
+                                </button>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-danger w-100" onclick="exportForecastPDF()">
+                                    Export PDF
+                                </button>
+                            </div>
                         </div>
-                        <!-- TABLE -->
+                        <!-- TABLE HASIL PRODUKSI -->
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
@@ -758,7 +755,46 @@
                         </table>
                     </div>
                 </div>
+                <!-- FORECAST PRODUKSI -->
+                <div id="forecast_production" class="menu-page">
+                    <div class="card-custom">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="text-warning" id="forecastProductionTitle">
+                                Forecast Produksi
+                            </h3>
+                            <button class="btn btn-secondary" onclick="showPage('produksi_hasil')">
+                                <i class="fa fa-arrow-left"></i>
+                                Back
+                            </button>
+                        </div>
+                        <!-- TABLE FORECAST -->
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Kode Bahan Baku</th>
+                                    <th>Nama Bahan Baku</th>
+                                    <th>UOM</th>
+                                    <th>Weight</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forecastProductionTable"></tbody>
+                        </table>
+                        <!-- TOTAL -->
+                        <div class="text-end mt-4">
+
+                            <h4 class="text-warning">
+                                Total Forecast :
+                                <span id="forecastProductionTotal">
+                                    Rp 0
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- WASTE FG -->
                 <div id="produksi_waste_fg" class="menu-page">
+
                     <div class="card-custom">
                         <h3 class="text-danger">
                             Waste Finished Goods
@@ -775,6 +811,7 @@
                         </table>
                     </div>
                 </div>
+                <!-- WASTE BAHAN -->
                 <div id="produksi_waste_bahan" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-info">
@@ -793,7 +830,6 @@
                         </table>
                     </div>
                 </div>
-
                 <!-- MARKETING -->
                 <div id="marketing_toko" class="menu-page">
                     <div class="card-custom">
@@ -1837,11 +1873,8 @@
                 const snap = await getDocs(
                     query(collection(db, "purchasing"), orderBy("date", "desc"))
                 );
-
                 const materialSnap = await getDocs(collection(db, "materials"));
-
                 let html = "";
-
                 snap.forEach(d => {
                     const data = d.data();
 
@@ -1955,7 +1988,7 @@
                     return;
                 }
 
-                loadPurchasesData(start, end);
+                loadPurchasesData();
             }
 
             /* ================= PRODUKSI ================= */
@@ -2437,7 +2470,190 @@
                     "wasteMaterialList"
                 ).innerHTML = html;
             }
+            /* ================= FORECAST PRODUKSI ================= */
+            let forecastProductionData = [];
 
+            function parseDate(str) {
+                const [y, m, d] = str.split("-").map(Number);
+                return new Date(y, m - 1, d);
+            }
+
+            function formatBulan(start) {
+                const [y, m] = start.split("-");
+
+                const bulanNama = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+
+                return `${bulanNama[parseInt(m) - 1]} ${y}`;
+            }
+
+            async function viewForecastProduction() {
+
+                const start = document.getElementById("prodStartDate").value;
+                const end = document.getElementById("prodEndDate").value;
+
+                if (!start || !end) {
+                    alert("Pilih tanggal filter dulu");
+                    return;
+                }
+
+                showPage("forecast_production");
+
+                const prodSnap = await getDocs(collection(db, "production_results"));
+                const recipeSnap = await getDocs(collection(db, "product_recipes"));
+                const materialSnap = await getDocs(collection(db, "materials"));
+
+                const materialMap = {};
+
+                const startDate = parseDate(start);
+                const endDate = parseDate(end);
+
+                prodSnap.forEach(prod => {
+
+                    const p = prod.data();
+                    const itemDate = parseDate(p.date);
+
+                    if (itemDate < startDate || itemDate > endDate) return;
+
+                    recipeSnap.forEach(recipe => {
+
+                        const r = recipe.data();
+
+                        if (r.productCode !== p.productCode) return;
+
+                        const material = materialSnap.docs
+                            .map(m => m.data())
+                            .find(m =>
+                                m.name.toLowerCase().trim() ===
+                                r.material.toLowerCase().trim()
+                            );
+
+                        if (!material) return;
+
+                        const key = material.code;
+
+                        const weight =
+                            Number(r.qty || 0) *
+                            Number(p.fgPcs || 0);
+
+                        const price =
+                            weight *
+                            Number(material.price || 0);
+
+                        if (!materialMap[key]) {
+                            materialMap[key] = {
+                                code: material.code,
+                                name: material.name,
+                                unit: material.unit,
+                                weight: 0,
+                                price: 0
+                            };
+                        }
+
+                        materialMap[key].weight += weight;
+                        materialMap[key].price += price;
+                    });
+                });
+
+                forecastProductionData = Object.values(materialMap);
+
+                forecastProductionData.sort((a, b) =>
+                    a.code.localeCompare(b.code)
+                );
+
+                let html = "";
+                let grandTotal = 0;
+
+                forecastProductionData.forEach(item => {
+
+                    grandTotal += item.price;
+
+                    html += `
+<tr>
+    <td>${item.code}</td>
+    <td>${item.name}</td>
+    <td>${item.unit}</td>
+    <td>${item.weight.toLocaleString()}</td>
+    <td>Rp ${item.price.toLocaleString()}</td>
+</tr>
+`;
+                });
+
+                document.getElementById("forecastProductionTitle").innerHTML =
+                    `Forecast Produksi Bulan ${formatBulan(start)}`;
+
+                document.getElementById("forecastProductionTable").innerHTML = html;
+
+                document.getElementById("forecastProductionTotal").innerHTML =
+                    `Rp ${grandTotal.toLocaleString()}`;
+            }
+
+            window.viewForecastProduction = viewForecastProduction;
+            /* ================= EXPORT PDF ================= */
+
+            async function exportForecastPDF() {
+
+                if (forecastProductionData.length === 0) {
+                    alert("Data forecast kosong");
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF("landscape", "pt", "a4");
+
+                const start = document.getElementById("prodStartDate").value;
+
+                const bulanNama = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+
+                const [y, m] = start.split("-");
+                const bulan = `${bulanNama[parseInt(m) - 1]} ${y}`;
+
+                doc.setFontSize(16);
+                doc.text(`Forecast Produksi Bulan ${bulan}`, 40, 40);
+
+                let total = 0;
+
+                const rows = forecastProductionData.map(item => {
+
+                    total += item.price;
+
+                    return [
+                        item.code,
+                        item.name,
+                        item.unit,
+                        item.weight.toLocaleString(),
+                        "Rp " + item.price.toLocaleString()
+                    ];
+                });
+
+                doc.autoTable({
+                    startY: 60,
+                    head: [[
+                        "Kode Bahan",
+                        "Nama Bahan",
+                        "UOM",
+                        "Weight",
+                        "Price"
+                    ]],
+                    body: rows
+                });
+
+                doc.setFontSize(14);
+                doc.text(
+                    `Total Forecast : Rp ${total.toLocaleString()}`,
+                    40,
+                    doc.lastAutoTable.finalY + 30
+                );
+
+                doc.save(`Forecast-Produksi-${bulan}.pdf`);
+            }
+
+            window.exportForecastPDF = exportForecastPDF;
 
             /* ================= MARKETING CODE (FIXED FULL) ================= */
 
@@ -2551,7 +2767,6 @@
             }
 
             /* ================= SALES ================= */
-
             /* OPEN SALES PAGE */
             async function openMarketingSales() {
                 showPage("marketing_sales");
@@ -2764,6 +2979,7 @@
             window.loadMaterials = loadMaterials;
             window.deleteProduction = deleteProduction;
 
+
             window.deleteUnit = deleteUnit;
             window.deleteSupplier = deleteSupplier;
             window.deleteMaterial = deleteMaterial;
@@ -2875,7 +3091,9 @@
 
             // CHART EXPENSE
             new Chart(document.getElementById('expenseChart'), {
+
                 type: 'pie',
+
                 data: {
                     labels: ['Tepung', 'Gula', 'Mentega', 'Telur'],
                     datasets: [{
@@ -2893,6 +3111,7 @@
 
             function updateDateTime() {
                 const now = new Date();
+
                 const hariList = [
                     "Minggu", "Senin", "Selasa", "Rabu",
                     "Kamis", "Jumat", "Sabtu"
@@ -2915,4 +3134,5 @@
             updateDateTime();
         </script>
     </body>
+
 </html>
