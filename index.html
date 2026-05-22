@@ -239,9 +239,7 @@
                     ">
                         - Input Hasil Produksi
                     </a>
-                    <a href="#" onclick="showPage('produksi_waste_fg'); loadWasteFG()">- Waste FG</a>
-                    <a href="#" onclick="showPage('produksi_waste_bahan'); loadWasteMaterial()">- Waste Bahan
-                        Baku</a>
+                    <a href="#" onclick="openWasteMenu()">- Input Waste</a>
                 </div>
 
                 <a href="#" onclick="toggleMarketing()">
@@ -508,7 +506,9 @@
                         </h3>
                         <div class="section-divider"></div>
                         <div class="section-subtitle">
-                            Input Purchase Order Bahan Baku
+                            <h5 class="text-warning mb-3">
+                                Input Purchase Order Bahan Baku
+                            </h5>
                         </div>
                         <!-- FORM INPUT -->
                         <div class="row">
@@ -545,7 +545,6 @@
                                 <label>Tanggal Pembelian</label>
                                 <input type="date" id="purchaseDate" class="form-control">
                             </div>
-
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="savePurchase()">
                                     <i class="fa-solid fa-save"></i>
@@ -574,7 +573,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- VIEW DATA (SUMMARY PAGE) -->
+                <!-- FILTER DTA PURCHASING -->
                 <div id="purchasing_viewdata" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-3">
@@ -582,7 +581,6 @@
                             Purchasing Report
                         </h3>
                         <div class="section-divider"></div>
-
                         <h5 class="text-warning mb-3">
                             Summary Report PO Bahan Baku
                         </h5>
@@ -792,43 +790,159 @@
                         </div>
                     </div>
                 </div>
-                <!-- WASTE FG -->
-                <div id="produksi_waste_fg" class="menu-page">
 
-                    <div class="card-custom">
-                        <h3 class="text-danger">
-                            Waste Finished Goods
-                        </h3>
-                        <table class="table table-dark table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Qty Waste</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="wasteFGList"></tbody>
-                        </table>
+                <!-- ================= INPUT WASTE MENU ================= -->
+                <div id="input_waste" class="menu-page">
+                    <h3 class="text-warning mb-4">INPUT WASTE</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-danger w-100 p-4" onclick="openWasteFGPage()">
+                                INPUT WASTE FG
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-warning w-100 p-4" onclick="openWasteMaterialPage()">
+                                INPUT WASTE BAHAN BAKU
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <!-- WASTE BAHAN -->
-                <div id="produksi_waste_bahan" class="menu-page">
-                    <div class="card-custom">
-                        <h3 class="text-info">
-                            Waste Bahan Baku
-                        </h3>
-                        <table class="table table-dark table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Bahan</th>
-                                    <th>Qty Waste</th>
-                                    <th>Supplier</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="wasteMaterialList"></tbody>
-                        </table>
+
+                <!-- ================= WASTE FG PAGE ================= -->
+                <div id="produksi_waste_fg" class="menu-page">
+                    <h3 class="text-danger mb-4">INPUT WASTE FG</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label>Produk</label>
+                            <select id="wasteFgProduct" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Qty PCS</label>
+                            <input type="number" id="wasteFgQty" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Tanggal</label>
+                            <input type="date" id="wasteFgDate" class="form-control">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button class="btn btn-danger w-100" onclick="saveWasteFG()">
+                                Submit
+                            </button>
+                        </div>
                     </div>
+                    <!-- FILTER FINISH GOOD -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <input type="date" id="wasteFgStart" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" id="wasteFgEnd" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-info w-100" onclick="loadWasteFGTable()">
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+                    <!-- TABLE -->
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Kode Produk</th>
+                                <th>Nama Produk</th>
+                                <th>Qty</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wasteFGList"></tbody>
+                    </table>
+                    <button class="btn btn-secondary mt-3" onclick="showPage('input_waste')">
+                        Back
+                    </button>
+                </div>
+                <!-- ================= WASTE MATERIAL PAGE ================= -->
+                <div id="produksi_waste_bahan" class="menu-page">
+                    <h3 class="text-warning mb-4">
+                        INPUT WASTE BAHAN BAKU
+                    </h3>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Bahan Baku</label>
+                            <select id="wasteMaterialName" class="form-control"
+                                onchange="calculateWasteMaterialPrice()">
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Weight</label>
+                            <input type="number" step="0.01" id="wasteMaterialQty" class="form-control"
+                                oninput="calculateWasteMaterialPrice()">
+                        </div>
+                        <div class="col-md-2">
+                            <label>UOM</label>
+                            <select id="wasteMaterialUnit" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Price</label>
+                            <input type="text" id="wasteMaterialPrice" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Tanggal</label>
+                            <input type="date" id="wasteMaterialDate" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <button class="btn btn-warning w-100" onclick="saveWasteMaterial()">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                    <!-- FILTER MATERIAL -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <input type="date" id="wasteMaterialStart" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <input type="date" id="wasteMaterialEnd" class="form-control">
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-info w-100" onclick="loadWasteMaterialTable()">
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+                    <!-- TABLE -->
+                    <table class="table table-dark table-striped">
+
+                        <thead>
+
+                            <tr>
+                                <th>Kode Bahan</th>
+                                <th>Nama Bahan</th>
+                                <th>Weight</th>
+                                <th>UOM</th>
+                                <th>Price</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="wasteMaterialList"></tbody>
+
+                    </table>
+
+                    <button class="btn btn-secondary mt-3" onclick="showPage('input_waste')">
+
+                        Back
+
+                    </button>
+
                 </div>
                 <!-- MARKETING -->
                 <div id="marketing_toko" class="menu-page">
@@ -1768,7 +1882,7 @@
                 }
             }
 
-            /* ================= PURCHASING FIXED ================= */
+            /* ================= PURCHASING ================= */
 
             function togglePurchasing() {
                 const menu = document.getElementById("purchasingSubMenu");
@@ -1919,37 +2033,28 @@
                 alert("Berhasil dihapus");
             }
 
-            /* ================= SUMMARY + FILTER (FIXED) ================= */
+            /* ================= FILTER DATA PURCHASING ================= */
             async function loadPurchasesData() {
-
                 const start = document.getElementById("purchaseStartDate").value;
                 const end = document.getElementById("purchaseEndDate").value;
 
                 const snap = await getDocs(
-                    query(collection(db, "purchasing"), orderBy("date", "desc")) // 🔥 PASTIKAN INI BENAR
+                    query(collection(db, "purchasing"), orderBy("date", "desc"))
                 );
-
-                let data = [];
-
-                snap.forEach(d => {
-                    data.push({ id: d.id, ...d.data() });
-                });
 
                 let html = "";
                 let total = 0;
 
-                data.forEach(item => {
+                snap.forEach(d => {
+                    const item = d.data();
 
-                    // 🔥 DEBUG SAFETY FILTER
+                    // 🔥 FILTER AMAN (SAMA SEPERTI FG & MATERIAL)
                     if (start && end) {
-
                         if (!item.date) return;
 
-                        const itemDate = new Date(item.date);
-                        const startDate = new Date(start);
-                        const endDate = new Date(end);
-
-                        if (isNaN(itemDate)) return; // 🔥 penting banget
+                        const itemDate = parseDate(item.date);
+                        const startDate = parseDate(start);
+                        const endDate = parseDate(end);
 
                         if (itemDate < startDate || itemDate > endDate) return;
                     }
@@ -1960,16 +2065,16 @@
                     total += qty * price;
 
                     html += `
-        <tr>
-            <td>${item.code || "-"}</td>
-            <td>${item.materialName || item.material || "-"}</td>
-            <td>${qty}</td>
-            <td>${item.unit || "-"}</td>
-            <td>${price.toLocaleString()}</td>
-            <td>${item.avg || "-"}</td>
-            <td>${item.supplier || "-"}</td>
-            <td>${item.date || "-"}</td>
-        </tr>
+            <tr>
+                <td>${item.code || "-"}</td>
+                <td>${item.materialName || item.material || "-"}</td>
+                <td>${qty}</td>
+                <td>${item.unit || "-"}</td>
+                <td>${price.toLocaleString()}</td>
+                <td>${item.average || "-"}</td>
+                <td>${item.supplier || "-"}</td>
+                <td>${item.date || "-"}</td>
+            </tr>
         `;
                 });
 
@@ -1990,7 +2095,6 @@
 
                 loadPurchasesData();
             }
-
             /* ================= PRODUKSI ================= */
             function toggleProduksi() {
                 const menu = document.getElementById("produksiSubMenu");
@@ -2420,59 +2524,80 @@
             }
 
             async function loadWasteFG() {
-
-                const snap = await getDocs(
-                    collection(db, "waste_fg")
-                );
-
+                const start = document.getElementById("wasteFgStart").value;
+                const end = document.getElementById("wasteFgEnd").value;
+                const snap = await getDocs(collection(db, "waste_fg"));
                 let html = "";
-
                 snap.forEach(d => {
-
                     const data = d.data();
+                    if (!data.date) return;
+                    if (start && end) {
+                        const itemDate = parseDate(data.date);
+                        const startDate = parseDate(start);
+                        const endDate = parseDate(end);
+
+                        if (!itemDate) return;
+                        if (itemDate < startDate || itemDate > endDate) return;
+                    }
 
                     html += `
-            <tr>
-                <td>${data.product}</td>
-                <td>${data.qty}</td>
-                <td>${data.note}</td>
-            </tr>
+        <tr>
+            <td>${data.productCode}</td>
+            <td>${data.productName}</td>
+            <td>${data.qty}</td>
+            <td>${data.date}</td>
+            <td>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteWasteFG('${d.id}')">
+                    Hapus
+                </button>
+            </td>
+        </tr>
         `;
                 });
 
-                document.getElementById(
-                    "wasteFGList"
-                ).innerHTML = html;
+                document.getElementById("wasteFGList").innerHTML = html;
             }
             async function loadWasteMaterial() {
-
-                const snap = await getDocs(
-                    collection(db, "waste_material")
-                );
-
+                const start = document.getElementById("wasteMaterialStart").value;
+                const end = document.getElementById("wasteMaterialEnd").value;
+                const snap = await getDocs(collection(db, "waste_material"));
                 let html = "";
-
                 snap.forEach(d => {
-
                     const data = d.data();
 
+                    if (!data.date) return;
+
+                    if (start && end) {
+                        const itemDate = parseDate(data.date);
+                        const startDate = parseDate(start);
+                        const endDate = parseDate(end);
+
+                        if (!itemDate) return;
+                        if (itemDate < startDate || itemDate > endDate) return;
+                    }
+
                     html += `
-            <tr>
-                <td>${data.material}</td>
-                <td>${data.qty}</td>
-                <td>${data.supplier}</td>
-                <td>${data.note}</td>
-            </tr>
+        <tr>
+            <td>${data.materialCode}</td>
+            <td>${data.materialName}</td>
+            <td>${data.qty}</td>
+            <td>${data.unit}</td>
+            <td>Rp ${Number(data.price).toLocaleString()}</td>
+            <td>${data.date}</td>
+            <td>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteWasteMaterial('${d.id}')">
+                    Hapus
+                </button>
+            </td>
+        </tr>
         `;
                 });
-
-                document.getElementById(
-                    "wasteMaterialList"
-                ).innerHTML = html;
+                document.getElementById("wasteMaterialList").innerHTML = html;
             }
             /* ================= FORECAST PRODUKSI ================= */
             let forecastProductionData = [];
-
             function parseDate(str) {
                 const [y, m, d] = str.split("-").map(Number);
                 return new Date(y, m - 1, d);
@@ -2480,7 +2605,6 @@
 
             function formatBulan(start) {
                 const [y, m] = start.split("-");
-
                 const bulanNama = [
                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -2490,7 +2614,6 @@
             }
 
             async function viewForecastProduction() {
-
                 const start = document.getElementById("prodStartDate").value;
                 const end = document.getElementById("prodEndDate").value;
 
@@ -2504,12 +2627,9 @@
                 const prodSnap = await getDocs(collection(db, "production_results"));
                 const recipeSnap = await getDocs(collection(db, "product_recipes"));
                 const materialSnap = await getDocs(collection(db, "materials"));
-
                 const materialMap = {};
-
                 const startDate = parseDate(start);
                 const endDate = parseDate(end);
-
                 prodSnap.forEach(prod => {
 
                     const p = prod.data();
@@ -2558,7 +2678,6 @@
                 });
 
                 forecastProductionData = Object.values(materialMap);
-
                 forecastProductionData.sort((a, b) =>
                     a.code.localeCompare(b.code)
                 );
@@ -2583,9 +2702,7 @@
 
                 document.getElementById("forecastProductionTitle").innerHTML =
                     `Forecast Produksi Bulan ${formatBulan(start)}`;
-
                 document.getElementById("forecastProductionTable").innerHTML = html;
-
                 document.getElementById("forecastProductionTotal").innerHTML =
                     `Rp ${grandTotal.toLocaleString()}`;
             }
@@ -2594,7 +2711,6 @@
             /* ================= EXPORT PDF ================= */
 
             async function exportForecastPDF() {
-
                 if (forecastProductionData.length === 0) {
                     alert("Data forecast kosong");
                     return;
@@ -2602,9 +2718,7 @@
 
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF("landscape", "pt", "a4");
-
                 const start = document.getElementById("prodStartDate").value;
-
                 const bulanNama = [
                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -2612,12 +2726,9 @@
 
                 const [y, m] = start.split("-");
                 const bulan = `${bulanNama[parseInt(m) - 1]} ${y}`;
-
                 doc.setFontSize(16);
                 doc.text(`Forecast Produksi Bulan ${bulan}`, 40, 40);
-
                 let total = 0;
-
                 const rows = forecastProductionData.map(item => {
 
                     total += item.price;
@@ -2655,6 +2766,319 @@
 
             window.exportForecastPDF = exportForecastPDF;
 
+            /* =========================================================
+            INPUT WASTE MENU
+            ========================================================= */
+            function openWasteMenu() {
+                showPage("input_waste");
+            }
+            /* =========================================================
+            WASTE FG
+            ========================================================= */
+            async function openWasteFGPage() {
+                showPage("produksi_waste_fg");
+                const select =
+                    document.getElementById("wasteFgProduct");
+                if (!select) return;
+                const snap = await getDocs(
+                    query(
+                        collection(db, "products"),
+                        orderBy("code", "asc")
+                    )
+                );
+
+                let html = `
+<option value="">
+    Pilih Produk
+</option>
+`;
+
+                snap.forEach(d => {
+                    const data = d.data();
+                    html += `
+<option value="${data.code}">
+    ${data.code} - ${data.name}
+</option>
+`;
+                });
+
+                select.innerHTML = html;
+
+                loadWasteFGTable();
+            }
+            async function saveWasteFG() {
+                const productCode =
+                    document.getElementById("wasteFgProduct")?.value;
+                const qty =
+                    document.getElementById("wasteFgQty")?.value;
+                const date =
+                    document.getElementById("wasteFgDate")?.value;
+
+                if (!productCode || !qty || !date) {
+                    alert("Lengkapi data");
+                    return;
+                }
+                let productName = "";
+                const snap = await getDocs(
+                    collection(db, "products")
+                );
+                snap.forEach(d => {
+
+                    if (d.data().code === productCode) {
+                        productName = d.data().name;
+                    }
+                });
+                await addDoc(
+                    collection(db, "waste_fg"),
+                    {
+                        productCode,
+                        productName,
+                        qty: Number(qty),
+                        date,
+                        createdAt: serverTimestamp()
+                    }
+                );
+
+                alert("Waste FG berhasil disimpan");
+                document.getElementById("wasteFgQty").value = "";
+                document.getElementById("wasteFgDate").value = "";
+                loadWasteFGTable();
+            }
+            async function loadWasteFGTable() {
+                const start = document.getElementById("wasteFgStart")?.value;
+                const end = document.getElementById("wasteFgEnd")?.value;
+
+                const snap = await getDocs(
+                    query(
+                        collection(db, "waste_fg"),
+                        orderBy("date", "desc")
+                    )
+                );
+
+                let html = "";
+
+                snap.forEach(d => {
+                    const data = d.data();
+
+                    // ✅ FILTER AMAN (STRING COMPARISON)
+                    if (start && end) {
+                        if (data.date < start || data.date > end) return;
+                    }
+
+                    html += `
+        <tr>
+            <td>${data.productCode}</td>
+            <td>${data.productName}</td>
+            <td>${data.qty}</td>
+            <td>${data.date}</td>
+            <td width="120">
+                <button class="btn btn-danger btn-sm w-100" onclick="deleteWasteFG('${d.id}')">
+                    Hapus
+                </button>
+            </td>
+        </tr>
+        `;
+                });
+
+                const el = document.getElementById("wasteFGList");
+                if (el) el.innerHTML = html;
+            }
+            async function deleteWasteFG(id) {
+                if (!confirm("Hapus waste FG ?")) return;
+                await deleteDoc(
+                    doc(db, "waste_fg", id)
+                );
+                loadWasteFGTable();
+            }
+            /* =========================================================
+            WASTE MATERIAL
+            ========================================================= */
+            async function openWasteMaterialPage() {
+                showPage("produksi_waste_bahan");
+                /* MATERIAL */
+                const materialSelect =
+                    document.getElementById("wasteMaterialName");
+                if (!materialSelect) return;
+                const materialSnap = await getDocs(
+                    query(
+                        collection(db, "materials"),
+                        orderBy("code", "asc")
+                    )
+                );
+
+                let materialHtml = `
+    <option value="">
+        Pilih Bahan
+    </option>
+    `;
+
+                materialSnap.forEach(d => {
+                    const data = d.data();
+                    materialHtml += `
+    <option value="${data.code}">
+        ${data.code} - ${data.name}
+    </option>
+    `;
+                });
+                materialSelect.innerHTML = materialHtml;
+                /* UNIT */
+                const unitSnap = await getDocs(
+                    query(
+                        collection(db, "units"),
+                        orderBy("code", "asc")
+                    )
+                );
+
+                let unitHtml = "";
+                unitSnap.forEach(d => {
+                    unitHtml += `
+    <option value="${d.data().name}">
+        ${d.data().name}
+    </option>
+    `;
+                });
+
+                const unitEl =
+                    document.getElementById("wasteMaterialUnit");
+                if (unitEl) unitEl.innerHTML = unitHtml;
+                loadWasteMaterialTable();
+            }
+
+            async function calculateWasteMaterialPrice() {
+                const materialCode =
+                    document.getElementById("wasteMaterialName")?.value;
+                const qty =
+                    Number(
+                        document.getElementById("wasteMaterialQty")?.value
+                    );
+                if (!materialCode || !qty) {
+
+                    const priceEl =
+                        document.getElementById("wasteMaterialPrice");
+                    if (priceEl) priceEl.value = "";
+                    return;
+                }
+                const snap = await getDocs(
+                    collection(db, "materials")
+                );
+
+                let materialPrice = 0;
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (data.code === materialCode) {
+                        materialPrice = Number(data.price);
+                    }
+                });
+                const total = qty * materialPrice;
+                const priceEl =
+                    document.getElementById("wasteMaterialPrice");
+                if (priceEl) {
+                    priceEl.value = total.toLocaleString();
+                }
+            }
+            async function saveWasteMaterial() {
+                const materialCode =
+                    document.getElementById("wasteMaterialName")?.value;
+                const qty =
+                    document.getElementById("wasteMaterialQty")?.value;
+                const unit =
+                    document.getElementById("wasteMaterialUnit")?.value;
+                const date =
+                    document.getElementById("wasteMaterialDate")?.value;
+                if (
+                    !materialCode ||
+                    !qty ||
+                    !unit ||
+                    !date
+                ) {
+                    alert("Lengkapi data");
+                    return;
+                }
+
+                let materialName = "";
+                let materialPrice = 0;
+                const snap = await getDocs(
+                    collection(db, "materials")
+                );
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (data.code === materialCode) {
+
+                        materialName = data.name;
+                        materialPrice = Number(data.price);
+                    }
+                });
+                const totalPrice =
+                    Number(qty) * materialPrice;
+                await addDoc(
+                    collection(db, "waste_material"),
+                    {
+                        materialCode,
+                        materialName,
+                        qty: Number(qty),
+                        unit,
+                        price: totalPrice,
+                        date,
+                        createdAt: serverTimestamp()
+                    }
+                );
+
+                alert("Waste bahan berhasil disimpan");
+                document.getElementById("wasteMaterialQty").value = "";
+                document.getElementById("wasteMaterialPrice").value = "";
+                document.getElementById("wasteMaterialDate").value = "";
+                loadWasteMaterialTable();
+            }
+            async function loadWasteMaterialTable() {
+
+                const start = document.getElementById("wasteMaterialStart")?.value;
+                const end = document.getElementById("wasteMaterialEnd")?.value;
+
+                const snap = await getDocs(
+                    query(
+                        collection(db, "waste_material"),
+                        orderBy("date", "desc")
+                    )
+                );
+
+                let html = "";
+
+                snap.forEach(d => {
+                    const data = d.data();
+
+                    // 🔥 FILTER AMAN (STRING YYYY-MM-DD)
+                    if (start && end) {
+                        if (data.date < start || data.date > end) return;
+                    }
+
+                    html += `
+        <tr>
+            <td>${data.materialCode}</td>
+            <td>${data.materialName}</td>
+            <td>${data.qty}</td>
+            <td>${data.unit}</td>
+            <td>Rp ${Number(data.price).toLocaleString()}</td>
+            <td>${data.date}</td>
+            <td width="120">
+                <button class="btn btn-danger btn-sm w-100"
+                    onclick="deleteWasteMaterial('${d.id}')">
+                    Hapus
+                </button>
+            </td>
+        </tr>
+        `;
+                });
+
+                const el = document.getElementById("wasteMaterialList");
+                if (el) el.innerHTML = html;
+            }
+            async function deleteWasteMaterial(id) {
+                if (!confirm("Hapus waste bahan ?")) return;
+                await deleteDoc(
+                    doc(db, "waste_material", id)
+                );
+                loadWasteMaterialTable();
+            }
             /* ================= MARKETING CODE (FIXED FULL) ================= */
 
             /* TOGGLE MENU */
@@ -2669,12 +3093,9 @@
                 const snap = await getDocs(
                     query(collection(db, "stores"), orderBy("code", "desc"))
                 );
-
                 if (snap.empty) return "ST001";
-
                 const last = snap.docs[0].data().code;
                 const num = parseInt(last.replace("ST", "")) + 1;
-
                 return "ST" + String(num).padStart(3, "0");
             }
 
@@ -2710,7 +3131,6 @@
 
                 await loadStores();
                 await setStoreCode();
-
                 document.getElementById("storeName").value = "";
                 document.getElementById("storeAddress").value = "";
                 document.getElementById("storePhone").value = "";
@@ -2719,9 +3139,7 @@
             /* LOAD STORES */
             async function loadStores() {
                 const snap = await getDocs(collection(db, "stores"));
-
                 let data = [];
-
                 snap.forEach(d => {
                     data.push({ id: d.id, ...d.data() });
                 });
@@ -2753,14 +3171,12 @@
                 });
 
                 document.getElementById("storeList").innerHTML = html;
-
                 await setStoreCode();
             }
 
             /* DELETE STORE */
             async function deleteStore(id) {
                 if (!confirm("Hapus data toko ini?")) return;
-
                 await deleteDoc(doc(db, "stores", id));
                 await loadStores();
                 alert("Toko berhasil dihapus");
@@ -2773,7 +3189,6 @@
 
                 // dropdown store
                 const snap = await getDocs(collection(db, "stores"));
-
                 let html = `<option value="">Pilih Toko</option>`;
                 snap.forEach(d => {
                     const data = d.data();
@@ -2785,7 +3200,6 @@
 
                 const select = document.getElementById("salesStore");
                 if (select) select.innerHTML = html;
-
                 await loadSalesTable();
             }
 
@@ -2794,7 +3208,6 @@
                 const storeCode = document.getElementById("salesStore").value;
                 const value = document.getElementById("salesValue").value;
                 const date = document.getElementById("salesDate").value;
-
                 if (!storeCode || !value || !date) {
                     alert("Lengkapi data sales");
                     return;
@@ -2802,7 +3215,6 @@
 
                 let storeName = "";
                 const snap = await getDocs(collection(db, "stores"));
-
                 snap.forEach(d => {
                     if (d.data().code === storeCode) {
                         storeName = d.data().name;
@@ -2818,9 +3230,7 @@
                 });
 
                 alert("Sales berhasil disimpan");
-
                 await loadSalesTable();
-
                 document.getElementById("salesValue").value = "";
                 document.getElementById("salesDate").value = "";
             }
@@ -2828,9 +3238,7 @@
             /* LOAD SALES TABLE (INPUT PAGE) */
             async function loadSalesTable() {
                 const snap = await getDocs(collection(db, "sales"));
-
                 let data = [];
-
                 snap.forEach(d => {
                     data.push({ id: d.id, ...d.data() });
                 });
@@ -2843,9 +3251,7 @@
                 });
 
                 let html = "";
-
                 let totalSales = 0;
-
                 data.forEach(d => {
                     totalSales += Number(d.value);
 
@@ -2943,6 +3349,8 @@
                 }
             }
 
+
+
             /* ================= INIT ================= */
             function loadAll() {
                 loadUnits();
@@ -3016,6 +3424,18 @@
             window.deleteStore = deleteStore;
             window.deleteSales = deleteSales;
             window.loadSalesTable = loadSalesTable;
+
+            window.openWasteMenu = openWasteMenu;
+            window.openWasteFGPage = openWasteFGPage;
+            window.saveWasteFG = saveWasteFG;
+            window.deleteWasteFG = deleteWasteFG;
+            window.loadWasteFGTable = loadWasteFGTable;
+
+            window.openWasteMaterialPage = openWasteMaterialPage;
+            window.calculateWasteMaterialPrice = calculateWasteMaterialPrice;
+            window.saveWasteMaterial = saveWasteMaterial;
+            window.loadWasteMaterialTable = loadWasteMaterialTable;
+            window.deleteWasteMaterial = deleteWasteMaterial;
 
         </script>
 
@@ -3125,6 +3545,7 @@
                 });
 
                 const jam = now.toLocaleTimeString('id-ID');
+
                 document.getElementById("hari").innerText = hari;
                 document.getElementById("tanggal").innerText = tanggal;
                 document.getElementById("jam").innerText = jam;
