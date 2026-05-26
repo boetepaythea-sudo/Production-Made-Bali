@@ -205,6 +205,8 @@
                     <i class="fa-solid fa-chart-line"></i>
                     Dashboard
                 </a>
+
+                <!-- ================= MASTER DATA MENU ================= -->
                 <a href="#" onclick="toggleMaster()">
                     <i class="fa-solid fa-database"></i>
                     Master Data
@@ -215,8 +217,10 @@
                     <a href="#" onclick="showMaster('supplier')">- Supplier</a>
                     <a href="#" onclick="showMaster('bahan')">- Bahan Baku</a>
                     <a href="#" onclick="showProductionRecipe()">- Forecast Produk</a>
+                    <a href="#" onclick="showPriceProduct()">- Harga Jual Produk</a>
                 </div>
 
+                <!-- ================= PURCHASING MENU ================= -->
                 <a href="#" onclick="togglePurchasing()">
                     <i class="fa-solid fa-cart-shopping"></i>Purchasing</a>
                 <div id="purchasingSubMenu" style="display:none; padding-left:20px;">
@@ -224,6 +228,7 @@
                     <a href="#" onclick="showPage('purchasing_viewdata')">- Summary Data PO BB</a>
                 </div>
 
+                <!-- ================= PRODUKSI MENU ================= -->
                 <a href="#" onclick="toggleProduksi()">
                     <i class="fa-solid fa-industry"></i>
                     Produksi
@@ -237,24 +242,40 @@
                     <a href="#" onclick="showPage('input_waste')">- Input Waste</a>
                 </div>
 
+                <!-- ================= MARKETING MENU ================= -->
                 <a href="#" onclick="toggleMarketing()">
                     <i class="fa-solid fa-bullhorn"></i>
                     Marketing
                 </a>
                 <div id="marketingSubMenu" style="display:none; padding-left:20px;">
                     <a href="#" onclick="showPage('marketing_toko')">- Input Data Toko</a>
-                    <a href="#" onclick="openMarketingSales()">- Input Sales</a>
+                    <a href="#" onclick="openSalesFGPage()">- Input Sales FG</a>
+                    <a href="#" onclick="openMarketingSales()">- Input Sales Value</a>
                     <a href="#" onclick="showPage('marketing_report'); loadSalesReport()">- Report Sales</a>
                 </div>
 
+                <!-- ================= ACCOUNTING MENU ================= -->
+                <li>
+                    <a href="#" onclick="toggleAccounting()">
+                        <i class="fa-solid fa-coins"></i>
+                        Accounting
+                    </a>
+                    <!-- SUB MENU -->
+                    <div id="accountingSubMenu" class="submenu" style="display:none; padding-left:15px;">
+                        <a href="#" onclick="openProductionCost()">
+                            - Input Cost Production
+                        </a>
+                        <a href="#" onclick="openProfitLoss()">
+                            <i class="fa-solid fa-chart-line"></i>
+                            Laba Rugi
+                        </a>
+                    </div>
+                </li>
+
+                <!-- ================= GUDANG MENU ================= -->
                 <a href="#" onclick="showPage('gudang')">
                     <i class="fa-solid fa-warehouse"></i>
                     Gudang
-                </a>
-
-                <a href="#" onclick="showPage('accounting')">
-                    <i class="fa-solid fa-coins"></i>
-                    Accounting
                 </a>
 
                 <a href="#" onclick="logout()">
@@ -492,6 +513,50 @@
                         </div>
                     </div>
                 </div>
+                <!-- ================= PRICE FG ================= -->
+                <div id="pricefg" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-warning mb-3">
+                            <i class="fa-solid fa-tags"></i>
+                            Harga Jual Produk
+                        </h3>
+                        <div class="section-divider"></div>
+                        <!-- FORM INPUT -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Produk</label>
+                                <select id="priceFgProduct" class="form-control">
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Qty Per Box</label>
+                                <input type="number" id="priceFgQtyBox" class="form-control" placeholder="Isi per box">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Harga Jual</label>
+                                <input type="number" id="priceFgPrice" class="form-control" placeholder="Harga jual">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="savePriceFG()">
+                                    Simpan
+                                </button>
+                            </div>
+                        </div>
+                        <!-- TABLE -->
+                        <table class="table table-dark table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Produk</th>
+                                    <th>Qty / Box</th>
+                                    <th>Harga Jual</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="priceFGList"></tbody>
+                        </table>
+                    </div>
+                </div>
                 <!-- PURCHASING -->
                 <div id="purchasing" class="menu-page">
                     <div class="card-custom">
@@ -568,6 +633,8 @@
                         </div>
                     </div>
                 </div>
+
+
                 <!-- PURCHASING VIEW DATA -->
                 <div id="purchasing_viewdata" class="menu-page">
                     <div class="card-custom">
@@ -1014,7 +1081,7 @@
                         </button>
                     </div>
                 </div>
-                <!-- MARKETING -->
+                <!-- MARKETING MENU -->
                 <div id="marketing_toko" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -1057,6 +1124,75 @@
                                 </tr>
                             </thead>
                             <tbody id="storeList"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- SALES FINISH GOOD -->
+                <div id="salesFinishGood" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-shop"></i>
+                            Input Sales Finish Good
+                        </h3>
+                        <div class="section-divider"></div>
+                        <!-- HEADER -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Toko</label>
+
+                                <select id="salesFGStore" class="form-control">
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Tanggal</label>
+                                <input type="date" id="salesFGDate" class="form-control">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="addSalesFGRow()">
+                                    <i class="fa fa-plus"></i>
+                                    Tambah Produk
+                                </button>
+                            </div>
+                        </div>
+                        <!-- TABLE -->
+                        <div class="table-responsive mt-4">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Qty Box</th>
+                                        <th>Qty PCS</th>
+                                        <th>Harga / Box</th>
+                                        <th>Total</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesFGTable"></tbody>
+                            </table>
+                        </div>
+                        <!-- SAVE -->
+                        <button class="btn btn-success w-100 mt-3" onclick="saveSalesFG()">
+                            Simpan Sales FG
+                        </button>
+                        <hr>
+                        <!-- DATA -->
+                        <h4 class="text-warning mt-4">
+                            Data Sales FG
+                        </h4>
+                        <table class="table table-dark table-striped mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Toko</th>
+                                    <th>Produk</th>
+                                    <th>Qty Box</th>
+                                    <th>Qty PCS</th>
+                                    <th>Harga</th>
+                                    <th>Total</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesFGList"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1149,6 +1285,239 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- ================= ACCOUNTING ================= -->
+                <!-- ==== COST PRODUCTION ============ -->
+                <div id="productioncost" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-warning mb-4">
+                            Input Cost Production
+                        </h3>
+                        <!-- FILTER TANGGAL -->
+                        <div class="row mb-4">
+
+                            <div class="col-md-4">
+                                <label>Tanggal</label>
+
+                                <input type="date" id="costDate" class="form-control">
+                            </div>
+                        </div>
+
+                        <!-- TABLE INPUT -->
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="150">Kode</th>
+                                    <th>Nama Biaya</th>
+                                    <th width="250">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>COST001</td>
+                                    <td>Biaya Gaji Karyawan</td>
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costSalary"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST002</td>
+                                    <td>Biaya Listrik PLN</td>
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costElectric"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST003</td>
+                                    <td>Biaya Gas</td>
+
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costGas"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST004</td>
+                                    <td>Biaya Telepon / Internet</td>
+
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costInternet"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST005</td>
+                                    <td>Biaya Air Produksi</td>
+
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costAir"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST006</td>
+                                    <td>Bahan Bakar Minyak/BBM</td>
+
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costBahanBakar"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST007</td>
+                                    <td>Biaya Alat Tulis Kantor</td>
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costAlatTulis"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST008</td>
+                                    <td>Biaya Kebersihan Samapah</td>
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costSampah"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST009</td>
+                                    <td>Biaya Kemanan</td>
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costKeamanan"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>COST010</td>
+                                    <td>Biaya Overhead lainnya</td>
+                                    <td>
+                                        <input type="number" class="form-control cost-input" id="costOverhead"
+                                            placeholder="Input biaya">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- TOTAL -->
+                        <div class="text-end mb-4">
+                            <h4 class="text-warning">
+                                Total Cost Overhead :
+                                <span id="costTotal">
+                                    Rp 0
+                                </span>
+                            </h4>
+                        </div>
+                        <!-- BUTTON -->
+                        <button class="btn btn-warning w-100" onclick="saveProductionCost()">
+                            Submit Data
+                        </button>
+                        <!-- REPORT -->
+                        <hr class="mt-5 mb-4">
+                        <h4 class="text-warning mb-3">
+                            Report Cost Production
+                        </h4>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="date" id="costStartDate" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" id="costEndDate" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-warning w-100" onclick="loadProductionCostReport()">
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Kode</th>
+                                    <th>Nama Biaya</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productionCostList">
+                            </tbody>
+                        </table>
+                        <div class="text-end">
+                            <h4 class="text-warning">
+                                Total Cost :
+                                <span id="productionCostGrandTotal">
+                                    Rp 0
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- ==== LABA RUGI ============ -->
+                <div id="profitloss" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-warning mb-4">
+                            Laporan Laba Rugi
+                        </h3>
+
+                        <!-- FILTER -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label>Tanggal Awal</label>
+                                <input type="date" id="plStartDate" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Tanggal Akhir</label>
+
+                                <input type="date" id="plEndDate" class="form-control">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="loadProfitLoss()">
+                                    Load
+                                </button>
+                            </div>
+                        </div>
+                        <!-- TABLE -->
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Keterangan</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Sales</td>
+                                    <td id="plSales">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td>HPP Produksi</td>
+                                    <td id="plCOGS">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td>Cost Production Overhead</td>
+                                    <td id="plOverhead">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td>Waste Bahan</td>
+                                    <td id="plWasteMaterial">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td>Waste Finished Goods</td>
+                                    <td id="plWasteFG">Rp 0</td>
+                                </tr>
+                                <tr class="table-warning">
+                                    <td>
+                                        <b>Laba Kotor</b>
+                                    </td>
+                                    <td id="plGrossProfit">
+                                        <b>Rp 0</b>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <!-- GUDANG -->
                 <div id="gudang" class="menu-page">
                     <div class="card-custom">
@@ -1172,43 +1541,13 @@
                         </table>
                     </div>
                 </div>
-                <!-- ACCOUNTING -->
-                <div id="accounting" class="menu-page">
-                    <div class="card-custom">
-                        <h4>Accounting</h4>
-                        <table class="table table-dark table-striped mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Keterangan</th>
-                                    <th>Masuk</th>
-                                    <th>Keluar</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr>
-                                    <td>Penjualan</td>
-                                    <td>Rp 15.000.000</td>
-                                    <td>-</td>
-                                </tr>
-
-                                <tr>
-                                    <td>Pembelian</td>
-                                    <td>-</td>
-                                    <td>Rp 5.000.000</td>
-                                </tr>
-                            </tbody>
-
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
         <script type="module">
 
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
             const firebaseConfig = {
                 apiKey: "AIzaSyCqmojmZagGLMpxpemlhf3L0u42lShW6NM",
@@ -1761,9 +2100,7 @@
                 renderRecipeTable();
             }
             function renderRecipeTable() {
-
                 let html = "";
-
                 recipeItems.forEach((item, index) => {
 
                     html += `
@@ -1771,7 +2108,6 @@
             <td>${item.material}</td>
             <td>${item.qty}</td>
             <td>${item.unit}</td>
-
             <td width="120">
                 <button class="btn btn-danger btn-sm"
                     onclick="deleteRecipeItem(${index})">
@@ -1852,6 +2188,10 @@
                     onclick="viewForecast('${product.code}')">
                     Detail
                 </button>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteForecast('${product.code}')">
+                    Delete
+                </button>
             </td>
         </tr>
         `;
@@ -1860,6 +2200,44 @@
                 const el = document.getElementById("forecastList");
                 if (el) el.innerHTML = html;
             }
+
+            window.deleteForecast = async function (code) {
+                const confirmDelete = confirm(
+                    "Yakin ingin menghapus forecast ini?"
+                );
+                if (!confirmDelete) return;
+                try {
+
+                    // hapus product
+                    const productSnap = await getDocs(
+                        query(
+                            collection(db, "products"),
+                            where("code", "==", code)
+                        )
+                    );
+                    for (const docItem of productSnap.docs) {
+                        await deleteDoc(doc(db, "products", docItem.id));
+                    }
+
+                    // hapus recipe terkait
+                    const recipeSnap = await getDocs(
+                        query(
+                            collection(db, "product_recipes"),
+                            where("productCode", "==", code)
+                        )
+                    );
+                    for (const docItem of recipeSnap.docs) {
+                        await deleteDoc(doc(db, "product_recipes", docItem.id));
+                    }
+                    alert("Forecast berhasil dihapus");
+                    loadForecast();
+                } catch (err) {
+
+                    console.error(err);
+                    alert("Gagal menghapus forecast");
+                }
+            }
+
             async function viewForecast(code) {
                 forecastSource = "forecast";
                 showPage('forecastdetail');
@@ -1945,6 +2323,192 @@
                 } else {
                     showPage("forecastproduk");
                 }
+            }
+
+            /* =========================================================
+            PRICE FG
+            ========================================================= */
+
+            /* ================= OPEN PAGE ================= */
+            async function showPriceProduct() {
+                showPage("pricefg");
+                await loadPriceFGProducts();
+                await loadPriceFGTable();
+            }
+
+            /* ================= LOAD PRODUCT ================= */
+            async function loadPriceFGProducts() {
+                const select =
+                    document.getElementById("priceFgProduct");
+                if (!select) return;
+                const snap = await getDocs(
+                    query(
+                        collection(db, "products"),
+                        orderBy("code", "asc")
+                    )
+                );
+
+                let html = `
+        <option value="">
+            Pilih Produk
+        </option>
+    `;
+
+                snap.forEach(d => {
+                    const data = d.data();
+                    html += `
+            <option value="${data.code}">
+                ${data.code} - ${data.name}
+            </option>
+        `;
+                });
+
+                select.innerHTML = html;
+            }
+
+            /* ================= SAVE PRICE ================= */
+            async function savePriceFG() {
+                const productCode =
+                    document.getElementById("priceFgProduct").value;
+                const qtyPerBox =
+                    Number(
+                        document.getElementById("priceFgQtyBox").value
+                    );
+
+                const price =
+                    Number(
+                        document.getElementById("priceFgPrice").value
+                    );
+
+                if (
+                    !productCode ||
+                    !qtyPerBox ||
+                    !price
+                ) {
+
+                    alert("Lengkapi data");
+                    return;
+                }
+
+                /* ================= PRODUCT NAME ================= */
+                let productName = "";
+                const productSnap =
+                    await getDocs(collection(db, "products"));
+                productSnap.forEach(d => {
+                    const data = d.data();
+                    if (data.code === productCode) {
+                        productName = data.name;
+                    }
+                });
+
+                /* ================= CHECK EXIST ================= */
+                const priceSnap =
+                    await getDocs(collection(db, "price_fg"));
+                let existingId = null;
+                priceSnap.forEach(d => {
+                    const data = d.data();
+                    if (data.productCode === productCode) {
+                        existingId = d.id;
+                    }
+                });
+
+                /* ================= UPDATE ================= */
+
+                if (existingId) {
+
+                    await updateDoc(
+                        doc(db, "price_fg", existingId),
+                        {
+                            qtyPerBox,
+                            price,
+                            updatedAt: serverTimestamp()
+                        }
+                    );
+
+                    alert("Harga jual berhasil diupdate");
+                }
+
+                /* ================= INSERT ================= */
+                else {
+                    await addDoc(
+                        collection(db, "price_fg"),
+                        {
+                            productCode,
+                            productName,
+                            qtyPerBox,
+                            price,
+                            createdAt: serverTimestamp()
+                        }
+                    );
+
+                    alert("Harga jual berhasil disimpan");
+                }
+
+                /* ================= RESET ================= */
+                document.getElementById("priceFgProduct").value = "";
+                document.getElementById("priceFgQtyBox").value = "";
+                document.getElementById("priceFgPrice").value = "";
+
+                await loadPriceFGTable();
+            }
+
+            /* ================= LOAD TABLE ================= */
+            async function loadPriceFGTable() {
+                const tbody =
+                    document.getElementById("priceFGList");
+                if (!tbody) return;
+                const snap = await getDocs(
+                    query(
+                        collection(db, "price_fg"),
+                        orderBy("productCode", "asc")
+                    )
+                );
+
+                let html = "";
+                snap.forEach(d => {
+
+                    const data = d.data();
+
+                    html += `
+            <tr>
+
+                <td>${data.productCode}</td>
+                <td>${data.productName}</td>
+                <td>${data.qtyPerBox}</td>
+                <td>
+                    Rp ${Number(data.price).toLocaleString()}
+                </td>
+                <td width="120">
+                    <button
+                        class="btn btn-danger btn-sm w-100"
+                        onclick="deletePriceFG('${d.id}')">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
+                });
+
+                tbody.innerHTML =
+                    html ||
+                    `
+        <tr>
+            <td colspan="5">
+                Tidak ada data
+            </td>
+        </tr>
+        `;
+            }
+
+            /* ================= DELETE ================= */
+            async function deletePriceFG(id) {
+                if (!confirm("Hapus harga jual produk?")) return;
+
+                await deleteDoc(
+                    doc(db, "price_fg", id)
+                );
+                await loadPriceFGTable();
+                alert("Harga jual berhasil dihapus");
             }
 
             /* ================= PURCHASING ================= */
@@ -2146,7 +2710,7 @@
 
                 totalEl.innerHTML = `Rp ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             }
-            
+
             /* ================= PRODUKSI ================= */
             function toggleProduksi() {
                 const menu = document.getElementById("produksiSubMenu");
@@ -3262,9 +3826,9 @@
                 );
                 loadWasteMaterialTable();
             }
-            /* ================= MARKETING CODE (FIXED FULL) ================= */
 
-            /* TOGGLE MENU */
+            /* ================= MARKETING CODE ================= */
+
             function toggleMarketing() {
                 const menu = document.getElementById("marketingSubMenu");
                 if (!menu) return;
@@ -3365,8 +3929,298 @@
                 alert("Toko berhasil dihapus");
             }
 
-            /* ================= SALES ================= */
-            /* OPEN SALES PAGE */
+            /* =========================================================
+                    SALES FINISH GOOD
+            ========================================================= */
+
+            let salesFGRowIndex = 0;
+
+            /* OPEN PAGE */
+            async function openSalesFGPage() {
+                showPage("salesFinishGood");
+                await loadSalesFGStores();
+                document.getElementById("salesFGTable").innerHTML = "";
+                addSalesFGRow();
+                loadSalesFGTable();
+            }
+
+            /* LOAD STORE */
+            async function loadSalesFGStores() {
+                const snap =
+                    await getDocs(collection(db, "stores"));
+                let html =
+                    `<option value="">Pilih Toko</option>`;
+                snap.forEach(doc => {
+
+                    const d = doc.data();
+
+                    html += `
+<option value="${d.code}">
+    ${d.code} - ${d.name}
+</option>
+`;
+                });
+
+                document.getElementById(
+                    "salesFGStore"
+                ).innerHTML = html;
+            }
+
+            /* ADD ROW */
+            async function addSalesFGRow() {
+                salesFGRowIndex++;
+                const rowId =
+                    `salesfgrow${salesFGRowIndex}`;
+                const productSnap =
+                    await getDocs(
+                        collection(db, "price_fg")
+                    );
+                let productOptions =
+                    `<option value="">Pilih Produk</option>`;
+                productSnap.forEach(doc => {
+                    const d = doc.data();
+
+                    productOptions += `
+<option value="${d.productCode}">
+    ${d.productCode} - ${d.productName}
+</option>
+`;
+                });
+
+                const html = `
+<tr id="${rowId}">
+    <td>
+        <select class="form-control salesfg-product"
+            onchange="setSalesFGPrice(this)">
+
+            ${productOptions}
+
+        </select>
+    </td>
+    <td>
+        <input type="number"
+            class="form-control salesfg-box"
+            value="0"
+            oninput="calculateSalesFGTotal(this)">
+    </td>
+    <td>
+        <input type="number"
+            class="form-control salesfg-pcs"
+            value="0">
+    </td>
+    <td>
+        <input type="number"
+            class="form-control salesfg-price"
+            readonly>
+    </td>
+    <td>
+        <input type="text"
+            class="form-control salesfg-total"
+            readonly>
+    </td>
+    <td>
+        <button class="btn btn-danger btn-sm"
+            onclick="removeSalesFGRow('${rowId}')">
+            Hapus
+        </button>
+    </td>
+</tr>
+`;
+
+                document.getElementById(
+                    "salesFGTable"
+                ).insertAdjacentHTML(
+                    "beforeend",
+                    html
+                );
+            }
+
+            /* REMOVE ROW */
+            function removeSalesFGRow(id) {
+                const el =
+                    document.getElementById(id);
+                if (el) el.remove();
+            }
+
+            /* SET PRICE */
+            async function setSalesFGPrice(selectEl) {
+
+                const row =
+                    selectEl.closest("tr");
+
+                const productCode =
+                    selectEl.value;
+
+                const priceInput =
+                    row.querySelector(".salesfg-price");
+
+                const snap =
+                    await getDocs(
+                        collection(db, "price_fg")
+                    );
+
+                let price = 0;
+
+                snap.forEach(doc => {
+
+                    const data = doc.data();
+
+                    if (data.productCode === productCode) {
+
+                        price =
+                            Number(data.price || 0);
+                    }
+                });
+
+                /* AUTO SET PRICE */
+                priceInput.value = price;
+
+                /* AUTO HITUNG TOTAL */
+                calculateSalesFGTotal(
+                    row.querySelector(".salesfg-box")
+                );
+            }
+
+            /* CALCULATE TOTAL */
+            function calculateSalesFGTotal(inputEl) {
+                const row =
+                    inputEl.closest("tr");
+                const qtyBox =
+                    Number(
+                        row.querySelector(".salesfg-box").value || 0
+                    );
+                const price =
+                    Number(
+                        row.querySelector(".salesfg-price").value || 0
+                    );
+                const total =
+                    qtyBox * price;
+                row.querySelector(".salesfg-total")
+                    .value =
+                    "Rp " + total.toLocaleString();
+            }
+
+            /* SAVE */
+            async function saveSalesFG() {
+
+                const store =
+                    document.getElementById(
+                        "salesFGStore"
+                    ).value;
+                const date =
+                    document.getElementById(
+                        "salesFGDate"
+                    ).value;
+                if (!store || !date) {
+                    alert("Lengkapi data");
+                    return;
+                }
+                const rows =
+                    document.querySelectorAll(
+                        "#salesFGTable tr"
+                    );
+
+                if (rows.length <= 0) {
+                    alert("Tambah produk");
+                    return;
+                }
+
+                for (const row of rows) {
+                    const productSelect =
+                        row.querySelector(".salesfg-product");
+                    const productCode =
+                        productSelect.value;
+                    const productName =
+                        productSelect.options[
+                            productSelect.selectedIndex
+                        ].text;
+                    const qtyBox =
+                        Number(
+                            row.querySelector(".salesfg-box").value || 0
+                        );
+                    const qtyPcs =
+                        Number(
+                            row.querySelector(".salesfg-pcs").value || 0
+                        );
+                    const price =
+                        Number(
+                            row.querySelector(".salesfg-price").value || 0
+                        );
+                    const total =
+                        qtyBox * price;
+                    if (!productCode) continue;
+                    await addDoc(
+                        collection(db, "sales_fg"),
+                        {
+                            store,
+                            productCode,
+                            productName,
+                            qtyBox,
+                            qtyPcs,
+                            price,
+                            total,
+                            date,
+                            createdAt: serverTimestamp()
+                        }
+                    );
+                }
+
+                alert("Sales FG berhasil disimpan");
+                document.getElementById(
+                    "salesFGTable"
+                ).innerHTML = "";
+                addSalesFGRow();
+                loadSalesFGTable();
+            }
+
+            /* LOAD TABLE */
+            async function loadSalesFGTable() {
+                const snap =
+                    await getDocs(
+                        collection(db, "sales_fg")
+                    );
+
+                let html = "";
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    html += `
+<tr>
+
+    <td>${d.store}</td>
+    <td>${d.productName}</td>
+    <td>${d.qtyBox}</td>
+    <td>${d.qtyPcs}</td>
+    <td>Rp ${Number(d.price).toLocaleString()}</td>
+    <td>Rp ${Number(d.total).toLocaleString()}</td>
+    <td>${d.date}</td>
+    <td>
+        <button class="btn btn-danger btn-sm"
+            onclick="deleteSalesFG('${doc.id}')">
+            Hapus
+        </button>
+    </td>
+</tr>
+`;
+                });
+
+                document.getElementById(
+                    "salesFGList"
+                ).innerHTML = html;
+            }
+
+            /* DELETE */
+            async function deleteSalesFG(id) {
+
+                if (!confirm("Hapus data?")) return;
+
+                await deleteDoc(
+                    doc(db, "sales_fg", id)
+                );
+
+                loadSalesFGTable();
+            }
+
+            /* ================= SALES VALUE ================= */
             async function openMarketingSales() {
                 showPage("marketing_sales");
 
@@ -3532,6 +4386,456 @@
                 }
             }
 
+            /* =========================================================
+            ACCOUNTING
+            ========================================================= */
+            function toggleAccounting() {
+
+                const menu =
+                    document.getElementById("accountingSubMenu");
+
+                if (!menu) return;
+
+                menu.style.display =
+                    menu.style.display === "block"
+                        ? "none"
+                        : "block";
+            }
+            /* =========================================================
+            COST PRODUCTION
+            ========================================================= */
+            /* ================= OPEN PAGE ================= */
+            async function openProductionCost() {
+                showPage("productioncost");
+                await loadProductionCostReport();
+                calculateProductionCostTotal();
+            }
+
+            /* ================= AUTO TOTAL ================= */
+            function calculateProductionCostTotal() {
+                const salary =
+                    Number(
+                        document.getElementById("costSalary").value || 0
+                    );
+                const electric =
+                    Number(
+                        document.getElementById("costElectric").value || 0
+                    );
+                const gas =
+                    Number(
+                        document.getElementById("costGas").value || 0
+                    );
+                const internet =
+                    Number(
+                        document.getElementById("costInternet").value || 0
+                    );
+                const air =
+                    Number(
+                        document.getElementById("costAir").value || 0
+                    );
+                const bbm =
+                    Number(
+                        document.getElementById("costBahanBakar").value || 0
+                    );
+                const atk =
+                    Number(
+                        document.getElementById("costAlatTulis").value || 0
+                    );
+                const keamanan =
+                    Number(
+                        document.getElementById("costKeamanan").value || 0
+                    );
+                const sampah =
+                    Number(
+                        document.getElementById("costSampah").value || 0
+                    );
+                const overhead =
+                    Number(
+                        document.getElementById("costOverhead").value || 0
+                    );
+                const total =
+                    salary +
+                    electric +
+                    gas +
+                    internet +
+                    air +
+                    bbm +
+                    atk +
+                    keamanan +
+                    sampah +
+                    overhead;
+
+                document.getElementById("costTotal").innerHTML =
+                    `Rp ${total.toLocaleString()}`;
+            }
+
+            /* ================= EVENT INPUT ================= */
+            document.addEventListener("input", function (e) {
+                if (
+                    e.target.classList.contains("cost-input")
+                ) {
+
+                    calculateProductionCostTotal();
+                }
+            });
+
+            /* ================= SAVE ================= */
+            async function saveProductionCost() {
+                const date =
+                    document.getElementById("costDate").value;
+                if (!date) {
+
+                    alert("Pilih tanggal");
+                    return;
+                }
+
+                const costData = [
+
+                    {
+                        code: "COST001",
+                        name: "Biaya Gaji Karyawan",
+                        value: Number(
+                            document.getElementById("costSalary").value || 0
+                        )
+                    },
+
+                    {
+                        code: "COST002",
+                        name: "Biaya Listrik PLN",
+                        value: Number(
+                            document.getElementById("costElectric").value || 0
+                        )
+                    },
+
+                    {
+                        code: "COST003",
+                        name: "Biaya Gas",
+                        value: Number(
+                            document.getElementById("costGas").value || 0
+                        )
+                    },
+
+                    {
+                        code: "COST004",
+                        name: "Biaya Telepon / Internet",
+                        value: Number(
+                            document.getElementById("costInternet").value || 0
+                        )
+                    },
+                    {
+                        code: "COST005",
+                        name: "Biaya Air Produksi",
+                        value: Number(
+                            document.getElementById("costAir").value || 0
+                        )
+                    },
+                    {
+                        code: "COST006",
+                        name: "Biaya Bahan Bakar Minyak / BBM",
+                        value: Number(
+                            document.getElementById("costBahanBakar").value || 0
+                        )
+                    },
+                    {
+                        code: "COST007",
+                        name: "Biaya Alat Tulis Kantor",
+                        value: Number(
+                            document.getElementById("costAlatTulis").value || 0
+                        )
+                    },
+                    {
+                        code: "COST008",
+                        name: "Biaya Kemanan",
+                        value: Number(
+                            document.getElementById("costKeamanan").value || 0
+                        )
+                    },
+                    {
+                        code: "COST009",
+                        name: "Biaya Kebersihan Sampah",
+                        value: Number(
+                            document.getElementById("costSampah").value || 0
+                        )
+                    },
+                    {
+                        code: "COST010",
+                        name: "Biaya Overhead Lainnya",
+                        value: Number(
+                            document.getElementById("costOverhead").value || 0
+                        )
+                    }
+
+                ];
+
+                let hasData = false;
+                for (const item of costData) {
+                    if (item.value <= 0) continue;
+                    hasData = true;
+                    await addDoc(
+                        collection(db, "production_cost"),
+                        {
+                            date,
+                            code: item.code,
+                            name: item.name,
+                            value: item.value,
+                            createdAt: serverTimestamp()
+                        }
+                    );
+                }
+
+                if (!hasData) {
+
+                    alert("Input cost terlebih dahulu");
+                    return;
+                }
+
+                alert("Cost Production berhasil disimpan");
+
+                /* RESET */
+
+                document.getElementById("costSalary").value = "";
+                document.getElementById("costElectric").value = "";
+                document.getElementById("costGas").value = "";
+                document.getElementById("costInternet").value = "";
+                document.getElementById("costAir").value = "";
+                document.getElementById("costBahanBakar").value = "";
+                document.getElementById("costAlatTulis").value = "";
+                document.getElementById("costKeamanan").value = "";
+                document.getElementById("costSampah").value = "";
+                document.getElementById("costOverhead").value = "";
+                document.getElementById("costTotal").innerHTML =
+                    "Rp 0";
+
+                await loadProductionCostReport();
+            }
+
+            /* ================= LOAD REPORT ================= */
+            async function loadProductionCostReport() {
+
+                const start =
+                    document.getElementById("costStartDate").value;
+
+                const end =
+                    document.getElementById("costEndDate").value;
+
+                const tbody =
+                    document.getElementById("productionCostList");
+
+                const grandTotalEl =
+                    document.getElementById("productionCostGrandTotal");
+
+                // RESET VIEW dulu
+                tbody.innerHTML = `
+        <tr>
+            <td colspan="10" class="text-center text-muted">
+                Silakan pilih tanggal untuk menampilkan data
+            </td>
+        </tr>
+    `;
+
+                grandTotalEl.innerHTML = "Rp 0";
+
+                // kalau belum filter, STOP
+                if (!start || !end) return;
+
+                const snap =
+                    await getDocs(collection(db, "production_cost"));
+
+                let html = "";
+                let grandTotal = 0;
+
+                snap.forEach(docSnap => {
+
+                    const data = docSnap.data();
+
+                    // FILTER RANGE
+                    if (data.date < start || data.date > end) return;
+
+                    grandTotal += Number(data.value || 0);
+
+                    html += `
+<tr>
+    <td>${data.date}</td>
+    <td>${data.code}</td>
+    <td>${data.name}</td>
+    <td>Rp ${Number(data.value).toLocaleString()}</td>
+</tr>
+`;
+                });
+
+                tbody.innerHTML =
+                    html ||
+                    `
+<tr>
+    <td colspan="4" class="text-center">
+        Tidak ada data pada periode ini
+    </td>
+</tr>
+`;
+
+                grandTotalEl.innerHTML =
+                    `Rp ${grandTotal.toLocaleString()}`;
+            }
+
+            /* =========================================================
+               OPEN PROFIT LOSS PAGE
+            ========================================================= */
+            function openProfitLoss() {
+
+                showPage("profitloss");
+            }
+
+            /* =========================================================
+               LOAD PROFIT LOSS
+            ========================================================= */
+            async function loadProfitLoss() {
+                const start =
+                    document.getElementById("plStartDate").value;
+                const end =
+                    document.getElementById("plEndDate").value;
+
+                if (!start || !end) {
+
+                    alert("Pilih tanggal");
+
+                    return;
+
+                }
+
+
+                /* ================= LOAD DATA ================= */
+                const salesSnap =
+                    await getDocs(collection(db, "sales"));
+                const prodSnap =
+                    await getDocs(collection(db, "production_results"));
+                const recipeSnap =
+                    await getDocs(collection(db, "product_recipes"));
+                const materialSnap =
+                    await getDocs(collection(db, "materials"));
+                const wasteMaterialSnap =
+                    await getDocs(collection(db, "waste_material"));
+                const wasteFGSnap =
+                    await getDocs(collection(db, "waste_fg"));
+
+                /* ================= SALES ================= */
+                let totalSales = 0;
+                salesSnap.forEach(docu => {
+                    const data = docu.data();
+                    if (data.date < start || data.date > end) return;
+                    totalSales += Number(data.value || 0);
+                });
+
+                /* ================= HPP ================= */
+                let totalCOGS = 0;
+                prodSnap.forEach(prodDoc => {
+                    const prod = prodDoc.data();
+                    if (prod.date < start || prod.date > end) return;
+                    const recipes = recipeSnap.docs
+                        .map(d => d.data())
+                        .filter(r =>
+                            r.productCode === prod.productCode
+                        );
+                    recipes.forEach(recipe => {
+                        const material = materialSnap.docs
+                            .map(d => d.data())
+                            .find(m =>
+                                m.name.toLowerCase().trim() ===
+                                recipe.material.toLowerCase().trim()
+                            );
+
+                        if (!material) return;
+                        const usedQty =
+                            Number(recipe.qty || 0) *
+                            Number(prod.fgPcs || 0);
+
+                        const totalValue =
+                            usedQty *
+                            Number(material.price || 0);
+
+                        totalCOGS += totalValue;
+                    });
+                });
+
+                /* ================= OVERHEAD COST ================= */
+                let totalOverhead = 0;
+                const costSnap =
+                    await getDocs(collection(db, "production_cost"));
+                costSnap.forEach(docu => {
+                    const data = docu.data();
+                    if (data.date < start || data.date > end) return;
+                    totalOverhead += Number(data.value || 0);
+                });
+
+
+                /* ================= WASTE MATERIAL ================= */
+                let totalWasteMaterial = 0;
+                wasteMaterialSnap.forEach(docu => {
+                    const data = docu.data();
+                    if (data.date < start || data.date > end) return;
+                    totalWasteMaterial +=
+                        Number(data.price || 0);
+                });
+
+                /* ================= WASTE FG ================= */
+                let totalWasteFG = 0;
+                wasteFGSnap.forEach(docu => {
+                    const waste = docu.data();
+                    if (waste.date < start || waste.date > end) return;
+                    const recipes = recipeSnap.docs
+                        .map(d => d.data())
+                        .filter(r =>
+                            r.productCode === waste.productCode
+                        );
+
+                    recipes.forEach(recipe => {
+
+                        const material = materialSnap.docs
+                            .map(d => d.data())
+                            .find(m =>
+                                m.name.toLowerCase().trim() ===
+                                recipe.material.toLowerCase().trim()
+                            );
+
+                        if (!material) return;
+
+                        const totalValue =
+                            Number(recipe.qty || 0) *
+                            Number(waste.qty || 0) *
+                            Number(material.price || 0);
+
+                        totalWasteFG += totalValue;
+                    });
+                });
+
+                /* ================= GROSS PROFIT ================= */
+
+                const grossProfit =
+                    totalSales -
+                    totalCOGS -
+                    totalOverhead -
+                    totalWasteMaterial -
+                    totalWasteFG;
+
+                /* ================= RENDER ================= */
+
+                document.getElementById("plSales").innerHTML =
+                    `Rp ${totalSales.toLocaleString()}`;
+
+                document.getElementById("plCOGS").innerHTML =
+                    `Rp ${totalCOGS.toLocaleString()}`;
+
+                document.getElementById("plOverhead").innerHTML =
+                    `Rp ${totalOverhead.toLocaleString()}`;
+
+                document.getElementById("plWasteMaterial").innerHTML =
+                    `Rp ${totalWasteMaterial.toLocaleString()}`;
+
+                document.getElementById("plWasteFG").innerHTML =
+                    `Rp ${totalWasteFG.toLocaleString()}`;
+
+                document.getElementById("plGrossProfit").innerHTML =
+                    `Rp ${grossProfit.toLocaleString()}`;
+            }
 
 
             /* ================= INIT ================= */
@@ -3570,7 +4874,6 @@
             window.loadSuppliers = loadSuppliers;
             window.loadMaterials = loadMaterials;
             window.deleteProduction = deleteProduction;
-
 
             window.deleteUnit = deleteUnit;
             window.deleteSupplier = deleteSupplier;
@@ -3621,8 +4924,30 @@
             window.deleteWasteMaterial = deleteWasteMaterial;
             window.loadCOGSData = loadCOGSData;
 
-        </script>
+            window.toggleAccounting = toggleAccounting;
+            window.openProfitLoss = openProfitLoss;
+            window.loadProfitLoss = loadProfitLoss;
 
+            window.loadCOGSData = loadCOGSData;
+            window.showPriceProduct = showPriceProduct;
+            window.savePriceFG = savePriceFG;
+            window.loadPriceFGTable = loadPriceFGTable;
+            window.deletePriceFG = deletePriceFG;
+
+            window.openSalesFGPage = openSalesFGPage;
+            window.addSalesFGRow = addSalesFGRow;
+            window.saveSalesFG = saveSalesFG;
+            window.deleteSalesFG = deleteSalesFG;
+            window.setSalesFGPrice = setSalesFGPrice;
+            window.calculateSalesFGTotal = calculateSalesFGTotal;
+            window.removeSalesFGRow = removeSalesFGRow;
+
+            window.openProductionCost = openProductionCost;
+            window.saveProductionCost = saveProductionCost;
+            window.loadProductionCostReport = loadProductionCostReport;
+
+
+        </script>
         <script>
 
             function showPage(id) {
@@ -3719,12 +5044,10 @@
 
             function updateDateTime() {
                 const now = new Date();
-
                 const hariList = [
                     "Minggu", "Senin", "Selasa", "Rabu",
                     "Kamis", "Jumat", "Sabtu"
                 ];
-
                 const hari = hariList[now.getDay()];
                 const tanggal = now.toLocaleDateString('id-ID', {
                     year: 'numeric',
@@ -3733,7 +5056,6 @@
                 });
 
                 const jam = now.toLocaleTimeString('id-ID');
-
                 document.getElementById("hari").innerText = hari;
                 document.getElementById("tanggal").innerText = tanggal;
                 document.getElementById("jam").innerText = jam;
