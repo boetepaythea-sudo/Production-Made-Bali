@@ -225,7 +225,7 @@
                     <i class="fa-solid fa-cart-shopping"></i>Purchasing</a>
                 <div id="purchasingSubMenu" style="display:none; padding-left:20px;">
                     <a href="#" onclick="showPage('purchasing')">- Input PO BB</a>
-                    <a href="#" onclick="showPage('purchasing_viewdata')">- Summary Data PO BB</a>
+                    <a href="#" onclick="showPage('purchasingView')">- View Data Purchasing</a>
                 </div>
 
                 <!-- ================= PRODUKSI MENU ================= -->
@@ -633,32 +633,46 @@
                         </div>
                     </div>
                 </div>
+                <!-- ================= VIEW DATA PURCHASING ================= -->
+                <div id="purchasingView" class="menu-page">
 
-
-                <!-- PURCHASING VIEW DATA -->
-                <div id="purchasing_viewdata" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-3">
-                            <i class="fa-solid fa-database"></i>
-                            Summary Data PO BB
+                            <i class="fa-solid fa-table"></i>
+                            View Data Purchasing
                         </h3>
                         <div class="section-divider"></div>
                         <!-- FILTER -->
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label>Dari Tanggal</label>
-                                <input type="date" id="purchaseStartDate" class="form-control">
+                                <input type="date" id="filterStartDate" class="form-control">
                             </div>
                             <div class="col-md-4">
                                 <label>Sampai Tanggal</label>
-                                <input type="date" id="purchaseEndDate" class="form-control">
+                                <input type="date" id="filterEndDate" class="form-control">
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="loadPurchasesData()">
-                                    <i class="fa-solid fa-filter"></i>
-                                    Filter Data
+
+                                    <i class="fa-solid fa-search"></i>
+                                    Tampilkan Data
                                 </button>
                             </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-danger w-100" onclick="printPurchasePDF()">
+
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                    Cetak PDF
+                                </button>
+                            </div>
+                        </div>
+                        <!-- TOTAL -->
+                        <div class="alert alert-warning text-dark fw-bold">
+                            Total Harga Beli :
+                            <span id="totalPurchasePrice">
+                                Rp 0
+                            </span>
                         </div>
                         <!-- TABLE -->
                         <div class="table-responsive">
@@ -677,15 +691,6 @@
                                 </thead>
                                 <tbody id="purchaseViewList"></tbody>
                             </table>
-                        </div>
-                        <!-- TOTAL -->
-                        <div class="mt-3 text-end">
-                            <h4 class="text-warning">
-                                Total Value :
-                                <span id="purchaseTotalValue">
-                                    Rp 0,00
-                                </span>
-                            </h4>
                         </div>
                     </div>
                 </div>
@@ -1737,21 +1742,30 @@
                     html = `
         <h4 class="mb-3 text-warning">
             Master Bahan Baku
-        </h4>
-        <div class="row">
-            <div class="col-md-4">
+                </h4>
+            <div class="row">
+            <div class="col-md-3">
                 <input type="text"
                     id="materialName"
                     class="form-control mb-2"
                     placeholder="Nama Bahan">
             </div>
-            <div class="col-md-4">
+
+            <div class="col-md-3">
                 <select id="materialUnit"
                     class="form-control mb-2">
                     <option value="">Pilih Satuan</option>
                 </select>
             </div>
-            <div class="col-md-4">
+
+            <div class="col-md-3">
+                <input type="number"
+                    id="materialWeight"
+                    class="form-control mb-2"
+                    placeholder="Weight">
+            </div>
+
+            <div class="col-md-3">
                 <input type="number"
                     id="materialPrice"
                     class="form-control mb-2"
@@ -1763,15 +1777,17 @@
             Simpan Bahan
         </button>
         <table class="table table-dark table-striped">
-            <thead>
-                <tr>
-                    <th>Kode</th>
-                    <th>Nama Bahan</th>
-                    <th>Satuan</th>
-                    <th>Harga</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+           <thead>
+            <tr>
+                <th>Kode</th>
+                <th>Nama Bahan</th>
+                <th>Satuan</th>
+                <th>Weight</th>
+                <th>Harga</th>
+                <th>Average</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
             <tbody id="materialList"></tbody>
         </table>
         `;
@@ -1934,36 +1950,40 @@
             }
             /* ================= BAHAN ================= */
             async function addMaterial() {
+
                 const name = document.getElementById("materialName").value;
                 const unit = document.getElementById("materialUnit").value;
+                const weight = document.getElementById("materialWeight").value;
                 const price = document.getElementById("materialPrice").value;
-                if (!name || !unit || !price) {
+
+                if (!name || !unit || !weight || !price) {
                     alert("Lengkapi data bahan");
                     return;
                 }
 
-                // hitung jumlah bahan
-                const q = query(
-                    collection(db, "materials"),
-                    orderBy("code", "asc")
-                );
-
-                const snap = await getDocs(q);
+                // hitung average
+                const average = Number(price) / Number(weight);
 
                 // generate kode
                 const code = await generateCode("materials", "MAT");
+
                 await addDoc(collection(db, "materials"), {
                     code,
                     name,
                     unit,
+                    weight,
                     price,
+                    average,
                     createdAt: serverTimestamp()
                 });
 
-                // reset
+                // reset form
                 document.getElementById("materialName").value = "";
+                document.getElementById("materialWeight").value = "";
                 document.getElementById("materialPrice").value = "";
+
                 loadMaterials();
+
                 alert("Bahan berhasil disimpan");
             }
 
@@ -1976,23 +1996,30 @@
                 const snap = await getDocs(q);
                 let html = "";
                 snap.forEach(d => {
+
                     html += `
-        <tr>
-            <td>${d.data().code}</td>
-            <td>${d.data().name}</td>
-            <td>${d.data().unit}</td>
-            <td>
-                Rp ${Number(d.data().price).toLocaleString()}
-            </td>
-            <td width="120">
-                <button
-                    class="btn btn-danger btn-sm w-100"
-                    onclick="deleteMaterial('${d.id}')">
-                    Hapus
-                </button>
-            </td>
-        </tr>
-        `;
+    <tr>
+        <td>${d.data().code}</td>
+        <td>${d.data().name}</td>
+        <td>${d.data().unit}</td>
+        <td>
+            ${Number(d.data().weight).toLocaleString()}
+        </td>
+        <td>
+            Rp ${Number(d.data().price).toLocaleString()}
+        </td>
+        <td>
+            Rp ${Number(d.data().average).toLocaleString()}
+        </td>
+        <td width="120">
+            <button
+                class="btn btn-danger btn-sm w-100"
+                onclick="deleteMaterial('${d.id}')">
+                Hapus
+            </button>
+        </td>
+    </tr>
+    `;
                 });
 
                 const el = document.getElementById("materialList");
@@ -2281,7 +2308,7 @@
                                 r.material?.toLowerCase().trim()
                             ) {
                                 materialCode = m.code;
-                                materialPrice = Number(m.price);
+                                materialPrice = Number(m.average || 0);
                             }
                         });
 
@@ -2603,6 +2630,7 @@
 
                 await loadPurchases();
                 await loadPurchasesData();
+
             }
 
             /* ================= LIST TABLE ================= */
@@ -2654,43 +2682,46 @@
                 await loadPurchases();
                 await loadPurchasesData();
 
+
                 alert("Berhasil dihapus");
             }
 
-            /* ================= SUMMARY DATA PURCHASING ================= */
+            /* ================= VIEW DATA PURCHASING ================= */
             async function loadPurchasesData() {
-                const start = document.getElementById("purchaseStartDate").value;
-                const end = document.getElementById("purchaseEndDate").value;
+                const startDate =
+                    document.getElementById("filterStartDate").value;
+                const endDate =
+                    document.getElementById("filterEndDate").value;
+                let q;
 
-                const tbody = document.getElementById("purchaseViewList");
-                const totalEl = document.getElementById("purchaseTotalValue");
+                // FILTER TANGGAL
+                if (startDate && endDate) {
+                    q = query(
+                        collection(db, "purchasing"),
+                        where("date", ">=", startDate),
+                        where("date", "<=", endDate),
+                        orderBy("date", "desc")
+                    );
 
-                tbody.innerHTML = "Loading...";
-                totalEl.innerHTML = "Rp 0,00";
+                } else {
 
-                const snap = await getDocs(collection(db, "purchasing"));
+                    q = query(
+                        collection(db, "purchasing"),
+                        orderBy("date", "desc")
+                    );
+                }
 
+                const snap = await getDocs(q);
                 let html = "";
-                let total = 0;
-
-                const startDate = start ? new Date(start) : null;
-                const endDate = end ? new Date(end) : null;
-                if (endDate) endDate.setHours(23, 59, 59, 999);
+                let grandTotal = 0;
 
                 snap.forEach(d => {
+
                     const item = d.data();
-                    const itemDate = item.date.toDate ? item.date.toDate() : new Date(item.date);
-
-                    // Filter data sesuai tanggal
-                    if (startDate && itemDate < startDate) return;
-                    if (endDate && itemDate > endDate) return;
-
                     const qty = Number(item.qty || 0);
                     const price = Number(item.price || 0);
-                    const average = qty > 0 ? price / qty : 0;
-
-                    // TOTAL VALUE = jumlah harga beli saja
-                    total += price;
+                    const average = price / (qty || 1);
+                    grandTotal += price;
 
                     html += `
             <tr>
@@ -2698,18 +2729,214 @@
                 <td>${item.material}</td>
                 <td>${qty}</td>
                 <td>${item.unit}</td>
-                <td>Rp ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td>Rp ${average.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+
+                <td>
+                    Rp ${price.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}
+                </td>
+
+                <td>
+                    Rp ${average.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}
+                </td>
+
                 <td>${item.supplier}</td>
                 <td>${item.date}</td>
             </tr>
         `;
                 });
 
-                tbody.innerHTML = html || "<tr><td colspan='8'>Tidak ada data</td></tr>";
+                // TOTAL HARGA BELI
+                document.getElementById("totalPurchasePrice").innerHTML =
+                    `Rp ${grandTotal.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}`;
 
-                totalEl.innerHTML = `Rp ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                // TABLE
+                document.getElementById("purchaseViewList").innerHTML =
+                    html || `
+            <tr>
+                <td colspan="8" class="text-center">
+                    Tidak ada data
+                </td>
+            </tr>
+        `;
             }
+            window.addEventListener("load", () => {
+
+                const today = new Date().toISOString().split("T")[0];
+
+                document.getElementById("filterStartDate").value = today;
+                document.getElementById("filterEndDate").value = today;
+
+                loadPurchasesData();
+            });
+
+            /* ================= EXPORT PURCHASE PDF ================= */
+            async function printPurchasePDF() {
+
+                // ================= JSPDF =================
+                const { jsPDF } = window.jspdf;
+
+                // PDF
+                const doc = new jsPDF(
+                    "landscape",
+                    "pt",
+                    "a4"
+                );
+
+                // ================= FILTER TANGGAL =================
+                const startDate =
+                    document.getElementById("filterStartDate").value;
+
+                const endDate =
+                    document.getElementById("filterEndDate").value;
+
+                let q;
+
+                // ================= QUERY =================
+                if (startDate && endDate) {
+
+                    q = query(
+                        collection(db, "purchasing"),
+                        where("date", ">=", startDate),
+                        where("date", "<=", endDate),
+                        orderBy("date", "desc")
+                    );
+
+                } else {
+
+                    q = query(
+                        collection(db, "purchasing"),
+                        orderBy("date", "desc")
+                    );
+                }
+
+                // ================= GET DATA =================
+                const snap = await getDocs(q);
+
+                // ================= CEK DATA =================
+                if (snap.empty) {
+                    alert("Data purchasing kosong");
+                    return;
+                }
+
+                // ================= FORMAT PRINT DATE =================
+                const today = new Date();
+
+                const printDate =
+                    today.getDate().toString().padStart(2, "0") + "/" +
+                    (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
+                    today.getFullYear();
+
+                // ================= TOTAL =================
+                let totalPrice = 0;
+
+                // ================= TABLE ROW =================
+                const rows = [];
+
+                let no = 1;
+
+                snap.forEach(d => {
+
+                    const item = d.data();
+
+                    const qty = Number(item.qty || 0);
+
+                    const price = Number(item.price || 0);
+
+                    const average = price / (qty || 1);
+
+                    totalPrice += price;
+
+                    rows.push([
+                        no++,
+                        item.code,
+                        item.material,
+                        qty,
+                        item.unit,
+                        "Rp " + price.toLocaleString(),
+                        "Rp " + average.toLocaleString(),
+                        item.supplier,
+                        item.date
+                    ]);
+                });
+
+                // ================= HEADER =================
+                doc.setFontSize(16);
+
+                doc.text(
+                    "LIST DETAIL PURCHASE ORDER",
+                    40,
+                    40
+                );
+
+                // ================= PERIODE =================
+                doc.setFontSize(11);
+
+                doc.text(
+                    `PERIODE ${startDate || "-"} S.D ${endDate || "-"}`,
+                    40,
+                    60
+                );
+
+                // ================= PRINT DATE =================
+                doc.text(
+                    `Print Date : ${printDate}`,
+                    650,
+                    60
+                );
+
+                // ================= TOTAL HARGA BELI =================
+                doc.setFontSize(12);
+
+                doc.text(
+                    `Total Purchase Order : Rp ${totalPrice.toLocaleString()}`,
+                    40,
+                    80
+                );
+
+                // ================= TABLE PDF =================
+                doc.autoTable({
+
+                    startY: 100,
+
+                    head: [[
+                        "No",
+                        "Kode",
+                        "Nama Bahan",
+                        "Qty",
+                        "Satuan",
+                        "Harga Beli",
+                        "Average",
+                        "Supplier",
+                        "Tanggal"
+                    ]],
+
+                    body: rows,
+
+                    theme: "grid",
+
+                    styles: {
+                        fontSize: 9
+                    },
+
+                    headStyles: {
+                        fillColor: [255, 193, 7]
+                    }
+                });
+
+                // ================= SAVE PDF =================
+                doc.save("Purchase-Order.pdf");
+            }
+
+            // ================= GLOBAL =================
+            window.printPurchasePDF = printPurchasePDF;
 
             /* ================= PRODUKSI ================= */
             function toggleProduksi() {
@@ -2997,7 +3224,7 @@
 
                     if (!recipe) return;
                     const recipeQty = Number(recipe.qty);
-                    const materialPrice = Number(material.price);
+                    const materialPrice = Number(material.average);
                     const totalMaterialQty = recipeQty * qtyProd;
                     const totalCost = totalMaterialQty * materialPrice;
 
@@ -3274,7 +3501,7 @@
 
                         const price =
                             weight *
-                            Number(material.price || 0);
+                            Number(material.average || 0);
 
                         if (!materialMap[key]) {
                             materialMap[key] = {
@@ -3469,7 +3696,7 @@
                         if (!material) continue;
 
                         const materialCode = material.code;
-                        const materialPrice = Number(material.price || 0);
+                        const materialPrice = Number(material.average || 0);
 
                         // PEMAKAIAN
                         const usedQty =
@@ -3713,7 +3940,7 @@
                 snap.forEach(d => {
                     const data = d.data();
                     if (data.code === materialCode) {
-                        materialPrice = Number(data.price);
+                        materialPrice = Number(data.average);
                     }
                 });
                 const total = qty * materialPrice;
@@ -3752,7 +3979,7 @@
                     if (data.code === materialCode) {
 
                         materialName = data.name;
-                        materialPrice = Number(data.price);
+                        materialPrice = Number(data.average);
                     }
                 });
                 const totalPrice =
@@ -4889,6 +5116,7 @@
             window.togglePurchasing = togglePurchasing;
             window.savePurchase = savePurchase;
             window.deletePurchase = deletePurchase;
+            window.printPurchasePDF = printPurchasePDF;
 
             window.toggleProduksi = toggleProduksi;
             window.showProduksi = showProduksi;
