@@ -546,14 +546,38 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Produk</label>
-                                <select id="priceFgProduct" class="form-control">
+                                <select id="priceFgProduct" class="form-control" onchange="calculatePriceFG()">
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>HPP Forecast / Pcs</label>
+                                <input type="text" id="priceFgForecastHpp" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bahan Baku Kemasan</label>
+                                <select id="priceFgMaterial" class="form-control" onchange="calculatePriceFG()">
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label>Qty Per Box</label>
-                                <input type="number" id="priceFgQtyBox" class="form-control" placeholder="Isi per box">
+                                <label>Harga Bahan Baku</label>
+                                <input type="text" id="priceFgMaterialPrice" class="form-control" readonly>
                             </div>
-                            <div class="col-md-3">
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-2">
+                                <label>Qty Per Box</label>
+                                <input type="number" id="priceFgQtyBox" class="form-control" placeholder="Isi per box"
+                                    oninput="calculatePriceFG()">
+                            </div>
+                            <div class="col-md-2">
+                                <label>HPP Forecast Box</label>
+                                <input type="text" id="priceFgForecastBox" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Total HPP</label>
+                                <input type="text" id="priceFgTotalHpp" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-2">
                                 <label>Harga Jual</label>
                                 <input type="number" id="priceFgPrice" class="form-control" placeholder="Harga jual">
                             </div>
@@ -570,6 +594,7 @@
                                     <th>Kode</th>
                                     <th>Produk</th>
                                     <th>Qty / Box</th>
+                                    <th>HPP Total</th>
                                     <th>Harga Jual</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -2576,9 +2601,7 @@
                         let html = "";
 
                         for (const productDoc of productSnap.docs) {
-
                             const product = productDoc.data();
-
                             const count = recipes.filter(r =>
                                 r.productCode === product.code
                             ).length;
@@ -2658,26 +2681,20 @@
 
                         document.getElementById("forecastTitle").innerHTML =
                             `Forecast Produk : ${productName}`;
-
                         // ambil recipe
                         const recipeSnap =
                             await getDocs(collection(db, "product_recipes"));
-
                         // ambil bahan baku
                         const materialSnap =
                             await getDocs(collection(db, "materials"));
 
                         let grandTotal = 0;
                         let rows = [];
-
                         recipeSnap.forEach(recipe => {
                             const r = recipe.data();
-
                             if (r.productCode === code) {
-
                                 let materialCode = "";
                                 let materialPrice = 0;
-
                                 materialSnap.forEach(mat => {
                                     const m = mat.data();
 
@@ -2692,9 +2709,7 @@
 
                                 const qty = Number(r.qty || 0);
                                 const totalPrice = qty * materialPrice;
-
                                 grandTotal += totalPrice;
-
                                 rows.push({
                                     code: materialCode || "UNKNOWN",
                                     html: `
@@ -2738,6 +2753,7 @@
                     async function showPriceProduct() {
                         showPage("pricefg");
                         await loadPriceFGProducts();
+                        await loadPriceFGMaterials();
                         await loadPriceFGTable();
                     }
 
@@ -2771,6 +2787,117 @@
                         select.innerHTML = html;
                     }
 
+                    async function loadPriceFGMaterials() {
+                        const select =
+                            document.getElementById("priceFgMaterial");
+                        console.log("SELECT =", select);
+                        if (!select) return;
+                        const snap = await getDocs(
+                            query(
+                                collection(db, "materials"),
+                                orderBy("code", "asc")
+                            )
+                        );
+                        console.log("TOTAL MATERIAL =", snap.size);
+                        let html = `
+        <option value="">
+            Pilih Bahan Baku
+        </option>
+    `;
+
+                        snap.forEach(d => {
+                            console.log(d.data());
+                            const data = d.data();
+                            html += `
+            <option
+                value="${d.id}"
+                data-name="${data.name}"
+                data-price="${Number(data.price || 0)}">
+                ${data.code} - ${data.name}
+            </option>
+        `;
+                        });
+
+                        select.innerHTML = html;
+                    }
+
+                    async function calculatePriceFG() {
+                        const productCode =
+                            document.getElementById("priceFgProduct").value;
+                        const materialSelect =
+                            document.getElementById("priceFgMaterial");
+                        let forecastHpp = 0;
+                        if (productCode) {
+                            const recipeSnap =
+                                await getDocs(
+                                    collection(db, "product_recipes")
+                                );
+                            const materialSnap =
+                                await getDocs(
+                                    collection(db, "materials")
+                                );
+                            recipeSnap.forEach(recipe => {
+                                const r = recipe.data();
+                                if (r.productCode === productCode) {
+                                    let avg = 0;
+
+                                    materialSnap.forEach(mat => {
+
+                                        const m = mat.data();
+
+                                        if (
+                                            m.name?.toLowerCase().trim() ===
+                                            r.material?.toLowerCase().trim()
+                                        ) {
+                                            avg = Number(m.average || 0);
+                                        }
+                                    });
+
+                                    forecastHpp +=
+                                        Number(r.qty || 0) * avg;
+                                }
+                            });
+                        }
+
+                        document.getElementById(
+                            "priceFgForecastHpp"
+                        ).value =
+                            forecastHpp.toLocaleString();
+                        let materialPrice = 0;
+                        if (materialSelect.value) {
+                            const selected =
+                                materialSelect.options[
+                                materialSelect.selectedIndex
+                                ];
+                            materialPrice =
+                                Number(
+                                    selected.getAttribute("data-price")
+                                ) || 0;
+                        }
+                        document.getElementById(
+                            "priceFgMaterialPrice"
+                        ).value =
+                            materialPrice.toLocaleString();
+
+                        const qtyPerBox =
+                            Number(
+                                document.getElementById("priceFgQtyBox").value
+                            ) || 0;
+
+                        const forecastBox =
+                            forecastHpp * qtyPerBox;
+                        document.getElementById(
+                            "priceFgForecastBox"
+                        ).value =
+                            forecastBox.toLocaleString();
+                        const totalHpp =
+                            forecastBox + materialPrice;
+                        document.getElementById(
+                            "priceFgTotalHpp"
+                        ).value =
+                            totalHpp.toLocaleString();
+                    }
+
                     /* ================= SAVE PRICE ================= */
                     async function savePriceFG() {
                         const productCode =
@@ -2785,6 +2912,37 @@
                                 document.getElementById("priceFgPrice").value
                             );
 
+                        const materialSelect =
+                            document.getElementById("priceFgMaterial");
+
+                        const materialName =
+                            materialSelect.value
+                                ? materialSelect.options[
+                                    materialSelect.selectedIndex
+                                ].getAttribute("data-name")
+                                : "";
+
+                        const materialPrice =
+                            materialSelect.value
+                                ? Number(
+                                    materialSelect.options[
+                                        materialSelect.selectedIndex
+                                    ].getAttribute("data-price")
+                                )
+                                : 0;
+
+                        const hppForecast =
+                            Number(
+                                document.getElementById("priceFgForecastHpp")
+                                    .value.replace(/,/g, "")
+                            ) || 0;
+
+                        const hppTotal =
+                            Number(
+                                document.getElementById("priceFgTotalHpp")
+                                    .value.replace(/,/g, "")
+                            ) || 0;
+
                         if (
                             !productCode ||
                             !qtyPerBox ||
@@ -2794,6 +2952,7 @@
                             alert("Lengkapi data");
                             return;
                         }
+
 
                         /* ================= PRODUCT NAME ================= */
                         let productName = "";
@@ -2826,6 +2985,10 @@
                                 {
                                     qtyPerBox,
                                     price,
+                                    materialName,
+                                    materialPrice,
+                                    hppForecast,
+                                    hppTotal,
                                     updatedAt: serverTimestamp()
                                 }
                             );
@@ -2841,6 +3004,10 @@
                                     productCode,
                                     productName,
                                     qtyPerBox,
+                                    materialName,
+                                    materialPrice,
+                                    hppForecast,
+                                    hppTotal,
                                     price,
                                     createdAt: serverTimestamp()
                                 }
@@ -2853,6 +3020,11 @@
                         document.getElementById("priceFgProduct").value = "";
                         document.getElementById("priceFgQtyBox").value = "";
                         document.getElementById("priceFgPrice").value = "";
+                        document.getElementById("priceFgMaterial").value = "";
+                        document.getElementById("priceFgForecastHpp").value = "";
+                        document.getElementById("priceFgForecastBox").value = "";
+                        document.getElementById("priceFgMaterialPrice").value = "";
+                        document.getElementById("priceFgTotalHpp").value = "";
 
                         await loadPriceFGTable();
                     }
@@ -2875,34 +3047,41 @@
                             const data = d.data();
 
                             html += `
-            <tr>
+                        <tr>
+                            <td>${data.productCode}</td>
+                            <td>${data.productName}</td>
+                            <td>${data.qtyPerBox}</td>
+                            <td>
+                                Rp ${Number(
+                                data.hppTotal || 0
+                            ).toLocaleString()}
+                            </td>
+                            <td>
+                                Rp ${Number(
+                                data.price || 0
+                            ).toLocaleString()}
+                            </td>
+                            <td width="120">
+                                <button
+                                    class="btn btn-danger btn-sm w-100"
+                                    onclick="deletePriceFG('${d.id}')">
+                                    Hapus
+                                </button>
+                            </td>
 
-                <td>${data.productCode}</td>
-                <td>${data.productName}</td>
-                <td>${data.qtyPerBox}</td>
-                <td>
-                    Rp ${Number(data.price).toLocaleString()}
-                </td>
-                <td width="120">
-                    <button
-                        class="btn btn-danger btn-sm w-100"
-                        onclick="deletePriceFG('${d.id}')">
-                        Hapus
-                    </button>
-                </td>
-            </tr>
-        `;
+                        </tr>
+                        `;
                         });
 
                         tbody.innerHTML =
                             html ||
                             `
-        <tr>
-            <td colspan="5">
-                Tidak ada data
-            </td>
-        </tr>
-        `;
+                    <tr>
+                        <td colspan="6">
+                            Tidak ada data
+                        </td>
+                    </tr>
+                    `;
                     }
 
                     /* ================= DELETE ================= */
@@ -3092,7 +3271,6 @@
                         const snap = await getDocs(q);
                         let html = "";
                         let grandTotal = 0;
-
                         snap.forEach(d => {
 
                             const item = d.data();
@@ -3107,21 +3285,18 @@
                 <td>${item.material}</td>
                 <td>${qty}</td>
                 <td>${item.unit}</td>
-
                 <td>
                     Rp ${price.toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             })}
                 </td>
-
                 <td>
                     Rp ${average.toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             })}
                 </td>
-
                 <td>${item.supplier}</td>
                 <td>${item.date}</td>
             </tr>
@@ -3146,9 +3321,7 @@
         `;
                     }
                     window.addEventListener("load", () => {
-
                         const today = new Date().toISOString().split("T")[0];
-
                         document.getElementById("filterStartDate").value = today;
                         document.getElementById("filterEndDate").value = today;
 
@@ -3171,7 +3344,6 @@
                         // ================= FILTER TANGGAL =================
                         const startDate =
                             document.getElementById("filterStartDate").value;
-
                         const endDate =
                             document.getElementById("filterEndDate").value;
 
@@ -3217,21 +3389,13 @@
 
                         // ================= TABLE ROW =================
                         const rows = [];
-
                         let no = 1;
-
                         snap.forEach(d => {
-
                             const item = d.data();
-
                             const qty = Number(item.qty || 0);
-
                             const price = Number(item.price || 0);
-
                             const average = price / (qty || 1);
-
                             totalPrice += price;
-
                             rows.push([
                                 no++,
                                 item.code,
@@ -3247,7 +3411,6 @@
 
                         // ================= HEADER =================
                         doc.setFontSize(16);
-
                         doc.text(
                             "LIST DETAIL PURCHASE ORDER",
                             40,
@@ -3256,7 +3419,6 @@
 
                         // ================= PERIODE =================
                         doc.setFontSize(11);
-
                         doc.text(
                             `PERIODE ${startDate || "-"} S.D ${endDate || "-"}`,
                             40,
@@ -3272,7 +3434,6 @@
 
                         // ================= TOTAL HARGA BELI =================
                         doc.setFontSize(12);
-
                         doc.text(
                             `Total Purchase Order : Rp ${totalPrice.toLocaleString()}`,
                             40,
@@ -3281,9 +3442,7 @@
 
                         // ================= TABLE PDF =================
                         doc.autoTable({
-
                             startY: 100,
-
                             head: [[
                                 "No",
                                 "Kode",
@@ -3297,13 +3456,10 @@
                             ]],
 
                             body: rows,
-
                             theme: "grid",
-
                             styles: {
                                 fontSize: 9
                             },
-
                             headStyles: {
                                 fillColor: [255, 193, 7]
                             }
@@ -3982,15 +4138,12 @@
 
                         doc.save(`Forecast-Produksi-${bulan}.pdf`);
                     }
-
                     window.exportForecastPDF = exportForecastPDF;
 
                     /* ================= LOAD COGS DATA ================= */
                     async function loadCOGSData() {
-
                         const start = document.getElementById("cogsStartDate").value;
                         const end = document.getElementById("cogsEndDate").value;
-
                         const fgTable = document.getElementById("cogsFGTable");
                         const materialTable = document.getElementById("cogsMaterialTable");
                         const totalEl = document.getElementById("cogsTotalValue");
@@ -4016,16 +4169,13 @@
                         let fgMap = {};
 
                         prodSnap.forEach(docu => {
-
                             const prod = docu.data();
-
                             // FILTER TANGGAL
                             if (start && end) {
                                 if (prod.date < start || prod.date > end) return;
                             }
 
                             const key = prod.productCode;
-
                             if (!fgMap[key]) {
                                 fgMap[key] = {
                                     productCode: prod.productCode,
@@ -4053,16 +4203,13 @@
                         // ================= MATERIAL USAGE =================
                         let materialUsage = {};
                         let totalCOGS = 0;
-
                         for (const fg of Object.values(fgMap)) {
-
                             // AMBIL RECIPE PRODUK
                             const recipes = recipeSnap.docs
                                 .map(d => d.data())
                                 .filter(r => r.productCode === fg.productCode);
 
                             for (const recipe of recipes) {
-
                                 // CARI MATERIAL
                                 const material = materialSnap.docs
                                     .map(d => d.data())
@@ -4072,7 +4219,6 @@
                                     );
 
                                 if (!material) continue;
-
                                 const materialCode = material.code;
                                 const materialPrice = Number(material.average || 0);
 
@@ -4083,9 +4229,7 @@
 
                                 const totalValue =
                                     usedQty * materialPrice;
-
                                 totalCOGS += totalValue;
-
                                 // GROUP MATERIAL
                                 if (!materialUsage[materialCode]) {
 
@@ -4382,10 +4526,8 @@
                         loadWasteMaterialTable();
                     }
                     async function loadWasteMaterialTable() {
-
                         const start = document.getElementById("wasteMaterialStart")?.value;
                         const end = document.getElementById("wasteMaterialEnd")?.value;
-
                         const snap = await getDocs(
                             query(
                                 collection(db, "waste_material"),
@@ -4537,9 +4679,7 @@
                     /* =========================================================
                             SALES FINISH GOOD
                     ========================================================= */
-
                     let salesFGRowIndex = 0;
-
                     /* OPEN PAGE */
                     async function openSalesFGPage() {
                         showPage("salesFinishGood");
@@ -4597,9 +4737,7 @@
     <td>
         <select class="form-control salesfg-product"
             onchange="setSalesFGPrice(this)">
-
             ${productOptions}
-
         </select>
     </td>
     <td>
@@ -4649,27 +4787,20 @@
 
                     /* SET PRICE */
                     async function setSalesFGPrice(selectEl) {
-
                         const row =
                             selectEl.closest("tr");
-
                         const productCode =
                             selectEl.value;
-
                         const priceInput =
                             row.querySelector(".salesfg-price");
-
                         const snap =
                             await getDocs(
                                 collection(db, "price_fg")
                             );
 
                         let price = 0;
-
                         snap.forEach(doc => {
-
                             const data = doc.data();
-
                             if (data.productCode === productCode) {
 
                                 price =
@@ -4679,7 +4810,6 @@
 
                         /* AUTO SET PRICE */
                         priceInput.value = price;
-
                         /* AUTO HITUNG TOTAL */
                         calculateSalesFGTotal(
                             row.querySelector(".salesfg-box")
@@ -4926,12 +5056,9 @@
                     /* DELETE SALES */
                     async function deleteSales(id) {
                         if (!confirm("Hapus data sales ini?")) return;
-
                         await deleteDoc(doc(db, "sales", id));
-
                         await loadSalesTable();
                         await loadSalesReport();
-
                         alert("Sales berhasil dihapus");
                     }
 
@@ -5215,16 +5342,12 @@
 
                     /* ================= LOAD REPORT ================= */
                     async function loadProductionCostReport() {
-
                         const start =
                             document.getElementById("costStartDate").value;
-
                         const end =
                             document.getElementById("costEndDate").value;
-
                         const tbody =
                             document.getElementById("productionCostList");
-
                         const grandTotalEl =
                             document.getElementById("productionCostGrandTotal");
 
@@ -5241,7 +5364,6 @@
 
                         // kalau belum filter, STOP
                         if (!start || !end) return;
-
                         const snap =
                             await getDocs(collection(db, "production_cost"));
 
@@ -5249,12 +5371,9 @@
                         let grandTotal = 0;
 
                         snap.forEach(docSnap => {
-
                             const data = docSnap.data();
-
                             // FILTER RANGE
                             if (data.date < start || data.date > end) return;
-
                             grandTotal += Number(data.value || 0);
 
                             html += `
@@ -5331,15 +5450,29 @@
 
                         /* ================= HPP ================= */
                         let totalCOGS = 0;
+                        let fgMap = {};
                         prodSnap.forEach(prodDoc => {
                             const prod = prodDoc.data();
                             if (prod.date < start || prod.date > end) return;
+
+                            if (!fgMap[prod.productCode]) {
+
+                                fgMap[prod.productCode] = {
+                                    qty: 0
+                                };
+                            }
+                            fgMap[prod.productCode].qty +=
+                                Number(prod.fgPcs || 0);
+                        });
+
+                        for (const productCode in fgMap) {
                             const recipes = recipeSnap.docs
                                 .map(d => d.data())
                                 .filter(r =>
-                                    r.productCode === prod.productCode
+                                    r.productCode === productCode
                                 );
-                            recipes.forEach(recipe => {
+
+                            for (const recipe of recipes) {
                                 const material = materialSnap.docs
                                     .map(d => d.data())
                                     .find(m =>
@@ -5347,18 +5480,17 @@
                                         recipe.material.toLowerCase().trim()
                                     );
 
-                                if (!material) return;
+                                if (!material) continue;
                                 const usedQty =
                                     Number(recipe.qty || 0) *
-                                    Number(prod.fgPcs || 0);
-
+                                    Number(fgMap[productCode].qty || 0);
                                 const totalValue =
                                     usedQty *
-                                    Number(material.price || 0);
+                                    Number(material.average || 0);
 
                                 totalCOGS += totalValue;
-                            });
-                        });
+                            }
+                        }
 
                         /* ================= OVERHEAD COST ================= */
                         let totalOverhead = 0;
@@ -5405,7 +5537,7 @@
                                 const totalValue =
                                     Number(recipe.qty || 0) *
                                     Number(waste.qty || 0) *
-                                    Number(material.price || 0);
+                                    Number(material.average || 0);
 
                                 totalWasteFG += totalValue;
                             });
@@ -5421,7 +5553,6 @@
                             totalWasteFG;
 
                         /* ================= RENDER ================= */
-
                         document.getElementById("plSales").innerHTML =
                             `Rp ${totalSales.toLocaleString()}`;
 
@@ -5567,12 +5698,9 @@
                     window.readStockAwalExcel = readStockAwalExcel;
                     /* ================= SAVE STOCK AWAL ================= */
                     async function saveStockAwalData() {
-
                         if (stockAwalExcelData.length === 0) {
-
                             alert("Data kosong");
                             return;
-
                         }
 
                         try {
@@ -5580,26 +5708,21 @@
                             // ===============================
                             // HAPUS DATA LAMA STOCK CARD
                             // ===============================
-
                             const oldSnap =
                                 await getDocs(
                                     collection(db, "stock_card")
                                 );
 
                             for (const docItem of oldSnap.docs) {
-
                                 await deleteDoc(
                                     doc(db, "stock_card", docItem.id)
                                 );
-
                             }
 
                             // ===============================
                             // INSERT DATA BARU
                             // ===============================
-
                             for (const item of stockAwalExcelData) {
-
                                 await addDoc(
                                     collection(db, "stock_card"),
                                     {
@@ -5608,20 +5731,14 @@
                                         createdAt: serverTimestamp()
                                     }
                                 );
-
                             }
-
                             alert(
                                 "Stock awal berhasil refresh stock card"
                             );
-
                         } catch (err) {
-
                             console.error(err);
                             alert("Gagal save stock awal");
-
                         }
-
                     }
 
                     window.saveStockAwalData = saveStockAwalData;
@@ -5645,7 +5762,6 @@
                             alert("Pilih tanggal SO");
                             return;
                         }
-
                         const reader = new FileReader();
                         reader.onload = async function (e) {
 
@@ -5653,7 +5769,6 @@
 
                                 const data =
                                     new Uint8Array(e.target.result);
-
                                 const workbook =
                                     XLSX.read(data, { type: "array" });
                                 const sheet =
@@ -5670,14 +5785,15 @@
                                 // LOAD MASTER MATERIAL
                                 const materialSnap =
                                     await getDocs(
-                                        collection(db, "materials")
+                                        query(
+                                            collection(db, "materials"),
+                                            orderBy("code", "asc")
+                                        )
                                     );
 
                                 let materialMap = {};
                                 materialSnap.forEach(d => {
-
                                     const m = d.data();
-
                                     materialMap[
                                         String(m.code).trim()
                                     ] = m;
@@ -5687,15 +5803,12 @@
                                 let html = "";
                                 let grandTotal = 0;
                                 let totalData = 0;
-
                                 json.forEach(item => {
-
                                     // HEADER EXCEL
                                     const code =
                                         item["Kode"] ||
                                         item["kode"] ||
                                         item["KODE"];
-
                                     const weight =
                                         Number(
                                             item["Weight"] ||
@@ -5705,12 +5818,10 @@
                                         );
 
                                     if (!code) return;
-
                                     const material =
                                         materialMap[
                                         String(code).trim()
                                         ];
-
                                     if (!material) {
                                         console.warn(
                                             "Material tidak ditemukan:",
@@ -5718,17 +5829,13 @@
                                         );
                                         return;
                                     }
-
                                     const average =
                                         Number(material.average || 0);
-
                                     const value =
                                         average * weight;
-
                                     // TOTAL
                                     grandTotal += value;
                                     totalData++;
-
                                     // ROW
                                     const row = {
 
@@ -5748,22 +5855,18 @@
                     <td>${row.code}</td>
                     <td>${row.name}</td>
                     <td>${row.unit}</td>
-
                     <td>
                         ${Number(row.weight)
                                             .toLocaleString()}
                     </td>
-
                     <td>
                         Rp ${Number(row.average)
                                             .toLocaleString()}
                     </td>
-
                     <td>
                         Rp ${Number(row.value)
                                             .toLocaleString()}
                     </td>
-
                     <td>${row.soDate}</td>
                 </tr>
             `;
@@ -5788,7 +5891,6 @@
                                     " data"
                                 );
                             } catch (err) {
-
                                 console.error(err);
                                 alert("Gagal membaca excel");
                             }
@@ -5809,7 +5911,6 @@
                             alert("Data SO kosong");
                             return;
                         }
-
                         for (const item of soExcelData) {
                             await addDoc(
                                 collection(db, "stock_opname"),
@@ -5836,12 +5937,9 @@
                         const end =
                             document.getElementById("filterSOEnd")
                                 .value;
-
                         let q;
-
                         // FILTER
                         if (start && end) {
-
                             q = query(
                                 collection(db, "stock_opname"),
                                 where("soDate", ">=", start),
@@ -5878,17 +5976,14 @@
                 ${Number(item.weight)
                                     .toLocaleString()}
             </td>
-
             <td>
                 Rp ${Number(item.average)
-                                    .toLocaleString()}
+                                   .toLocaleString()}
             </td>
-
             <td>
                 Rp ${Number(item.value)
                                     .toLocaleString()}
             </td>
-
             <td>${item.soDate}</td>
 
         </tr>
@@ -6094,11 +6189,8 @@
                             // =========================
                             // LOAD WASTE
                             // =========================
-
                             let wasteQuery;
-
                             if (start && end) {
-
                                 wasteQuery = query(
                                     collection(db, "waste_material"),
                                     where("date", ">=", start),
@@ -6106,12 +6198,10 @@
                                 );
 
                             } else {
-
                                 wasteQuery =
                                     collection(db, "waste_material");
 
                             }
-
                             const wasteSnap =
                                 await getDocs(wasteQuery);
 
@@ -6135,7 +6225,6 @@
                                     collection(db, "stock_opname");
 
                             }
-
                             const soSnap =
                                 await getDocs(soQuery);
 
@@ -6177,7 +6266,6 @@
                             // =========================
                             // PRODUKSI BERDASARKAN RECIPE
                             // =========================
-
                             produksiSnap.forEach(prodDoc => {
                                 const prod = prodDoc.data();
                                 const productCode =
@@ -6584,6 +6672,9 @@
                     window.loadPriceFGTable = loadPriceFGTable;
                     window.deletePriceFG = deletePriceFG;
 
+                    window.loadPriceFGMaterials = loadPriceFGMaterials;
+                    window.calculatePriceFG = calculatePriceFG;
+
                     window.openSalesFGPage = openSalesFGPage;
                     window.addSalesFGRow = addSalesFGRow;
                     window.saveSalesFG = saveSalesFG;
@@ -6645,9 +6736,7 @@
 
                     // CHART PRODUKSI
                     new Chart(document.getElementById('productionChart'), {
-
                         type: 'bar',
-
                         data: {
                             labels: ['Coklat', 'Keju', 'Sosis', 'Tawar'],
                             datasets: [{
