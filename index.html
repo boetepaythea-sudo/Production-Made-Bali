@@ -217,31 +217,31 @@
                 <div id="masterSubMenu" style="display:none; padding-left:20px;">
                     <a href="#" onclick="showMaster('satuan')">- UOM/Unit</a>
                     <a href="#" onclick="showMaster('supplier')">- Supplier</a>
-                    <a href="#" onclick="showMaster('bahan')">- Raw Material</a>
-                    <a href="#" onclick="showProductionRecipe()">- Forecast Produk</a>
-                    <a href="#" onclick="showPriceProduct()">- Product Selling Price</a>
+                    <a href="#" onclick="showMaster('bahan')">- Raw Materials</a>
+                    <a href="#" onclick="showProductionRecipe()">- Forecast Product</a>
+                    <a href="#" onclick="showPriceProduct()">- Selling Price Product</a>
                 </div>
 
                 <!-- ================= PURCHASING MENU ================= -->
                 <a href="#" onclick="togglePurchasing()">
                     <i class="fa-solid fa-cart-shopping"></i>Purchasing</a>
                 <div id="purchasingSubMenu" style="display:none; padding-left:20px;">
-                    <a href="#" onclick="showPage('purchasing')">- Input PO BB</a>
-                    <a href="#" onclick="showPage('purchasingView')">- View Data Purchasing</a>
+                    <a href="#" onclick="showPage('purchasing')">- PO Raw Material</a>
+                    <a href="#" onclick="showPage('purchasingView')">- Report Purchae Order</a>
                 </div>
 
                 <!-- ================= PRODUKSI MENU ================= -->
                 <a href="#" onclick="toggleProduksi()">
                     <i class="fa-solid fa-industry"></i>
-                    Production MRP
+                    MRP Production
                 </a>
                 <div id="produksiSubMenu" style="display:none; padding-left:20px;">
-                    <a href="#" onclick="showPage('produksi_input')">- Input Recipe Produksi</a>
+                    <a href="#" onclick="showPage('produksi_input')">- MRP Recipe Production</a>
                     <a href="#"
                         onclick="showPage('produksi_hasil');loadProductionOrdersToResultSelect(); loadProductionResult();">-
-                        Input Hasil Produksi</a>
-                    <a href="#" onclick="showPage('cogs_data')">- COGS Data Produksi</a>
-                    <a href="#" onclick="showPage('input_waste')">- Input Waste</a>
+                        Production Data FG</a>
+                    <a href="#" onclick="showPage('cogs_data')">- COGS Production Report</a>
+                    <a href="#" onclick="showPage('input_waste')">- Waste Data</a>
                 </div>
 
                 <!-- ================= MARKETING MENU ================= -->
@@ -250,9 +250,9 @@
                     Marketing
                 </a>
                 <div id="marketingSubMenu" style="display:none; padding-left:20px;">
-                    <a href="#" onclick="showPage('marketing_toko')">- Input Data Toko</a>
-                    <a href="#" onclick="openSalesFGPage()">- Input Sales FG</a>
-                    <a href="#" onclick="openMarketingSales()">- Input Sales Value</a>
+                    <a href="#" onclick="showPage('marketing_toko')">- Data Store</a>
+                    <a href="#" onclick="openSalesFGPage()">- Sales FG</a>
+                    <a href="#" onclick="openMarketingSales()">- Sales Value</a>
                     <a href="#" onclick="showPage('marketing_report'); loadSalesReport()">- Report Sales</a>
                 </div>
 
@@ -281,7 +281,7 @@
                 </a>
                 <div id="gudangSubMenu" style="display:none; padding-left:20px;">
                     <a href="#" onclick="showPage('uploadStockAwal')">
-                        - Upload Stock Awal BB
+                        - Upload Raw Material Stock
                     </a>
                     <a href="#" onclick="showPage('uploadSO')">
                         - Upload Stock Opname
@@ -397,7 +397,7 @@
                         <div class="section-divider"></div>
                         <h5 class="text-warning mb-3">
                             <i class="fa-solid fa-calculator"></i>
-                            Forecast Produk / Recipe
+                            Forecast Product / Recipe
                         </h5>
                         <div class="section-divider"></div>
                         <div class="row">
@@ -429,14 +429,14 @@
                             <div class="col-md-2">
                                 <label>&nbsp;</label>
                                 <button class="btn btn-warning w-100" onclick="addRecipeItem()">
-                                    Add ingredients
+                                    Add Raw Material
                                 </button>
                             </div>
                         </div>
                         <table class="table table-dark table-striped mt-4">
                             <thead>
                                 <tr>
-                                    <th>Inggredients</th>
+                                    <th>Raw Material</th>
                                     <th>Weight</th>
                                     <th>UOM</th>
                                     <th>Action</th>
@@ -455,7 +455,7 @@
                             <tr>
                                 <th>Product Code</th>
                                 <th>Product Name</th>
-                                <th>Quantity of ingredients</th>
+                                <th>Quantity</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -499,7 +499,7 @@
                     <div class="card-custom">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="text-warning">
-                                Detail COGS Produksi
+                                COGS Production Report
                             </h3>
                             <button class="btn btn-secondary" onclick="backProduction()">
                                 <i class="fa fa-arrow-left"></i>
@@ -510,8 +510,8 @@
                         <table class="table table-dark table-striped mt-4">
                             <thead>
                                 <tr>
-                                    <th>Kode Bahan</th>
-                                    <th>Nama Bahan</th>
+                                    <th>PLU Code</th>
+                                    <th>Raw Material</th>
                                     <th>UOM</th>
                                     <th>Weight Recipe</th>
                                     <th>Price Average</th>
@@ -539,13 +539,13 @@
                         <div class="section-divider"></div>
                         <h5 class="text-warning mb-3">
                             <i class="fa-solid fa-tags"></i>
-                            Product Selling Price
+                            Selling Price Product
                         </h5>
                         <div class="section-divider"></div>
                         <!-- FORM INPUT -->
                         <div class="row">
                             <div class="col-md-4">
-                                <label>Produk</label>
+                                <label>Product</label>
                                 <select id="priceFgProduct" class="form-control" onchange="calculatePriceFG()">
                                 </select>
                             </div>
@@ -554,36 +554,42 @@
                                 <input type="text" id="priceFgForecastHpp" class="form-control" readonly>
                             </div>
                             <div class="col-md-3">
-                                <label>Bahan Baku Kemasan</label>
+                                <label>Select Box</label>
                                 <select id="priceFgMaterial" class="form-control" onchange="calculatePriceFG()">
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label>Harga Bahan Baku</label>
+                                <label>Price Box</label>
                                 <input type="text" id="priceFgMaterialPrice" class="form-control" readonly>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-2">
                                 <label>Qty Per Box</label>
-                                <input type="number" id="priceFgQtyBox" class="form-control" placeholder="Isi per box"
+                                <input type="number" id="priceFgQtyBox" class="form-control" placeholder="Qty per box"
                                     oninput="calculatePriceFG()">
                             </div>
                             <div class="col-md-2">
-                                <label>HPP Forecast Box</label>
+                                <label>HPP Forecast/Box</label>
                                 <input type="text" id="priceFgForecastBox" class="form-control" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label>Total HPP</label>
+                                <label>Total HPP Product</label>
                                 <input type="text" id="priceFgTotalHpp" class="form-control" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label>Harga Jual</label>
-                                <input type="number" id="priceFgPrice" class="form-control" placeholder="Harga jual">
+                                <label>Selling Price Mitra</label>
+                                <input type="number" id="priceFgPrice" class="form-control"
+                                    placeholder="Selling Price Mitra">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Selling Price Store</label>
+                                <input type="number" id="priceFgPriceStore" class="form-control"
+                                    placeholder="Selling Price Store">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="savePriceFG()">
-                                    Simpan
+                                    Save Data
                                 </button>
                             </div>
                         </div>
@@ -591,12 +597,13 @@
                         <table class="table table-dark table-striped mt-4">
                             <thead>
                                 <tr>
-                                    <th>Kode</th>
-                                    <th>Produk</th>
+                                    <th>Product Code</th>
+                                    <th>Product Name</th>
                                     <th>Qty / Box</th>
                                     <th>HPP Total</th>
-                                    <th>Harga Jual</th>
-                                    <th>Aksi</th>
+                                    <th>Selling Price Mitra</th>
+                                    <th>Selling Price Store</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="priceFGList"></tbody>
@@ -614,14 +621,14 @@
                         <div class="section-subtitle">
                             <h5 class="text-warning mb-3">
                                 <i class="fa-solid fa-keyboard"></i>
-                                Input Purchase Order Bahan Baku
+                                Input Purchase Order Raw Materials
                             </h5>
                             <div class="section-divider"></div>
                         </div>
                         <!-- FORM INPUT -->
                         <div class="row">
                             <div class="col-md-3">
-                                <label>Bahan Baku</label>
+                                <label>Raw Materials</label>
                                 <select id="purchaseMaterial" class="form-control"></select>
                             </div>
                             <div class="col-md-2">
@@ -629,12 +636,12 @@
                                 <input type="number" id="purchaseQty" class="form-control" oninput="calculateAverage()">
                             </div>
                             <div class="col-md-2">
-                                <label>Satuan</label>
+                                <label>UOM/Units</label>
                                 <select id="purchaseUnit" class="form-control"></select>
                             </div>
 
                             <div class="col-md-2">
-                                <label>Harga Beli</label>
+                                <label>Purchase Price</label>
                                 <input type="number" id="purchasePrice" class="form-control"
                                     oninput="calculateAverage()">
                             </div>
@@ -650,13 +657,13 @@
                                 <select id="purchaseSupplier" class="form-control"></select>
                             </div>
                             <div class="col-md-4">
-                                <label>Tanggal Pembelian</label>
+                                <label>Purchase Date</label>
                                 <input type="date" id="purchaseDate" class="form-control">
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="savePurchase()">
                                     <i class="fa-solid fa-save"></i>
-                                    Simpan Purchasing
+                                    Save Purchase Order
                                 </button>
                             </div>
                         </div>
@@ -665,15 +672,15 @@
                             <table class="table table-dark table-striped w-100 align-middle">
                                 <thead>
                                     <tr>
-                                        <th>Kode</th>
-                                        <th>Nama Bahan</th>
+                                        <th>Materials Code</th>
+                                        <th>Materials Name</th>
                                         <th>Qty</th>
-                                        <th>Satuan</th>
-                                        <th>Harga Beli</th>
+                                        <th>UOM/Units</th>
+                                        <th>Purchase Price</th>
                                         <th>Average</th>
                                         <th>Supplier</th>
-                                        <th>Tanggal</th>
-                                        <th>Aksi</th>
+                                        <th>Purchase Date</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="purchaseList"></tbody>
@@ -691,37 +698,36 @@
                         <div class="section-divider"></div>
                         <h5 class="text-warning mb-3">
                             <i class="fa-solid fa-table"></i>
-                            View Data Purchasing
+                            Report Purchase Order Data
                         </h5>
                         <div class="section-divider"></div>
                         <!-- FILTER -->
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label>Dari Tanggal</label>
+                                <label>From Date</label>
                                 <input type="date" id="filterStartDate" class="form-control">
                             </div>
                             <div class="col-md-4">
-                                <label>Sampai Tanggal</label>
+                                <label>End Date</label>
                                 <input type="date" id="filterEndDate" class="form-control">
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="loadPurchasesData()">
-
                                     <i class="fa-solid fa-search"></i>
-                                    Tampilkan Data
+                                    View Data Purchae Order
                                 </button>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-danger w-100" onclick="printPurchasePDF()">
 
                                     <i class="fa-solid fa-file-pdf"></i>
-                                    Cetak PDF
+                                    Print PDF
                                 </button>
                             </div>
                         </div>
                         <!-- TOTAL -->
                         <div class="alert alert-warning text-dark fw-bold">
-                            Total Harga Beli :
+                            Total Purchase Order :
                             <span id="totalPurchasePrice">
                                 Rp 0
                             </span>
@@ -731,14 +737,14 @@
                             <table class="table table-dark table-striped w-100 align-middle">
                                 <thead>
                                     <tr>
-                                        <th>Kode</th>
-                                        <th>Nama Bahan</th>
+                                        <th>PLU Code</th>
+                                        <th>Raw Material Name</th>
                                         <th>Qty</th>
-                                        <th>Satuan</th>
-                                        <th>Harga Beli</th>
+                                        <th>UOM</th>
+                                        <th>Purchase Price</th>
                                         <th>Average</th>
                                         <th>Supplier</th>
-                                        <th>Tanggal</th>
+                                        <th>Purchase Date</th>
                                     </tr>
                                 </thead>
                                 <tbody id="purchaseViewList"></tbody>
@@ -994,7 +1000,7 @@
                     <div class="section-divider"></div>
                     <h5 class="text-warning mb-3">
                         <i class="fa-solid fa-trash-can me-2"></i>
-                        INPUT DATA WASTE FG & RAW MATERIAL
+                        INPUT DATA WASTE FG & RAW MATERIALS
                     </h5>
                     <div class="section-divider"></div>
                     <div class="row">
@@ -1005,7 +1011,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <button class="btn btn-warning w-100 p-4" onclick="openWasteMaterialPage()">
-                                INPUT WASTE RAW MATERIAL
+                                INPUT WASTE RAW MATERIALS
                             </button>
                         </div>
                     </div>
@@ -1086,12 +1092,12 @@
                         <div class="section-divider"></div>
                         <h5 class="text-warning mb-3">
                             <i class="fa-solid fa-boxes-stacked me-2"></i>
-                            Input Waste Raw Material
+                            Input Waste Raw Materials
                         </h5>
                         <div class="section-divider"></div>
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <label>Raw Material</label>
+                                <label>Raw Materials</label>
                                 <select id="wasteMaterialName" class="form-control"
                                     onchange="calculateWasteMaterialPrice()">
                                 </select>
@@ -1143,7 +1149,7 @@
                             <thead>
                                 <tr>
                                     <th>Raw Code</th>
-                                    <th>Raw Material Name</th>
+                                    <th>Raw Materials Name</th>
                                     <th>Weight</th>
                                     <th>UOM/Unit</th>
                                     <th>Price</th>
@@ -1173,19 +1179,19 @@
                         <div class="section-divider"></div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label>Kode Toko</label>
+                                <label>PLU Code</label>
                                 <input type="text" id="storeCode" class="form-control" readonly>
                             </div>
                             <div class="col-md-3">
-                                <label>Nama Toko</label>
+                                <label>Store Name</label>
                                 <input type="text" id="storeName" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label>Alamat</label>
+                                <label>Address Store</label>
                                 <input type="text" id="storeAddress" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label>No HP</label>
+                                <label>Contact/Mobile Phone</label>
                                 <input type="text" id="storePhone" class="form-control">
                             </div>
                         </div>
@@ -1195,11 +1201,11 @@
                         <table class="table table-dark mt-4">
                             <thead>
                                 <tr>
-                                    <th>Kode</th>
-                                    <th>Nama</th>
-                                    <th>Alamat</th>
-                                    <th>HP</th>
-                                    <th>Aksi</th>
+                                    <th>PLU Code</th>
+                                    <th>Store Name</th>
+                                    <th>Address Store</th>
+                                    <th>Contact/Mobile Phone</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="storeList"></tbody>
@@ -1222,19 +1228,19 @@
                         <!-- HEADER -->
                         <div class="row">
                             <div class="col-md-4">
-                                <label>Toko</label>
+                                <label>Store</label>
 
                                 <select id="salesFGStore" class="form-control">
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label>Tanggal</label>
+                                <label>Select Date</label>
                                 <input type="date" id="salesFGDate" class="form-control">
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="addSalesFGRow()">
                                     <i class="fa fa-plus"></i>
-                                    Tambah Produk
+                                    Add Product
                                 </button>
                             </div>
                         </div>
@@ -1243,12 +1249,12 @@
                             <table class="table table-dark table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Produk</th>
+                                        <th>Product</th>
                                         <th>Qty Box</th>
                                         <th>Qty PCS</th>
-                                        <th>Harga / Box</th>
-                                        <th>Total</th>
-                                        <th>Aksi</th>
+                                        <th>Price / Box</th>
+                                        <th>Total Price</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="salesFGTable"></tbody>
@@ -1256,24 +1262,24 @@
                         </div>
                         <!-- SAVE -->
                         <button class="btn btn-success w-100 mt-3" onclick="saveSalesFG()">
-                            Simpan Sales FG
+                            Save FG Sales
                         </button>
                         <hr>
                         <!-- DATA -->
                         <h4 class="text-warning mt-4">
-                            Data Sales FG
+                            Report FG Sales
                         </h4>
                         <table class="table table-dark table-striped mt-3">
                             <thead>
                                 <tr>
-                                    <th>Toko</th>
-                                    <th>Produk</th>
+                                    <th>Store</th>
+                                    <th>Product</th>
                                     <th>Qty Box</th>
                                     <th>Qty PCS</th>
-                                    <th>Harga</th>
-                                    <th>Total</th>
-                                    <th>Tanggal</th>
-                                    <th>Aksi</th>
+                                    <th>Price</th>
+                                    <th>Totals</th>
+                                    <th>Sales Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="salesFGList"></tbody>
@@ -1312,16 +1318,16 @@
                         </button>
                         <h4 class="mt-3">Data Sales</h4>
                         <div id="salesTotal" style="margin-bottom:10px; font-size:18px; color:#facc15;">
-                            Total Sales: Rp 0
+                            Total Sales Value : Rp 0
                         </div>
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Toko</th>
-                                    <th>Nama</th>
-                                    <th>Value</th>
-                                    <th>Tanggal</th>
-                                    <th>Aksi</th>
+                                    <th>Store Code</th>
+                                    <th>Store Name</th>
+                                    <th>Sales Value</th>
+                                    <th>Sales Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="salesList"></tbody>
@@ -2006,7 +2012,7 @@
                             html = `
         <h5 class="mb-3 text-warning">
             <i class="fa-solid fa-truck"></i>
-            Supplier Master Data
+            Master Data Supplier
         </h5>
          <div class="section-divider"></div>
         <div class="row">
@@ -2036,7 +2042,7 @@
         <table class="table table-dark table-striped">
             <thead>
                 <tr>
-                    <th>Code</th>
+                    <th>Supplier Code</th>
                     <th>Supplier Name</th>
                     <th>Address</th>
                     <th>Contact</th>
@@ -2063,7 +2069,7 @@
                 <input type="text"
                     id="materialName"
                     class="form-control mb-2"
-                    placeholder="Raw Material">
+                    placeholder="Input Raw Materials Name">
             </div>
 
             <div class="col-md-3">
@@ -2089,13 +2095,13 @@
         </div>
         <button class="btn btn-warning w-100 mb-3"
             onclick="addMaterial()">
-            Save Raw Material
+            Save Raw Materials
         </button>
         <table class="table table-dark table-striped">
            <thead>
             <tr>
-                <th>Code</th>
-                <th>Raw Material</th>
+                <th>Materials Code</th>
+                <th>Raw Materials Name</th>
                 <th>UOM/Unit</th>
                 <th>Weight</th>
                 <th>Purchase Price</th>
@@ -2771,7 +2777,7 @@
 
                         let html = `
         <option value="">
-            Pilih Produk
+            Select Product
         </option>
     `;
 
@@ -2801,7 +2807,7 @@
                         console.log("TOTAL MATERIAL =", snap.size);
                         let html = `
         <option value="">
-            Pilih Bahan Baku
+            Select Box product
         </option>
     `;
 
@@ -2911,6 +2917,10 @@
                             Number(
                                 document.getElementById("priceFgPrice").value
                             );
+                        const priceStore =
+                            Number(
+                                document.getElementById("priceFgPriceStore").value
+                            );
 
                         const materialSelect =
                             document.getElementById("priceFgMaterial");
@@ -3009,6 +3019,7 @@
                                     hppForecast,
                                     hppTotal,
                                     price,
+                                    priceStore,
                                     createdAt: serverTimestamp()
                                 }
                             );
@@ -3020,6 +3031,7 @@
                         document.getElementById("priceFgProduct").value = "";
                         document.getElementById("priceFgQtyBox").value = "";
                         document.getElementById("priceFgPrice").value = "";
+                        document.getElementById("priceFgPriceStore").value = "";
                         document.getElementById("priceFgMaterial").value = "";
                         document.getElementById("priceFgForecastHpp").value = "";
                         document.getElementById("priceFgForecastBox").value = "";
@@ -3061,6 +3073,11 @@
                                 data.price || 0
                             ).toLocaleString()}
                             </td>
+                            <td>
+                                Rp ${Number(
+                                data.priceStore || 0
+                            ).toLocaleString()}
+                            </td>
                             <td width="120">
                                 <button
                                     class="btn btn-danger btn-sm w-100"
@@ -3077,7 +3094,7 @@
                             html ||
                             `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             Tidak ada data
                         </td>
                     </tr>
@@ -5978,7 +5995,7 @@
             </td>
             <td>
                 Rp ${Number(item.average)
-                                   .toLocaleString()}
+                                    .toLocaleString()}
             </td>
             <td>
                 Rp ${Number(item.value)
