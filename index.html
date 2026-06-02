@@ -2515,6 +2515,7 @@
 
                         document.getElementById("recipeUnit").innerHTML = html;
                     }
+                    
                     function addRecipeItem() {
                         const material =
                             document.getElementById("recipeMaterial").value;
@@ -2556,6 +2557,7 @@
 
                         document.getElementById("recipeTable").innerHTML = html;
                     }
+                    
                     async function saveRecipe() {
                         const code = document.getElementById("recipeCode").value;
                         const name = document.getElementById("recipeProductName").value;
@@ -2587,6 +2589,9 @@
 
                         alert("Forecast produk berhasil disimpan");
 
+                        // refresh tabel input bahan
+                        renderRecipeTable();
+                        
                         // reset form
                         recipeItems = [];
 
