@@ -790,7 +790,7 @@
                         <div class="section-divider"></div>
                         <h5 class="text-warning mb-3">
                             <i class="fa-solid fa-layer-group"></i>
-                            Input Recipe Produksi
+                            Input Recipe Production
                         </h5>
                         <div class="section-divider"></div>
                         <div class="row">
@@ -1664,7 +1664,7 @@
                         <!-- FILTER -->
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <label>Tanggal Stock Awal</label>
+                                <label>Start Date Stock</label>
                                 <input type="date" id="stockAwalDate" class="form-control">
                             </div>
                             <div class="col-md-3">
@@ -1678,7 +1678,7 @@
                             </div>
                             <div class="col-md-3 d-flex align-items-end">
                                 <button class="btn btn-success w-100" onclick="saveStockAwalData()">
-                                    Save Stock Awal
+                                    Save First Stock
                                 </button>
                             </div>
                         </div>
@@ -1706,13 +1706,13 @@
                             <table class="table table-dark table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Kode</th>
-                                        <th>Nama Bahan</th>
+                                        <th>Code</th>
+                                        <th>Material</th>
                                         <th>UOM</th>
                                         <th>Weight</th>
                                         <th>Average Price</th>
                                         <th>Value</th>
-                                        <th>Tanggal</th>
+                                        <th>Date</th>
                                     </tr>
                                 </thead>
                                 <tbody id="stockAwalTable"></tbody>
@@ -1733,7 +1733,7 @@
                         <div class="row mb-3">
 
                             <div class="col-md-3">
-                                <label>Tanggal SO</label>
+                                <label>SO Date</label>
                                 <input type="date" id="soDate" class="form-control">
                             </div>
                             <div class="col-md-3">
@@ -1754,16 +1754,16 @@
                         <!-- FILTER TANGGAL -->
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label>Filter Tanggal Awal</label>
+                                <label>Filter Start Date</label>
                                 <input type="date" id="filterSOStart" class="form-control">
                             </div>
                             <div class="col-md-4">
-                                <label>Filter Tanggal Akhir</label>
+                                <label>Filter End Date</label>
                                 <input type="date" id="filterSOEnd" class="form-control">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-info w-100" onclick="loadSOData()">
-                                    Tampilkan
+                                    View Data
                                 </button>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
@@ -1796,13 +1796,13 @@
                             <table class="table table-dark table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Kode</th>
-                                        <th>Nama Bahan</th>
+                                        <th>Code</th>
+                                        <th>Maaterial</th>
                                         <th>UOM</th>
                                         <th>Weight</th>
                                         <th>Average Price</th>
                                         <th>Value</th>
-                                        <th>Tanggal SO</th>
+                                        <th>SO Date</th>
                                     </tr>
                                 </thead>
                                 <tbody id="soTable"></tbody>
@@ -1821,16 +1821,16 @@
                         <!-- FILTER -->
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <label>Periode Awal</label>
+                                <label>Last Periode</label>
                                 <input type="date" id="stockCardStart" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label>Periode Akhir</label>
+                                <label>New Periode</label>
                                 <input type="date" id="stockCardEnd" class="form-control">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-success w-100" onclick="loadStockCardWarehouse()">
-                                    Tampilkan
+                                    View Data
                                 </button>
                             </div>
 
@@ -1843,7 +1843,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <h5 class="text-warning">
-                                        Total Value Selisih :
+                                        Difference Value :
                                         <span id="stockCardTotalValue">
                                             Rp 0
                                         </span>
@@ -1863,16 +1863,16 @@
                                 <table class="table table-dark table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Kode</th>
-                                            <th>Nama Bahan Baku</th>
+                                            <th>Code</th>
+                                            <th>Material</th>
                                             <th>UOM</th>
-                                            <th>Qty Stock Awal</th>
+                                            <th>Qty Last Stock</th>
                                             <th>Qty PO</th>
-                                            <th>Qty Produksi</th>
+                                            <th>Qty Production</th>
                                             <th>Qty Waste</th>
-                                            <th>Qty Stock Akhir</th>
-                                            <th>Qty SO Akhir</th>
-                                            <th>Qty Selisih</th>
+                                            <th>Qty New Stock</th>
+                                            <th>Qty New SO</th>
+                                            <th>Qty Difference</th>
                                             <th>Value</th>
                                         </tr>
                                     </thead>
@@ -1952,31 +1952,51 @@
                     let currentMaster = "";
                     let recipeItems = [];
                     let forecastSource = "forecast";
+                    let loginAttempt = 0;
 
                     /* ================= LOGIN ================= */
                     async function login() {
                         const email = document.getElementById('email').value;
                         const password = document.getElementById('password').value;
-
                         try {
                             const user = await signInWithEmailAndPassword(auth, email, password);
+                            // reset jika berhasil login
+                            loginAttempt = 0;
                             document.getElementById('userEmail').innerHTML = user.user.email;
-
                             document.getElementById('loginPage').style.display = 'none';
                             document.getElementById('dashboardPage').style.display = 'block';
 
-
                         } catch (error) {
-                            document.getElementById('error').innerHTML = error.message;
+                            if (error.code === "auth/invalid-credential") {
+                                loginAttempt++;
+                                document.getElementById('error').innerHTML =
+                                    `Password salah! Percobaan ${loginAttempt} dari 3`;
+                                if (loginAttempt >= 3) {
+                                    alert("Password salah 3 kali. Halaman akan dimuat ulang.");
+                                    loginAttempt = 0;
+
+                                    document.getElementById('email').value = '';
+                                    document.getElementById('password').value = '';
+                                    document.getElementById('error').innerHTML = '';
+
+                                    location.reload();
+                                }
+
+                            } else {
+                                document.getElementById('error').innerHTML =
+                                    "Terjadi kesalahan saat login";
+                                console.error(error);
+                            }
                         }
                     }
-                    async function logout() {
 
+                    async function logout() {
                         clearTimeout(idleTimer);
                         await signOut(auth);
                         document.getElementById('dashboardPage').style.display = 'none';
                         document.getElementById('loginPage').style.display = 'flex';
                     }
+
                     /* ================= MASTER MENU ================= */
                     function toggleMaster() {
                         const menu = document.getElementById("masterSubMenu");
@@ -2312,7 +2332,11 @@
                             }
                         } catch (e) {
                             console.error(e);
-                            alert("Gagal load data");
+
+                            // hanya alert jika user sudah login
+                            if (auth.currentUser) {
+                                alert("Gagal load data");
+                            }
                         }
                     }
 
@@ -3422,7 +3446,6 @@
                         await deleteDoc(doc(db, "purchasing", id));
                         await loadPurchases();
                         await loadPurchasesData();
-
 
                         alert("Berhasil dihapus");
                     }
