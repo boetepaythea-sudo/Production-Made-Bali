@@ -151,6 +151,17 @@
                 border-radius: 2px;
             }
 
+            .form-control.auto-field,
+            .form-control.auto-field:focus,
+            .form-control.auto-field[readonly] {
+                background-color: #d6d8db !important;
+                color: #495057 !important;
+                font-weight: 600;
+                border: 1px solid #adb5bd !important;
+                cursor: not-allowed;
+                opacity: 1 !important;
+            }
+
             #jam {
                 font-size: 18px;
                 color: #facc15;
@@ -403,15 +414,19 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label>Product Code</label>
-                                <input type="text" id="recipeCode" class="form-control" readonly>
+                                <input type="text" id="recipeCode" class="form-control auto-field" readonly>
                             </div>
                             <div class="col-md-9">
                                 <label>Product Name</label>
-                                <input type="text" id="recipeProductName" class="form-control">
+                                <input type="text" id="recipeProductName" class="form-control"
+                                    placeholder=" Input Raw Materials Name">
                             </div>
                         </div>
                         <hr>
                         <div class="row mt-3">
+                            <h5 class="text-warning mb-3">
+                                Add Raw Materials
+                            </h5>
                             <div class="col-md-4">
                                 <label>Raw Material</label>
                                 <select id="recipeMaterial" class="form-control">
@@ -449,7 +464,7 @@
                         </button>
                     </div>
                     <hr>
-                    <h5 class="mt-4 text-warning">Data Forecast Produk</h5>
+                    <h5 class="mt-4 text-warning">Data Forecast Product</h5>
                     <table class="table table-dark table-striped mt-2">
                         <thead>
                             <tr>
@@ -542,58 +557,71 @@
                             Selling Price Product
                         </h5>
                         <div class="section-divider"></div>
+
                         <!-- FORM INPUT -->
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>Product</label>
                                 <select id="priceFgProduct" class="form-control" onchange="calculatePriceFG()">
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label>HPP Forecast / Pcs</label>
-                                <input type="text" id="priceFgForecastHpp" class="form-control" readonly>
+                                <input type="text" id="priceFgForecastHpp" class="form-control auto-field" readonly>
                             </div>
                             <div class="col-md-3">
-                                <label>Select Box</label>
+                                <label>*Add Packing Box</label>
                                 <select id="priceFgMaterial" class="form-control" onchange="calculatePriceFG()">
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label>Price Box</label>
-                                <input type="text" id="priceFgMaterialPrice" class="form-control" readonly>
+                                <input type="text" id="priceFgMaterialPrice" class="form-control auto-field" readonly>
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-2">
+                        <div class="row">
+                            <div class="col-md-3">
                                 <label>Qty Per Box</label>
                                 <input type="number" id="priceFgQtyBox" class="form-control" placeholder="Qty per box"
                                     oninput="calculatePriceFG()">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label>HPP Forecast/Box</label>
-                                <input type="text" id="priceFgForecastBox" class="form-control" readonly>
+                                <input type="text" id="priceFgForecastBox" class="form-control auto-field" readonly>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
+                                <label>*Add Packing Plastic</label>
+                                <select id="priceFgPlastic" class="form-control" onchange="calculatePriceFG()">
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Price Plastic Srink</label>
+                                <input type="text" id="priceFgPlasticPrice" class="form-control auto-field" readonly>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
                                 <label>Total HPP Product</label>
-                                <input type="text" id="priceFgTotalHpp" class="form-control" readonly>
+                                <input type="text" id="priceFgTotalHpp" class="form-control auto-field" readonly>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label>Selling Price Mitra</label>
                                 <input type="number" id="priceFgPrice" class="form-control"
-                                    placeholder="Selling Price Mitra">
+                                    placeholder="Rp. ..............">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label>Selling Price Store</label>
                                 <input type="number" id="priceFgPriceStore" class="form-control"
-                                    placeholder="Selling Price Store">
+                                    placeholder="Rp. ..............">
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
+                            <div class="col-md-3 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="savePriceFG()">
                                     Save Data
                                 </button>
                             </div>
                         </div>
                         <!-- TABLE -->
+                        <h5 class="mt-4 text-warning">Tabel Hpp & Selling Price Product</h5>
                         <table class="table table-dark table-striped mt-4">
                             <thead>
                                 <tr>
@@ -610,6 +638,7 @@
                         </table>
                     </div>
                 </div>
+
                 <!-- PURCHASING -->
                 <div id="purchasing" class="menu-page">
                     <div class="card-custom">
@@ -1975,7 +2004,7 @@
                     <label>UOM Code</label>
                         <input type="text"
                         id="units"
-                        class="form-control" readonly>
+                        class="form-control auto-field" readonly>
                     </div>
             <div class="col-md-4">
                 <label>UOM Name</label>
@@ -2015,20 +2044,29 @@
             Master Data Supplier
         </h5>
          <div class="section-divider"></div>
-        <div class="row">
-            <div class="col-md-4">
+       <div class="row mb-3">
+             <div class="col-md-3">
+                    <label>SUP Code</label>
+                        <input type="text"
+                        id="suppliers"
+                        class="form-control auto-field" readonly>
+                    </div>
+            <div class="col-md-3">
+                <label>Supplier Name</label>
                 <input type="text"
                     id="supplierName"
                     class="form-control mb-2"
                     placeholder="Input Supplier Name">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label>Supplier Address</label>
                 <input type="text"
                     id="supplierAddress"
                     class="form-control mb-2"
                     placeholder="Input Address">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label>Contact / Mobile Phone</label>
                 <input type="text"
                     id="supplierPhone"
                     class="form-control mb-2"
@@ -2064,33 +2102,40 @@
             Master of Raw Materials
                 </h5>
                  <div class="section-divider"></div>
-            <div class="row">
+        <div class="row mb-3">
+             <div class="col-md-2">
+                    <label>MAT Code</label>
+                        <input type="text"
+                        id="materials"
+                        class="form-control auto-field" readonly>
+                    </div>
             <div class="col-md-3">
+                <label>Raw Materials Name</label>
                 <input type="text"
                     id="materialName"
                     class="form-control mb-2"
                     placeholder="Input Raw Materials Name">
             </div>
-
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <label>UOM / Units</label>
                 <select id="materialUnit"
                     class="form-control mb-2">
                     <option value="">Select UOM</option>
                 </select>
             </div>
-
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <label>Weight/Satuan</label>
                 <input type="number"
                     id="materialWeight"
                     class="form-control mb-2"
                     placeholder="Weight">
             </div>
-
             <div class="col-md-3">
+                <label>Purchase Price</label>
                 <input type="number"
                     id="materialPrice"
                     class="form-control mb-2"
-                    placeholder="Purchase Price">
+                    placeholder="Input Purchase Price">
             </div>
         </div>
         <button class="btn btn-warning w-100 mb-3"
@@ -2122,9 +2167,14 @@
                         if (type === "satuan") {
                             await setNextUnitCode();
                         }
+                        /* KHUSUS MENU SATUAN */
+                        if (type === "supplier") {
+                            await setNextSupCode();
+                        }
 
                         /* KHUSUS MENU BAHAN */
                         if (type === "bahan") {
+                            await setNextMaterialCode();
                             await loadUnitOptions();
 
                         }
@@ -2280,14 +2330,23 @@
                             /* UPDATE CODE BERIKUTNYA */
                             await setNextUnitCode();
                             alert("Data berhasil dihapus");
-                        } catch (e) {
 
+                        } catch (e) {
                             console.error(e);
                             alert("Gagal hapus data");
 
                         }
                     }
                     /* ================= SUPPLIER ================= */
+                    /* AUTO TAMPILKAN CODE BERIKUTNYA */
+                    async function setNextSupCode() {
+                        const code = await generateCode("suppliers", "SUP");
+                        const input = document.getElementById("suppliers");
+
+                        if (input) {
+                            input.value = code;
+                        }
+                    }
                     async function addSupplier() {
                         const name = document.getElementById("supplierName").value;
                         const address = document.getElementById("supplierAddress").value;
@@ -2313,6 +2372,10 @@
                             phone
 
                         });
+
+                        /* TAMPILKAN CODE BERIKUTNYA */
+                        await setNextSupCode();
+
                         // reset form
                         document.getElementById("supplierName").value = "";
                         document.getElementById("supplierAddress").value = "";
@@ -2349,16 +2412,29 @@
                         const el = document.getElementById("supplierList");
                         if (el) el.innerHTML = html;
                     }
+
                     async function deleteSupplier(id) {
                         const confirmDelete = confirm("Hapus supplier ?");
                         if (!confirmDelete) return;
                         await deleteDoc(doc(db, "suppliers", id));
+
                         loadSuppliers();
+                        await setNextSupCode();
                         alert("Supplier berhasil dihapus");
                     }
-                    /* ================= RAW MATERIAL DATA ================= */
-                    async function addMaterial() {
 
+                    /* ================= RAW MATERIAL DATA ================= */
+                    /* AUTO TAMPILKAN CODE BERIKUTNYA */
+                    async function setNextMaterialCode() {
+                        const code = await generateCode("materials", "MAT");
+                        const input = document.getElementById("materials");
+
+                        if (input) {
+                            input.value = code;
+                        }
+                    }
+
+                    async function addMaterial() {
                         const name = document.getElementById("materialName").value;
                         const unit = document.getElementById("materialUnit").value;
                         const weight = document.getElementById("materialWeight").value;
@@ -2384,6 +2460,9 @@
                             average,
                             createdAt: serverTimestamp()
                         });
+
+                        /* TAMPILKAN CODE BERIKUTNYA */
+                        await setNextMaterialCode();
 
                         // reset form
                         document.getElementById("materialName").value = "";
@@ -2434,13 +2513,18 @@
                         const el = document.getElementById("materialList");
                         if (el) el.innerHTML = html;
                     }
+
                     async function deleteMaterial(id) {
                         const confirmDelete = confirm("Hapus bahan baku ?");
                         if (!confirmDelete) return;
+
                         await deleteDoc(doc(db, "materials", id));
+                        await setNextMaterialCode();
+
                         loadMaterials();
                         alert("Bahan berhasil dihapus");
                     }
+
                     async function loadUnitOptions() {
                         const q = query(
                             collection(db, "units"),
@@ -2479,6 +2563,7 @@
                         loadRecipeUnits();
                         loadForecast();
                     }
+
                     async function loadRecipeMaterials() {
                         const q = query(
                             collection(db, "materials"),
@@ -2515,7 +2600,6 @@
 
                         document.getElementById("recipeUnit").innerHTML = html;
                     }
-                    
                     function addRecipeItem() {
                         const material =
                             document.getElementById("recipeMaterial").value;
@@ -2557,7 +2641,6 @@
 
                         document.getElementById("recipeTable").innerHTML = html;
                     }
-                    
                     async function saveRecipe() {
                         const code = document.getElementById("recipeCode").value;
                         const name = document.getElementById("recipeProductName").value;
@@ -2589,11 +2672,11 @@
 
                         alert("Forecast produk berhasil disimpan");
 
-                        // refresh tabel input bahan
-                        renderRecipeTable();
-                        
                         // reset form
                         recipeItems = [];
+
+                        // refresh tabel input bahan
+                        renderRecipeTable();
 
                         document.getElementById("recipeProductName").value = "";
                         document.getElementById("recipeQty").value = "";
@@ -2765,6 +2848,7 @@
                         showPage("pricefg");
                         await loadPriceFGProducts();
                         await loadPriceFGMaterials();
+                        await loadPriceFGPlastic();
                         await loadPriceFGTable();
                     }
 
@@ -2823,12 +2907,44 @@
             <option
                 value="${d.id}"
                 data-name="${data.name}"
-                data-price="${Number(data.price || 0)}">
+                data-price="${Number(data.average || 0)}">
                 ${data.code} - ${data.name}
             </option>
         `;
                         });
 
+                        select.innerHTML = html;
+                    }
+
+                    async function loadPriceFGPlastic() {
+                        const select =
+                            document.getElementById("priceFgPlastic");
+                        if (!select) return;
+                        const snap = await getDocs(
+                            query(
+                                collection(db, "materials"),
+                                orderBy("code", "asc")
+                            )
+                        );
+
+                        let html = `
+        <option value="">
+            Select Plastic Srink
+        </option>
+    `;
+
+                        snap.forEach(d => {
+                            const data = d.data();
+                            html += `
+            <option
+                value="${d.id}"
+                data-name="${data.name}"
+                data-price="${Number(data.average || 0)}">
+                ${data.code} - ${data.name}
+
+            </option>
+        `;
+                        });
                         select.innerHTML = html;
                     }
 
@@ -2874,6 +2990,7 @@
                             "priceFgForecastHpp"
                         ).value =
                             forecastHpp.toLocaleString();
+
                         let materialPrice = 0;
                         if (materialSelect.value) {
                             const selected =
@@ -2901,8 +3018,34 @@
                             "priceFgForecastBox"
                         ).value =
                             forecastBox.toLocaleString();
+                        let plasticPrice = 0;
+
+                        const plasticSelect =
+                            document.getElementById("priceFgPlastic");
+
+                        if (plasticSelect && plasticSelect.value) {
+
+                            const selected =
+                                plasticSelect.options[
+                                plasticSelect.selectedIndex
+                                ];
+
+                            plasticPrice =
+                                Number(
+                                    selected.getAttribute("data-price")
+                                ) || 0;
+                        }
+
+                        document.getElementById(
+                            "priceFgPlasticPrice"
+                        ).value =
+                            plasticPrice.toLocaleString();
+
                         const totalHpp =
-                            forecastBox + materialPrice;
+                            forecastBox +
+                            materialPrice +
+                            plasticPrice;
+
                         document.getElementById(
                             "priceFgTotalHpp"
                         ).value =
@@ -2942,6 +3085,25 @@
                                 ? Number(
                                     materialSelect.options[
                                         materialSelect.selectedIndex
+                                    ].getAttribute("data-price")
+                                )
+                                : 0;
+
+                        const plasticSelect =
+                            document.getElementById("priceFgPlastic");
+
+                        const plasticName =
+                            plasticSelect.value
+                                ? plasticSelect.options[
+                                    plasticSelect.selectedIndex
+                                ].getAttribute("data-name")
+                                : "";
+
+                        const plasticPrice =
+                            plasticSelect.value
+                                ? Number(
+                                    plasticSelect.options[
+                                        plasticSelect.selectedIndex
                                     ].getAttribute("data-price")
                                 )
                                 : 0;
@@ -3038,9 +3200,11 @@
                         document.getElementById("priceFgPrice").value = "";
                         document.getElementById("priceFgPriceStore").value = "";
                         document.getElementById("priceFgMaterial").value = "";
+                        document.getElementById("priceFgPlastic").value = "";
                         document.getElementById("priceFgForecastHpp").value = "";
                         document.getElementById("priceFgForecastBox").value = "";
                         document.getElementById("priceFgMaterialPrice").value = "";
+                        document.getElementById("priceFgPlasticPrice").value = "";
                         document.getElementById("priceFgTotalHpp").value = "";
 
                         await loadPriceFGTable();
