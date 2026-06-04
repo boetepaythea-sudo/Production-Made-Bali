@@ -3477,9 +3477,15 @@
                     });
 
                     /* ================= LOAD OPTIONS ================= */
-                    async function loadPurchaseOptions() {
 
-                        const materialSnap = await getDocs(collection(db, "materials"));
+                    async function loadPurchaseOptions() {
+                        const materialSnap = await getDocs(
+                            query(
+                                collection(db, "materials"),
+                                orderBy("code", "asc")
+                            )
+                        );
+
                         let materialHtml = `<option value="">Select Materials</option>`;
                         materialSnap.forEach(d => {
                             materialHtml += `
@@ -3502,7 +3508,10 @@
                         document.getElementById("purchaseUnit").innerHTML = unitHtml;
 
                         const supplierSnap = await getDocs(
-                            query(collection(db, "suppliers"), orderBy("code", "asc"))
+                            query(
+                                collection(db, "suppliers"),
+                                orderBy("code", "asc")
+                            )
                         );
 
                         let supplierHtml = `<option value="">Select Supplier</option>`;
@@ -6674,10 +6683,10 @@
                             // PURCHASE ORDER
                             poSnap.forEach(d => {
                                 const item = d.data();
-                                const material =
-                                    String(item.material || "").trim();
-                                poMap[material] =
-                                    (poMap[material] || 0)
+                                const materialCode =
+                                    String(item.materialCode || "").trim();
+                                poMap[materialCode] =
+                                    (poMap[materialCode] || 0)
                                     + Number(item.qty || 0);
 
                             });
@@ -6765,7 +6774,7 @@
                                     stockAwalMap[code] || 0;
 
                                 const qtyPO =
-                                    poMap[mat.name] || 0;
+                                    poMap[mat.code] || 0;
 
                                 const qtyProduksi =
                                     produksiMap[mat.name] || 0;
