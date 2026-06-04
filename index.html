@@ -419,7 +419,7 @@
                             <div class="col-md-9">
                                 <label>Product Name</label>
                                 <input type="text" id="recipeProductName" class="form-control"
-                                    placeholder=" Input Raw Material">
+                                    placeholder=" Input Product Name">
                             </div>
                         </div>
                         <hr>
@@ -428,18 +428,22 @@
                                 Add Raw Materials
                             </h5>
                             <div class="col-md-4">
-                                <label>Raw Material</label>
+                                <label>Select Raw Material</label>
                                 <select id="recipeMaterial" class="form-control">
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label>Weight</label>
                                 <input type="number" step="0.0001" id="recipeQty" class="form-control">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label>UOM/Unit</label>
                                 <select id="recipeUnit" class="form-control">
                                 </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Price</label>
+                                <input type="text" id="recipePrice" class="form-control auto-field" readonly>
                             </div>
                             <div class="col-md-2">
                                 <label>&nbsp;</label>
@@ -449,11 +453,18 @@
                             </div>
                         </div>
                         <table class="table table-dark table-striped mt-4">
+                            <div class="text-end mt-3">
+                                <h5 class="text-warning">
+                                    Total Cost :
+                                    <span id="priceForecaseTotal">Rp 0</span>
+                                </h5>
+                            </div>
                             <thead>
                                 <tr>
                                     <th>Raw Material</th>
                                     <th>Weight</th>
                                     <th>UOM</th>
+                                    <th>Price</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -471,6 +482,7 @@
                                 <th>Product Code</th>
                                 <th>Product Name</th>
                                 <th>Quantity</th>
+                                <th>Total Cost</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -498,8 +510,8 @@
                         <table class="table table-dark table-striped mt-4">
                             <thead>
                                 <tr>
-                                    <th>Raw Code</th>
-                                    <th>Raw Material</th>
+                                    <th>Materials Code</th>
+                                    <th>Materials Name</th>
                                     <th>Weight</th>
                                     <th>UOM</th>
                                     <th>Price</th>
@@ -858,7 +870,7 @@
                                 <input type="number" id="resFgBox" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label>Tanggal Produksi</label>
+                                <label>Production Date</label>
                                 <input type="date" id="resDate" class="form-control">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
@@ -870,11 +882,11 @@
                         <!-- FILTER -->
                         <div class="row mb-4">
                             <div class="col-md-3">
-                                <label>Dari Tanggal</label>
+                                <label>Start Date</label>
                                 <input type="date" id="prodStartDate" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label>Sampai Tanggal</label>
+                                <label>End Date</label>
                                 <input type="date" id="prodEndDate" class="form-control">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
@@ -897,12 +909,12 @@
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Kode Produk</th>
-                                    <th>Nama Produk</th>
+                                    <th>Product Code</th>
+                                    <th>Product Name</th>
                                     <th>FG PCS</th>
                                     <th>FG BOX</th>
-                                    <th>Tanggal</th>
-                                    <th>Aksi</th>
+                                    <th>Production Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="productionResultList"></tbody>
@@ -914,7 +926,7 @@
                     <div class="card-custom">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="text-warning" id="forecastProductionTitle">
-                                Forecast Produksi
+                                Production Forecase
                             </h3>
                             <button class="btn btn-secondary" onclick="showPage('produksi_hasil')">
                                 <i class="fa fa-arrow-left"></i>
@@ -925,8 +937,8 @@
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Kode Bahan Baku</th>
-                                    <th>Nama Bahan Baku</th>
+                                    <th>Materials Code</th>
+                                    <th>Materials Name</th>
                                     <th>UOM</th>
                                     <th>Weight</th>
                                     <th>Price</th>
@@ -962,11 +974,11 @@
                         <!-- FILTER -->
                         <div class="row mb-4">
                             <div class="col-md-4">
-                                <label>Dari Tanggal</label>
+                                <label>Start Date</label>
                                 <input type="date" id="cogsStartDate" class="form-control">
                             </div>
                             <div class="col-md-4">
-                                <label>Sampai Tanggal</label>
+                                <label>End Date</label>
                                 <input type="date" id="cogsEndDate" class="form-control">
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
@@ -982,8 +994,8 @@
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Kode Produk</th>
-                                    <th>Nama Produk</th>
+                                    <th>Product Code</th>
+                                    <th>Product Name</th>
                                     <th>Qty</th>
                                 </tr>
                             </thead>
@@ -991,13 +1003,13 @@
                         </table>
                         <!-- ================= TABLE 2 ================= -->
                         <h5 class="text-warning mt-5 mb-3">
-                            PEMAKAIAN BAHAN BAKU
+                            USE OF RAW MATERIALS
                         </h5>
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Kode Bahan</th>
-                                    <th>Nama Bahan</th>
+                                    <th>Materials Code</th>
+                                    <th>Materials Name</th>
                                     <th>UOM</th>
                                     <th>Weight</th>
                                     <th>Average Price</th>
@@ -1176,8 +1188,8 @@
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Raw Code</th>
-                                    <th>Raw Material</th>
+                                    <th>Materials Code</th>
+                                    <th>Materials Name</th>
                                     <th>Weight</th>
                                     <th>UOM/Unit</th>
                                     <th>Price</th>
@@ -2583,6 +2595,13 @@
                         document.getElementById("recipeCode").value = code;
                         loadRecipeMaterials();
                         loadRecipeUnits();
+
+                        document.getElementById("recipeMaterial")
+                            .addEventListener("change", calculateRecipePrice);
+
+                        document.getElementById("recipeQty")
+                            .addEventListener("input", calculateRecipePrice);
+
                         loadForecast();
                     }
 
@@ -2622,35 +2641,99 @@
 
                         document.getElementById("recipeUnit").innerHTML = html;
                     }
-                    function addRecipeItem() {
+
+                    async function calculateRecipePrice() {
                         const material =
                             document.getElementById("recipeMaterial").value;
                         const qty =
-                            document.getElementById("recipeQty").value;
+                            Number(document.getElementById("recipeQty").value || 0);
+
+                        if (!material || qty <= 0) {
+                            document.getElementById("recipePrice").value = "";
+                            return;
+                        }
+
+                        const materialSnap =
+                            await getDocs(collection(db, "materials"));
+
+                        let average = 0;
+                        materialSnap.forEach(mat => {
+
+                            const m = mat.data();
+
+                            if (
+                                m.name?.toLowerCase().trim() ===
+                                material.toLowerCase().trim()
+                            ) {
+                                average = Number(m.average || 0);
+                            }
+
+                        });
+                        const totalPrice = qty * average;
+                        document.getElementById("recipePrice").value =
+                            totalPrice.toLocaleString("id-ID");
+                    }
+
+                    async function addRecipeItem() {
+
+                        const material =
+                            document.getElementById("recipeMaterial").value;
+
+                        const qty =
+                            Number(document.getElementById("recipeQty").value);
+
                         const unit =
                             document.getElementById("recipeUnit").value;
+
                         if (!material || !qty || !unit) {
                             alert("Lengkapi data bahan");
                             return;
                         }
+
+                        // cari average material
+                        const materialSnap =
+                            await getDocs(collection(db, "materials"));
+
+                        let materialPrice = 0;
+                        materialSnap.forEach(mat => {
+                            const m = mat.data();
+                            if (
+                                m.name?.toLowerCase().trim() ===
+                                material.toLowerCase().trim()
+                            ) {
+                                materialPrice = Number(m.average || 0);
+                            }
+                        });
+
+                        const totalPrice = qty * materialPrice;
                         recipeItems.push({
                             material,
                             qty,
-                            unit
+                            unit,
+                            price: totalPrice
                         });
 
                         document.getElementById("recipeQty").value = "";
+                        document.getElementById("recipePrice").value = "";
+
                         renderRecipeTable();
                     }
+
                     function renderRecipeTable() {
+
                         let html = "";
+                        let grandTotal = 0;
+
                         recipeItems.forEach((item, index) => {
+
+                            grandTotal += Number(item.price || 0);
 
                             html += `
         <tr>
             <td>${item.material}</td>
             <td>${item.qty}</td>
             <td>${item.unit}</td>
+            <td>Rp ${Number(item.price || 0).toLocaleString()}</td>
             <td width="120">
                 <button class="btn btn-danger btn-sm"
                     onclick="deleteRecipeItem(${index})">
@@ -2662,7 +2745,11 @@
                         });
 
                         document.getElementById("recipeTable").innerHTML = html;
+
+                        document.getElementById("priceForecaseTotal").innerHTML =
+                            `Rp ${grandTotal.toLocaleString()}`;
                     }
+
                     async function saveRecipe() {
                         const code = document.getElementById("recipeCode").value;
                         const name = document.getElementById("recipeProductName").value;
@@ -2706,6 +2793,7 @@
                         // reload data forecast
                         loadForecast();
                     }
+
                     async function loadForecast() {
                         const productSnap = await getDocs(
                             query(collection(db, "products"), orderBy("code", "asc"))
@@ -2713,32 +2801,60 @@
                         const recipeSnap = await getDocs(
                             collection(db, "product_recipes")
                         );
+
+                        const materialSnap = await getDocs(
+                            collection(db, "materials")
+                        );
+
                         const recipes = recipeSnap.docs.map(d => d.data());
                         let html = "";
 
                         for (const productDoc of productSnap.docs) {
                             const product = productDoc.data();
-                            const count = recipes.filter(r =>
-                                r.productCode === product.code
-                            ).length;
+                            const productRecipes = recipes.filter(
+                                r => r.productCode === product.code
+                            );
+
+                            const count = productRecipes.length;
+                            let totalCost = 0;
+                            productRecipes.forEach(r => {
+                                let materialPrice = 0;
+                                materialSnap.forEach(mat => {
+                                    const m = mat.data();
+
+                                    if (
+                                        m.name?.toLowerCase().trim() ===
+                                        r.material?.toLowerCase().trim()
+                                    ) {
+                                        materialPrice = Number(m.average || 0);
+                                    }
+
+                                });
+
+                                const qty = Number(r.qty || 0);
+                                totalCost += qty * materialPrice;
+
+                            });
 
                             html += `
-        <tr>
-            <td>${product.code}</td>
-            <td>${product.name}</td>
-            <td>${count} bahan</td>
-            <td>
-                <button class="btn btn-info btn-sm"
-                    onclick="viewForecast('${product.code}')">
-                    Detail
-                </button>
-                <button class="btn btn-danger btn-sm"
-                    onclick="deleteForecast('${product.code}')">
-                    Delete
-                </button>
-            </td>
-        </tr>
-        `;
+    <tr>
+        <td>${product.code}</td>
+        <td>${product.name}</td>
+        <td>${count} bahan</td>
+        <td>Rp ${totalCost.toLocaleString()}</td>
+        <td>
+            <button class="btn btn-info btn-sm"
+                onclick="viewForecast('${product.code}')">
+                Detail
+            </button>
+
+            <button class="btn btn-danger btn-sm"
+                onclick="deleteForecast('${product.code}')">
+                Delete
+            </button>
+        </td>
+    </tr>
+    `;
                         }
 
                         const el = document.getElementById("forecastList");
