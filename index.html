@@ -708,6 +708,30 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label>Filter Month</label>
+                                <select id="filterMonth" class="form-control" onchange="loadPurchases()">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Filter Year</label>
+                                <select id="filterYear" class="form-control" onchange="loadPurchases()">
+                                </select>
+                            </div>
+                        </div>
                         <!-- TABLE -->
                         <div class="table-responsive mt-3">
                             <table class="table table-dark table-striped w-100 align-middle">
@@ -3425,6 +3449,33 @@
                         menu.style.display = (menu.style.display === "block") ? "none" : "block";
                     }
 
+                    function initPurchaseFilter() {
+
+                        const yearSelect = document.getElementById("filterYear");
+                        const currentYear = new Date().getFullYear();
+
+                        let html = "";
+
+                        for (let year = 2025; year <= currentYear + 50; year++) {
+                            html += `<option value="${year}">${year}</option>`;
+                        }
+
+                        yearSelect.innerHTML = html;
+
+                        document.getElementById("filterMonth").value =
+                            String(new Date().getMonth() + 1);
+
+                        document.getElementById("filterYear").value =
+                            String(currentYear);
+                    }
+
+                    window.addEventListener("load", async () => {
+                        initPurchaseFilter();
+                        await loadUnits();
+                        await loadPurchases();
+                        await loadPurchasesData();
+                    });
+
                     /* ================= LOAD OPTIONS ================= */
                     async function loadPurchaseOptions() {
 
@@ -3432,9 +3483,11 @@
                         let materialHtml = `<option value="">Select Materials</option>`;
                         materialSnap.forEach(d => {
                             materialHtml += `
-            <option value="${d.data().name}">
-                ${d.data().name}
-            </option>`;
+                        <option
+                            value="${d.data().code}"
+                            data-name="${d.data().name}">
+                            ${d.data().code} - ${d.data().name}
+                        </option>`;
                         });
                         document.getElementById("purchaseMaterial").innerHTML = materialHtml;
 
@@ -3477,14 +3530,21 @@
 
                     /* ================= SAVE ================= */
                     async function savePurchase() {
-                        const material = document.getElementById("purchaseMaterial").value;
+                        const materialSelect = document.getElementById("purchaseMaterial");
+                        if (materialSelect.selectedIndex < 0) {
+                            alert("Pilih material");
+                            return;
+                        }
+                        const materialCode = materialSelect.value;
+                        const materialName = materialSelect.options[materialSelect.selectedIndex].dataset.name;
+
                         const qty = Number(document.getElementById("purchaseQty").value);
                         const unit = document.getElementById("purchaseUnit").value;
                         const price = Number(document.getElementById("purchasePrice").value);
                         const supplier = document.getElementById("purchaseSupplier").value;
                         const date = document.getElementById("purchaseDate").value;
 
-                        if (!material || !qty || !unit || !price || !supplier || !date) {
+                        if (!materialCode || !qty || !unit || !price || !supplier || !date) {
                             alert("Lengkapi data purchasing");
                             return;
                         }
@@ -3493,8 +3553,9 @@
                         const code = genCode("PUR", snap.size);
 
                         await addDoc(collection(db, "purchasing"), {
-                            code,
-                            material,
+
+                            materialCode,
+                            materialName,
                             qty,
                             unit,
                             price,
@@ -3505,9 +3566,13 @@
 
                         alert("Purchase Order Material Berhasil Disimpan");
 
+                        document.getElementById("purchaseMaterial").value = "";
                         document.getElementById("purchaseQty").value = "";
                         document.getElementById("purchasePrice").value = "";
+                        document.getElementById("purchaseUnit").value = "";
                         document.getElementById("purchaseDate").value = "";
+                        document.getElementById("purchaseAverage").value = "";
+                        document.getElementById("purchaseSupplier").value = "";
 
                         await loadPurchases();
                         await loadPurchasesData();
@@ -3517,12 +3582,39 @@
                     /* ================= LIST TABLE ================= */
                     async function loadPurchases() {
 
+                        console.log("filterMonth =", document.getElementById("filterMonth")?.value);
+                        const selectedMonth =
+                            Number(document.getElementById("filterMonth").value);
+
+                        console.log("filterYear =", document.getElementById("filterYear")?.value);
+                        const selectedYear =
+                            Number(document.getElementById("filterYear").value);
+
+                        const firstDay = new Date(
+                            selectedYear,
+                            selectedMonth - 1,
+                            1
+                        );
+
+                        const lastDay = new Date(
+                            selectedYear,
+                            selectedMonth,
+                            0
+                        );
+
+                        const startDate = firstDay.toISOString().split("T")[0];
+                        const endDate = lastDay.toISOString().split("T")[0];
+
                         const snap = await getDocs(
-                            query(collection(db, "purchasing"), orderBy("date", "desc"))
+                            query(
+                                collection(db, "purchasing"),
+                                where("date", ">=", startDate),
+                                where("date", "<=", endDate),
+                                orderBy("date", "desc")
+                            )
                         );
 
                         let html = "";
-                        let materialMap = {};
 
                         snap.forEach(d => {
                             const item = d.data();
@@ -3530,31 +3622,32 @@
                             const qty = Number(item.qty || 0);
                             const price = Number(item.price || 0);
                             const average = price / (qty || 1);
-                            const total = qty * price;
 
                             html += `
-            <tr>
-                <td>${item.code}</td>
-                <td>${item.material}</td>
-                <td>${qty}</td>
-                <td>${item.unit}</td>
-                <td>Rp ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td>Rp ${average.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td>${item.supplier}</td>
-                <td>${item.date}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm w-100"
-                        onclick="deletePurchase('${d.id}')">
-                        Hapus
-                    </button>
-                </td>
-            </tr>
+        <tr>
+            <td>${item.materialCode}</td>
+            <td>${item.materialName}</td>
+            <td>${qty}</td>
+            <td>${item.unit}</td>
+            <td>Rp ${price.toLocaleString()}</td>
+            <td>Rp ${average.toLocaleString()}</td>
+            <td>${item.supplier}</td>
+            <td>${item.date}</td>
+            <td>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deletePurchase('${d.id}')">
+                    Hapus
+                </button>
+            </td>
+        </tr>
         `;
                         });
 
                         document.getElementById("purchaseList").innerHTML =
-                            html || "<tr><td colspan='10'>Tidak ada data</td></tr>";
+                            html || "<tr><td colspan='9'>Tidak ada data</td></tr>";
                     }
+
+
                     /* ================= DELETE ================= */
                     async function deletePurchase(id) {
                         if (!confirm("Hapus purchasing?")) return;
@@ -3604,8 +3697,8 @@
 
                             html += `
             <tr>
-                <td>${item.code}</td>
-                <td>${item.material}</td>
+                <td>${item.materialCode}</td>
+                <td>${item.materialName}</td>
                 <td>${qty}</td>
                 <td>${item.unit}</td>
                 <td>
@@ -3648,7 +3741,6 @@
                         document.getElementById("filterStartDate").value = today;
                         document.getElementById("filterEndDate").value = today;
 
-                        loadPurchasesData();
                     });
 
                     /* ================= EXPORT PURCHASE PDF ================= */
@@ -3987,6 +4079,10 @@
                         });
 
                         alert("Produksi tersimpan");
+
+                        document.getElementById("prodProduct").value = "";
+                        document.getElementById("prodQty").value = "";
+
                         loadProductionList();
                     }
 
