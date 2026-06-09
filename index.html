@@ -324,16 +324,32 @@
                         <div id="jam"></div>
                         <div id="userEmail"></div>
                     </div>
-
                 </div>
 
                 <!-- DASHBOARD -->
                 <div id="dashboard" class="menu-page active-page">
+
+                    <!-- FILTER -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <select id="dashMonth" class="form-control"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="dashYear" class="form-control"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-warning w-100" onclick="applyDashboardFilter()">
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STAT -->
                     <div class="row mb-4">
                         <div class="col-md-3">
                             <div class="stat-card">
                                 <h6>Total Sales</h6>
-                                <h2>Rp 120 JT</h2>
+                                <h2 id="dashboardTotal">Rp 0</h2>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -355,6 +371,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- CHART -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card-custom">
@@ -369,15 +386,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-
+                    <div class="row mt-3">
                         <div class="col-md-6">
                             <div class="card-custom">
                                 <h5>Best Selling Product Variants</h5>
                                 <canvas id="variantChart"></canvas>
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="card-custom">
                                 <h5>Material Usage</h5>
@@ -1349,6 +1364,7 @@
                         </table>
                     </div>
                 </div>
+                <!-- INPUT DATA SALES VALUE -->
                 <div id="marketing_sales" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -1379,6 +1395,19 @@
                         <button class="btn btn-warning mt-3 w-100" onclick="saveSales()">
                             Save Sales
                         </button>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <label>Bulan</label>
+                                <select id="salesMonth" class="form-control" onchange="loadSalesTable()">
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Tahun</label>
+                                <select id="salesYear" class="form-control" onchange="loadSalesTable()">
+                                </select>
+                            </div>
+                        </div>
                         <h4 class="mt-3">Data Sales</h4>
                         <div id="salesTotal" style="margin-bottom:10px; font-size:18px; color:#facc15;">
                             Total Sales Value : Rp 0
@@ -1922,7 +1951,7 @@
 
                     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
                     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-                    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+                    import { getFirestore, collection, onSnapshot, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
                     const firebaseConfig = {
                         apiKey: "AIzaSyCqmojmZagGLMpxpemlhf3L0u42lShW6NM",
@@ -5121,6 +5150,7 @@
                     async function loadSalesFGStores() {
                         const snap =
                             await getDocs(collection(db, "stores"));
+
                         let html =
                             `<option value="">Select Store</option>`;
                         snap.forEach(doc => {
@@ -5386,6 +5416,8 @@
                     async function openMarketingSales() {
                         showPage("marketing_sales");
 
+                        initSalesFilter();
+
                         // dropdown store
                         const snap = await getDocs(collection(db, "stores"));
                         let html = `<option value="">Select Store</option>`;
@@ -5429,29 +5461,49 @@
                         });
 
                         alert("Sales berhasil disimpan");
+
                         await loadSalesTable();
+                        await loadSalesDashboard();
+                        await loadDashboardSales();
+
                         document.getElementById("salesValue").value = "";
                         document.getElementById("salesDate").value = "";
                     }
 
                     /* LOAD SALES TABLE (INPUT PAGE) */
                     async function loadSalesTable() {
+
+                        const selectedMonth = parseInt(document.getElementById("salesMonth").value);
+                        const selectedYear = parseInt(document.getElementById("salesYear").value);
+
                         const snap = await getDocs(collection(db, "sales"));
+
                         let data = [];
+
                         snap.forEach(d => {
                             data.push({ id: d.id, ...d.data() });
                         });
 
-                        // 🔥 SORT BY STORE CODE NUMBER
                         data.sort((a, b) => {
-                            const numA = parseInt(a.storeCode.replace("ST", ""));
-                            const numB = parseInt(b.storeCode.replace("ST", ""));
+                            const numA = parseInt(a.storeCode.replace("ST", "")) || 0;
+                            const numB = parseInt(b.storeCode.replace("ST", "")) || 0;
                             return numA - numB;
                         });
 
                         let html = "";
                         let totalSales = 0;
+
                         data.forEach(d => {
+
+                            const dateObj = new Date(d.date);
+                            const month = dateObj.getMonth() + 1;
+                            const year = dateObj.getFullYear();
+
+                            // 🔥 FILTER BULAN + TAHUN
+                            if (month !== selectedMonth || year !== selectedYear) {
+                                return;
+                            }
+
                             totalSales += Number(d.value);
 
                             html += `
@@ -5466,20 +5518,44 @@
             Hapus
         </button>
     </td>
-</tr>
-`;
+</tr>`;
                         });
 
                         document.getElementById("salesList").innerHTML = html;
 
-                        // 🔥 TOTAL SALES DISPLAY
-                        const totalEl = document.getElementById("salesTotal");
-                        if (totalEl) {
-                            totalEl.innerHTML = `
-            <b>Total Sales: Rp ${totalSales.toLocaleString()}</b>
-        `;
-                        }
+                        document.getElementById("salesTotal").innerHTML =
+                            `<b>Total Sales: Rp ${totalSales.toLocaleString()}</b>`;
                     }
+
+                    function initSalesFilter() {
+                        const now = new Date();
+
+                        const monthSelect = document.getElementById("salesMonth");
+                        const yearSelect = document.getElementById("salesYear");
+
+                        const months = [
+                            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                        ];
+
+                        let mHtml = "";
+                        months.forEach((m, i) => {
+                            mHtml += `<option value="${i + 1}">${m}</option>`;
+                        });
+
+                        monthSelect.innerHTML = mHtml;
+                        monthSelect.value = now.getMonth() + 1;
+
+                        let yHtml = "";
+
+                        for (let y = 2025; y <= 2075; y++) {
+                            yHtml += `<option value="${y}">${y}</option>`;
+                        }
+
+                        yearSelect.innerHTML = yHtml;
+                        yearSelect.value = new Date().getFullYear();
+                    }
+
 
                     /* DELETE SALES */
                     async function deleteSales(id) {
@@ -7124,108 +7200,275 @@
 
                 </script>
                 <script>
+                    // ==========================
+                    // FUNCITON OPEN PAGE ALL
+                    // ==========================
                     function showPage(pageId) {
                         // sembunyikan semua page
-                        document
-                            .querySelectorAll(".menu-page")
-                            .forEach(page => {
-                                page.style.display = "none";
-                            });
+                        document.querySelectorAll(".menu-page").forEach(page => {
+                            page.style.display = "none";
+                        });
+
                         // tampilkan page aktif
-                        const activePage =
-                            document.getElementById(pageId);
+                        const activePage = document.getElementById(pageId);
+
                         if (activePage) {
                             activePage.style.display = "block";
                         } else {
-
-                            console.error(
-                                "Page tidak ditemukan:",
-                                pageId
-                            );
-
+                            console.error("Page tidak ditemukan:", pageId);
+                            return;
                         }
 
+                        // 🔥 TAMBAHAN INI
+                        if (pageId === "dashboard") {
+                            loadDashboardSales();
+                        }
                     }
-                    // CHART SALES
-                    new Chart(document.getElementById('salesChart'), {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-                            datasets: [{
-                                label: 'Sales',
-                                data: [12, 19, 10, 25, 30, 40],
-                                borderColor: '#facc15',
-                                backgroundColor: 'rgba(250,204,21,0.2)',
-                                tension: 0.4
-                            }]
+
+                    // ==========================
+                    // GLOBAL CHART VARIABLES
+                    // ==========================
+                    let salesChart;
+                    let productionChart;
+                    let variantChart;
+                    let expenseChart;
+
+                    // ==========================
+                    // INIT ALL CHARTS
+                    // ==========================
+                    function initCharts() {
+
+                        salesChart = new Chart(
+                            document.getElementById('salesChart'),
+                            {
+                                type: 'line',
+                                data: {
+                                    labels: [],
+                                    datasets: [{
+                                        label: 'Sales',
+                                        data: [],
+                                        borderColor: '#facc15',
+                                        backgroundColor: 'rgba(250,204,21,0.2)',
+                                        fill: true,
+                                        tension: 0.4
+                                    }]
+                                }
+                            }
+                        );
+
+                        productionChart = new Chart(
+                            document.getElementById('productionChart'),
+                            {
+                                type: 'bar',
+                                data: {
+                                    labels: [],
+                                    datasets: [{
+                                        label: 'Produksi',
+                                        data: [],
+                                        backgroundColor: ['#facc15', '#f59e0b', '#eab308', '#ca8a04']
+                                    }]
+                                }
+                            }
+                        );
+
+                        variantChart = new Chart(
+                            document.getElementById('variantChart'),
+                            {
+                                type: 'doughnut',
+                                data: {
+                                    labels: [],
+                                    datasets: [{
+                                        data: [],
+                                        backgroundColor: ['#facc15', '#f59e0b', '#ca8a04', '#eab308', '#fbbf24']
+                                    }]
+                                }
+                            }
+                        );
+
+                        expenseChart = new Chart(
+                            document.getElementById('expenseChart'),
+                            {
+                                type: 'pie',
+                                data: {
+                                    labels: [],
+                                    datasets: [{
+                                        data: [],
+                                        backgroundColor: ['#facc15', '#f59e0b', '#eab308', '#ca8a04', '#fbbf24']
+                                    }]
+                                }
+                            }
+                        );
+                    }
+
+                    // ==========================
+                    // INIT FILTER DASHBOARD
+                    // ==========================
+                    function initDashboardFilter() {
+
+                        const m = document.getElementById("dashMonth");
+                        const y = document.getElementById("dashYear");
+
+                        const months = [
+                            "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+                            "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+                        ];
+
+                        m.innerHTML = months.map((x, i) =>
+                            `<option value="${i + 1}">${x}</option>`
+                        ).join("");
+
+                        const now = new Date();
+
+                        m.value = now.getMonth() + 1;
+
+                        let yearHTML = "";
+                        for (let i = 2025; i <= 2075; i++) {
+                            yearHTML += `<option value="${i}">${i}</option>`;
                         }
 
+                        y.innerHTML = yearHTML;
+                        y.value = now.getFullYear();
+                    }
+
+                    // ==========================
+                    // MAIN DASHBOARD (ONLY SALES TOTAL + CHART)
+                    // ==========================
+                    async function loadDashboardTotal(useDefault = true) {
+
+                        const now = new Date();
+
+                        const month = useDefault
+                            ? now.getMonth() + 1
+                            : parseInt(document.getElementById("dashMonth").value);
+
+                        const year = useDefault
+                            ? now.getFullYear()
+                            : parseInt(document.getElementById("dashYear").value);
+
+                        const snap = await getDocs(collection(db, "sales"));
+
+                        let totalSales = 0;
+                        let chartData = {};
+
+                        snap.forEach(doc => {
+
+                            const d = doc.data();
+                            if (!d.date) return;
+
+                            const dt = new Date(d.date + "T00:00:00");
+
+                            const m = dt.getMonth() + 1;
+                            const y = dt.getFullYear();
+
+                            // ==========================
+                            // TOTAL SALES FILTER
+                            // ==========================
+                            if (m === month && y === year) {
+                                totalSales += Number(d.value || 0);
+                            }
+
+                            // ==========================
+                            // CHART DATA (ALL TIME GROUPED)
+                            // ==========================
+                            const key = `${m}-${y}`;
+                            chartData[key] = (chartData[key] || 0) + Number(d.value || 0);
+                        });
+
+                        document.getElementById("dashboardTotal").innerHTML =
+                            "Rp " + totalSales.toLocaleString("id-ID");
+
+                        updateSalesChart(chartData);
+                    }
+
+                    // ==========================
+                    // UPDATE SALES CHART
+                    // ==========================
+                    function updateSalesChart(data) {
+
+                        const labels = Object.keys(data);
+                        const values = Object.values(data);
+
+                        if (!salesChart) return;
+
+                        salesChart.data.labels = labels;
+                        salesChart.data.datasets[0].data = values;
+                        salesChart.update();
+                    }
+
+                    // ==========================
+                    // FILTER BUTTON
+                    // ==========================
+                    function applyDashboardFilter() {
+                        loadDashboardTotal(false);
+                    }
+
+                    // ==========================
+                    // OTHER CHARTS (STATIC DEMO)
+                    // ==========================
+                    async function loadDashboardData() {
+
+                        updateProductionChart(
+                            ['Coklat', 'Keju', 'Sosis', 'Tawar'],
+                            [1200, 900, 700, 500]
+                        );
+
+                        updateVariantChart(
+                            ['Coklat', 'Keju', 'Sosis'],
+                            [45, 30, 25]
+                        );
+
+                        updateExpenseChart(
+                            ['Tepung', 'Gula', 'Mentega', 'Telur'],
+                            [40, 20, 25, 15]
+                        );
+                    }
+
+                    // ==========================
+                    // SAFE UPDATE CHARTS
+                    // ==========================
+                    function updateProductionChart(labels, values) {
+                        if (!productionChart) return;
+                        productionChart.data.labels = labels;
+                        productionChart.data.datasets[0].data = values;
+                        productionChart.update();
+                    }
+
+                    function updateVariantChart(labels, values) {
+                        if (!variantChart) return;
+                        variantChart.data.labels = labels;
+                        variantChart.data.datasets[0].data = values;
+                        variantChart.update();
+                    }
+
+                    function updateExpenseChart(labels, values) {
+                        if (!expenseChart) return;
+                        expenseChart.data.labels = labels;
+                        expenseChart.data.datasets[0].data = values;
+                        expenseChart.update();
+                    }
+
+                    // ==========================
+                    // INIT ON LOAD
+                    // ==========================
+                    window.addEventListener("DOMContentLoaded", () => {
+
+                        initCharts();
+                        initDashboardFilter();
+
+                        loadDashboardTotal(true);   // 🔥 ONLY SALES TOTAL
+
+                        loadDashboardData();        // other charts
+
+                        updateDateTime();
+                        setInterval(updateDateTime, 1000);
                     });
 
-                    // CHART PRODUKSI
-                    new Chart(document.getElementById('productionChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['Coklat', 'Keju', 'Sosis', 'Tawar'],
-                            datasets: [{
-                                label: 'Produksi',
-                                data: [1200, 900, 700, 500],
-                                backgroundColor: [
-                                    '#facc15',
-                                    '#f59e0b',
-                                    '#eab308',
-                                    '#ca8a04'
-                                ]
-                            }]
-                        }
-
-                    });
-
-                    // CHART VARIAN
-                    new Chart(document.getElementById('variantChart'), {
-
-                        type: 'doughnut',
-
-                        data: {
-                            labels: ['Coklat', 'Keju', 'Sosis'],
-                            datasets: [{
-                                data: [45, 30, 25],
-                                backgroundColor: [
-                                    '#facc15',
-                                    '#f59e0b',
-                                    '#ca8a04'
-                                ]
-                            }]
-                        }
-
-                    });
-
-                    // CHART EXPENSE
-                    new Chart(document.getElementById('expenseChart'), {
-
-                        type: 'pie',
-
-                        data: {
-                            labels: ['Tepung', 'Gula', 'Mentega', 'Telur'],
-                            datasets: [{
-                                data: [40, 20, 25, 15],
-                                backgroundColor: [
-                                    '#facc15',
-                                    '#f59e0b',
-                                    '#eab308',
-                                    '#ca8a04'
-                                ]
-                            }]
-                        }
-
-                    });
-
+                    // ==========================
+                    // DATE TIME
+                    // ==========================
                     function updateDateTime() {
                         const now = new Date();
-                        const hariList = [
-                            "Minggu", "Senin", "Selasa", "Rabu",
-                            "Kamis", "Jumat", "Sabtu"
-                        ];
+                        const hariList = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
                         const hari = hariList[now.getDay()];
                         const tanggal = now.toLocaleDateString('id-ID', {
                             year: 'numeric',
@@ -7234,6 +7477,7 @@
                         });
 
                         const jam = now.toLocaleTimeString('id-ID');
+
                         document.getElementById("hari").innerText = hari;
                         document.getElementById("tanggal").innerText = tanggal;
                         document.getElementById("jam").innerText = jam;
@@ -7241,7 +7485,9 @@
 
                     setInterval(updateDateTime, 1000);
                     updateDateTime();
+
                 </script>
+
     </body>
 
 </html>
