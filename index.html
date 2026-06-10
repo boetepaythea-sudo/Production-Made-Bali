@@ -665,7 +665,6 @@
                         </table>
                     </div>
                 </div>
-
                 <!-- PURCHASING -->
                 <div id="purchasing" class="menu-page">
                     <div class="card-custom">
@@ -684,19 +683,24 @@
                         <!-- FORM INPUT -->
                         <div class="row">
                             <div class="col-md-3">
+                                <label>Supplier</label>
+                                <select id="purchaseSupplier" class="form-control"></select>
+                            </div>
+                            <div class="col-md-3">
                                 <label>Raw Materials</label>
                                 <select id="purchaseMaterial" class="form-control"></select>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label>Qty</label>
                                 <input type="number" id="purchaseQty" class="form-control" oninput="calculateAverage()">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label>UOM/Units</label>
                                 <select id="purchaseUnit" class="form-control"></select>
                             </div>
-
-                            <div class="col-md-2">
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
                                 <label>Purchase Price</label>
                                 <input type="number" id="purchasePrice" class="form-control"
                                     oninput="calculateAverage()">
@@ -705,25 +709,25 @@
                                 <label>Average</label>
                                 <input type="text" id="purchaseAverage" class="form-control auto-field" readonly>
                             </div>
-                        </div>
 
-                        <div class="row mt-3">
-                            <div class="col-md-4">
-                                <label>Supplier</label>
-                                <select id="purchaseSupplier" class="form-control"></select>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>Purchase Date</label>
                                 <input type="date" id="purchaseDate" class="form-control">
                             </div>
-                            <div class="col-md-4 d-flex align-items-end">
+                            <div class="col-md-3 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="savePurchase()">
                                     <i class="fa-solid fa-save"></i>
                                     Save Purchase Order
                                 </button>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                    </div>
+                    <!-- TABLE -->
+                    <div class="card-custom">
+                        <h4 class="text-warning mt-1">
+                            Tabel Data Purchase Order Materials
+                        </h4>
+                        <div class="row mt-2">
                             <div class="col-md-3">
                                 <label>Filter Month</label>
                                 <select id="filterMonth" class="form-control" onchange="loadPurchases()">
@@ -746,8 +750,15 @@
                                 <select id="filterYear" class="form-control" onchange="loadPurchases()">
                                 </select>
                             </div>
+                            <div class="col-md-3">
+                                <label>Totals Purchase value</label>
+                                <div class="px-3 py-2 border border-warning rounded">
+                                    <strong class="text-warning">
+                                        <span id="totalPurchaseAmount">Rp 0</span>
+                                    </strong>
+                                </div>
+                            </div>
                         </div>
-                        <!-- TABLE -->
                         <div class="table-responsive mt-3">
                             <table class="table table-dark table-striped w-100 align-middle">
                                 <thead>
@@ -3619,12 +3630,20 @@
 
                     /* ================= LIST TABLE ================= */
                     async function loadPurchases() {
+                        console.log("loadPurchases dijalankan");
 
-                        console.log("filterMonth =", document.getElementById("filterMonth")?.value);
+                        console.log(
+                            "Month =",
+                            document.getElementById("filterMonth")?.value
+                        );
+
+                        console.log(
+                            "Year =",
+                            document.getElementById("filterYear")?.value
+                        );
+
                         const selectedMonth =
                             Number(document.getElementById("filterMonth").value);
-
-                        console.log("filterYear =", document.getElementById("filterYear")?.value);
                         const selectedYear =
                             Number(document.getElementById("filterYear").value);
 
@@ -3648,11 +3667,12 @@
                                 collection(db, "purchasing"),
                                 where("date", ">=", startDate),
                                 where("date", "<=", endDate),
-                                orderBy("date", "desc")
+                                orderBy("date", "asc")
                             )
                         );
 
                         let html = "";
+                        let totalPurchasePrice = 0;
 
                         snap.forEach(d => {
                             const item = d.data();
@@ -3661,30 +3681,34 @@
                             const price = Number(item.price || 0);
                             const average = price / (qty || 1);
 
+                            totalPurchasePrice += price;
+
                             html += `
-        <tr>
-            <td>${item.materialCode}</td>
-            <td>${item.materialName}</td>
-            <td>${qty}</td>
-            <td>${item.unit}</td>
-            <td>Rp ${price.toLocaleString()}</td>
-            <td>Rp ${average.toLocaleString()}</td>
-            <td>${item.supplier}</td>
-            <td>${item.date}</td>
-            <td>
-                <button class="btn btn-danger btn-sm"
-                    onclick="deletePurchase('${d.id}')">
-                    Hapus
-                </button>
-            </td>
-        </tr>
-        `;
+    <tr>
+        <td>${item.materialCode}</td>
+        <td>${item.materialName}</td>
+        <td>${qty}</td>
+        <td>${item.unit}</td>
+        <td>Rp ${price.toLocaleString("id-ID")}</td>
+        <td>Rp ${average.toLocaleString("id-ID")}</td>
+        <td>${item.supplier}</td>
+        <td>${item.date}</td>
+        <td>
+            <button class="btn btn-danger btn-sm"
+                onclick="deletePurchase('${d.id}')">
+                Hapus
+            </button>
+        </td>
+    </tr>
+    `;
                         });
 
                         document.getElementById("purchaseList").innerHTML =
                             html || "<tr><td colspan='9'>Tidak ada data</td></tr>";
-                    }
 
+                        document.getElementById("totalPurchaseAmount").innerHTML =
+                            `Rp ${totalPurchasePrice.toLocaleString("id-ID")}`;
+                    }
 
                     /* ================= DELETE ================= */
                     async function deletePurchase(id) {
@@ -7131,6 +7155,9 @@
                     window.savePurchase = savePurchase;
                     window.deletePurchase = deletePurchase;
                     window.printPurchasePDF = printPurchasePDF;
+                    window.loadPurchases = loadPurchases;
+                    window.loadPurchasesData = loadPurchasesData;
+                    window.loadPurchaseOptions = loadPurchaseOptions;
 
                     window.toggleProduksi = toggleProduksi;
                     window.showProduksi = showProduksi;
