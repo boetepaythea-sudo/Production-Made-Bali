@@ -6654,27 +6654,19 @@
                         // =========================
                         // LOAD PURCHASE ORDER
                         // =========================
-
                         let poQuery;
-
                         if (start && end) {
-
                             poQuery = query(
                                 collection(db, "purchasing"),
                                 where("date", ">=", start),
                                 where("date", "<=", end)
                             );
-
                         } else {
-
                             poQuery =
                                 collection(db, "purchasing");
-
                         }
-
                         const poSnap =
                             await getDocs(poQuery);
-
                         // =========================
                         // LOAD PRODUKSI
                         // =========================
@@ -6711,7 +6703,6 @@
                         }
                         const wasteSnap =
                             await getDocs(wasteQuery);
-
                         // =========================
                         // LOAD STOCK OPNAME
                         // =========================
@@ -6738,7 +6729,6 @@
                         // ====================================================
                         // MAPPING
                         // ====================================================
-
                         let stockAwalMap = {};
                         let poMap = {};
                         let produksiMap = {};
@@ -6747,12 +6737,9 @@
 
                         // STOCK AWAL
                         stockAwalSnap.forEach(d => {
-
                             const item = d.data();
-
                             const code =
                                 String(item.code).trim();
-
                             stockAwalMap[code] =
                                 (stockAwalMap[code] || 0)
                                 + Number(item.weight || 0);
@@ -6797,11 +6784,9 @@
                                     // total pemakaian bahan baku
                                     const totalUsage =
                                         qtyProduction * recipeQty;
-
                                     produksiMap[materialName] =
                                         (produksiMap[materialName] || 0)
                                         + totalUsage;
-
                                 }
                             });
                         });
@@ -6819,14 +6804,11 @@
 
                         });
 
-                        // STOCK OPNAME
+                        // STOCK OPNAME 
                         soSnap.forEach(d => {
-
                             const item = d.data();
-
                             const code =
                                 String(item.code).trim();
-
                             soMap[code] =
                                 (soMap[code] || 0)
                                 + Number(item.weight || 0);
