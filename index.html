@@ -325,10 +325,8 @@
                         <div id="userEmail"></div>
                     </div>
                 </div>
-
                 <!-- DASHBOARD -->
                 <div id="dashboard" class="menu-page active-page">
-
                     <!-- FILTER -->
                     <div class="row mb-3">
                         <div class="col-md-2">
@@ -336,11 +334,6 @@
                         </div>
                         <div class="col-md-2">
                             <select id="dashYear" class="form-control"></select>
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-warning w-100" onclick="applyDashboardFilter()">
-                                Filter
-                            </button>
                         </div>
                     </div>
 
@@ -3631,22 +3624,11 @@
                     /* ================= LIST TABLE ================= */
                     async function loadPurchases() {
                         console.log("loadPurchases dijalankan");
+                        console.log("Month =", document.getElementById("filterMonth")?.value);
+                        console.log("Year =", document.getElementById("filterYear")?.value);
 
-                        console.log(
-                            "Month =",
-                            document.getElementById("filterMonth")?.value
-                        );
-
-                        console.log(
-                            "Year =",
-                            document.getElementById("filterYear")?.value
-                        );
-
-                        const selectedMonth =
-                            Number(document.getElementById("filterMonth").value);
-                        const selectedYear =
-                            Number(document.getElementById("filterYear").value);
-
+                        const selectedMonth = Number(document.getElementById("filterMonth").value);
+                        const selectedYear = Number(document.getElementById("filterYear").value);
                         const firstDay = new Date(
                             selectedYear,
                             selectedMonth - 1,
@@ -3735,14 +3717,14 @@
                                 collection(db, "purchasing"),
                                 where("date", ">=", startDate),
                                 where("date", "<=", endDate),
-                                orderBy("date", "desc")
+                                orderBy("date", "asc")
                             );
 
                         } else {
 
                             q = query(
                                 collection(db, "purchasing"),
-                                orderBy("date", "desc")
+                                orderBy("date", "asc")
                             );
                         }
 
@@ -3875,8 +3857,8 @@
                             totalPrice += price;
                             rows.push([
                                 no++,
-                                item.code,
-                                item.material,
+                                item.materialCode,
+                                item.materialName,
                                 qty,
                                 item.unit,
                                 "Rp " + price.toLocaleString(),
@@ -3923,13 +3905,13 @@
                             head: [[
                                 "No",
                                 "Kode",
-                                "Nama Bahan",
+                                "Material Name",
                                 "Qty",
-                                "Satuan",
-                                "Harga Beli",
+                                "UOM",
+                                "Purchase Price",
                                 "Average",
                                 "Supplier",
-                                "Tanggal"
+                                "Purchase Date"
                             ]],
 
                             body: rows,
