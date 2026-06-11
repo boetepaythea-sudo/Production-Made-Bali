@@ -835,7 +835,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- PRODUKSI INPUT -->
+                <!-- INPUT DATA PRODUCTION MRP -->
                 <div id="produksi_input" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -1046,7 +1046,9 @@
                                 <tr>
                                     <th>Product Code</th>
                                     <th>Product Name</th>
-                                    <th>Qty</th>
+                                    <th>Qty Pcs</th>
+                                    <th>Qty Box</th>
+                                    <th>Production Date</th>
                                 </tr>
                             </thead>
                             <tbody id="cogsFGTable"></tbody>
@@ -3975,7 +3977,6 @@
                             loadProductionProducts();
                         });
                     }
-
                     /* ================= HASIL PRODUKSI ================= */
                     if (type === "hasil") {
 
@@ -4123,6 +4124,7 @@
 
                     document.getElementById("prodProduct").value = "";
                     document.getElementById("prodQty").value = "";
+                    document.getElementById("prodDate").value = "";
 
                     loadProductionList();
                 }
@@ -4141,7 +4143,7 @@
 
                         html += `
         <tr>
-            <td>${data.code}</td>
+            <td>${data.productCode}</td>
             <td>${data.productName}</td>
             <td>${data.qtyProduction}</td>
             <td>${data.date}</td>
@@ -4162,9 +4164,17 @@
                     const el = document.getElementById("productionList");
                     if (el) el.innerHTML = html;
                 }
+
                 async function deleteProduction(id) {
                     if (!confirm("Yakin anda akan Hapus data produksi ini?")) return;
                     await deleteDoc(doc(db, "production_orders", id));
+                    loadProductionList();
+                }
+
+                function clearProductionFilter() {
+                    document.getElementById("productionDateFrom").value = "";
+                    document.getElementById("productionDateTo").value = "";
+
                     loadProductionList();
                 }
 
@@ -4640,7 +4650,9 @@
                             fgMap[key] = {
                                 productCode: prod.productCode,
                                 productName: prod.productName,
-                                qty: 0
+                                qty: 0,
+                                qtyPerBox: prod.fgBox,
+                                date: prod.date
                             };
                         }
 
@@ -4656,6 +4668,8 @@
             <td>${item.productCode}</td>
             <td>${item.productName}</td>
             <td>${item.qty}</td>
+            <td>${item.qtyPerBox}</td>
+            <td>${item.date}</td>
         </tr>
         `;
                     });
@@ -6676,12 +6690,20 @@
                         // =========================
                         // LOAD PRODUKSI
                         // =========================
+                        let produksiQuery;
+                        if (start && end) {
 
-                        const produksiSnap =
-                            await getDocs(
-                                collection(db, "production_orders")
+                            produksiQuery = query(
+                                collection(db, "production_orders"),
+                                where("date", ">=", start),
+                                where("date", "<=", end)
                             );
-
+                        } else {
+                            produksiQuery =
+                                collection(db, "production_orders");
+                        }
+                        const produksiSnap =
+                            await getDocs(produksiQuery);
                         // =========================
                         // LOAD PRODUCT RECIPES
                         // =========================
@@ -6696,10 +6718,21 @@
                                 collection(db, "price_fg")
                             );
 
-                        const productionResultSnap =
-                            await getDocs(
-                                collection(db, "production_results")
+                        let productionResultQuery;
+
+                        if (start && end) {
+                            productionResultQuery = query(
+                                collection(db, "production_results"),
+                                where("date", ">=", start),
+                                where("date", "<=", end)
                             );
+                        } else {
+                            productionResultQuery =
+                                collection(db, "production_results");
+                        }
+
+                        const productionResultSnap =
+                            await getDocs(productionResultQuery);
 
                         // =========================
                         // LOAD WASTE
@@ -6817,29 +6850,20 @@
                         // =========================
                         // PEMAKAIAN BOX DARI HASIL PRODUKSI
                         // =========================
-
                         productionResultSnap.forEach(resultDoc => {
-
                             const result = resultDoc.data();
-
                             const productCode =
                                 String(result.productCode || "").trim();
-
                             const fgBox =
                                 Number(result.fgBox || 0);
-
                             priceFgSnap.forEach(priceDoc => {
-
                                 const price = priceDoc.data();
-
                                 if (
                                     String(price.productCode || "").trim()
                                     === productCode
                                 ) {
-
                                     const boxName =
                                         String(price.materialName || "").trim();
-
                                     produksiMap[boxName] =
                                         (produksiMap[boxName] || 0)
                                         + fgBox;
@@ -6883,25 +6907,16 @@
                         let totalData = 0;
                         materialSnap.forEach(d => {
                             const mat = d.data();
-                            const code =
-                                String(mat.code).trim();
-                            const average =
-                                Number(mat.average || 0);
+                            const code = String(mat.code).trim();
+                            const average = Number(mat.average || 0);
 
                             // =========================
                             // QTY
                             // =========================
-                            const qtyStockAwal =
-                                stockAwalMap[code] || 0;
-
-                            const qtyPO =
-                                poMap[mat.code] || 0;
-
-                            const qtyProduksi =
-                                produksiMap[mat.name] || 0;
-
-                            const qtyWaste =
-                                wasteMap[mat.name] || 0;
+                            const qtyStockAwal = stockAwalMap[code] || 0;
+                            const qtyPO = poMap[mat.code] || 0;
+                            const qtyProduksi = produksiMap[mat.name] || 0;
+                            const qtyWaste = wasteMap[mat.name] || 0;
 
                             // STOCK AKHIR
                             const qtyStockAkhir =
@@ -6973,6 +6988,7 @@
 
                 window.loadStockCardWarehouse =
                     loadStockCardWarehouse;
+                loadStockCardWarehouse();
 
                 /* =====================================================
                     PRINT PDF STOCK CARD
@@ -7003,9 +7019,12 @@
                     // GET TABLE DATA
                     // =========================
                     const rows = [];
-                    let grandTotal = 0;
+                    const grandTotal =
+                        document.getElementById("stockCardTotalValue")
+                            .innerText;
                     document.querySelectorAll(
                         "#stockCardTable tr"
+
                     ).forEach(tr => {
                         const cols =
                             tr.querySelectorAll("td");
@@ -7023,16 +7042,7 @@
                                 cols[9].innerText,
                                 cols[10].innerText
                             ]);
-                            // TOTAL VALUE
-                            const valueText =
-                                cols[10]
-                                    .innerText
-                                    .replace("Rp", "")
-                                    .replace(/\./g, "")
-                                    .replace(/,/g, "")
-                                    .trim();
-                            grandTotal +=
-                                Number(valueText || 0);
+
                         }
                     });
 
@@ -7100,11 +7110,8 @@
                             "Selisih",
                             "Value"
                         ]],
-
                         body: rows,
-
                         theme: "grid",
-
                         styles: {
                             fontSize: 8
                         },
@@ -7187,6 +7194,7 @@
                 window.viewProductionDetail = viewProductionDetail;
                 window.loadProductionProducts = loadProductionProducts;
                 window.backProduction = backProduction;
+                window.clearProductionFilter = clearProductionFilter;
 
                 window.loadProductionOrdersToResultSelect = loadProductionOrdersToResultSelect;
                 window.saveProductionResult = saveProductionResult;
@@ -7510,4 +7518,5 @@
                 updateDateTime();
             </script>
     </body>
+
 </html>
