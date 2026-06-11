@@ -6636,16 +6636,17 @@
                         // =========================
                         // LOAD MASTER MATERIAL
                         // =========================
-
                         const materialSnap =
                             await getDocs(
-                                collection(db, "materials")
+                                query(
+                                    collection(db, "materials"),
+                                    orderBy("code", "asc")
+                                )
                             );
 
                         // =========================
                         // LOAD STOCK AWAL
                         // =========================
-
                         const stockAwalSnap =
                             await getDocs(
                                 collection(db, "stock_card")
@@ -6661,12 +6662,17 @@
                                 where("date", ">=", start),
                                 where("date", "<=", end)
                             );
+
                         } else {
+
                             poQuery =
                                 collection(db, "purchasing");
+
                         }
+
                         const poSnap =
                             await getDocs(poQuery);
+
                         // =========================
                         // LOAD PRODUKSI
                         // =========================
@@ -6683,6 +6689,16 @@
                         const recipeSnap =
                             await getDocs(
                                 collection(db, "product_recipes")
+                            );
+
+                        const priceFgSnap =
+                            await getDocs(
+                                collection(db, "price_fg")
+                            );
+
+                        const productionResultSnap =
+                            await getDocs(
+                                collection(db, "production_results")
                             );
 
                         // =========================
@@ -6703,6 +6719,7 @@
                         }
                         const wasteSnap =
                             await getDocs(wasteQuery);
+
                         // =========================
                         // LOAD STOCK OPNAME
                         // =========================
@@ -6729,17 +6746,22 @@
                         // ====================================================
                         // MAPPING
                         // ====================================================
+
                         let stockAwalMap = {};
                         let poMap = {};
                         let produksiMap = {};
                         let wasteMap = {};
                         let soMap = {};
+                        let boxMap = {};
 
                         // STOCK AWAL
                         stockAwalSnap.forEach(d => {
+
                             const item = d.data();
+
                             const code =
                                 String(item.code).trim();
+
                             stockAwalMap[code] =
                                 (stockAwalMap[code] || 0)
                                 + Number(item.weight || 0);
@@ -6784,11 +6806,46 @@
                                     // total pemakaian bahan baku
                                     const totalUsage =
                                         qtyProduction * recipeQty;
+
                                     produksiMap[materialName] =
                                         (produksiMap[materialName] || 0)
                                         + totalUsage;
+
                                 }
                             });
+                        });
+                        // =========================
+                        // PEMAKAIAN BOX DARI HASIL PRODUKSI
+                        // =========================
+
+                        productionResultSnap.forEach(resultDoc => {
+
+                            const result = resultDoc.data();
+
+                            const productCode =
+                                String(result.productCode || "").trim();
+
+                            const fgBox =
+                                Number(result.fgBox || 0);
+
+                            priceFgSnap.forEach(priceDoc => {
+
+                                const price = priceDoc.data();
+
+                                if (
+                                    String(price.productCode || "").trim()
+                                    === productCode
+                                ) {
+
+                                    const boxName =
+                                        String(price.materialName || "").trim();
+
+                                    produksiMap[boxName] =
+                                        (produksiMap[boxName] || 0)
+                                        + fgBox;
+                                }
+                            });
+
                         });
 
                         // =========================
@@ -6804,11 +6861,14 @@
 
                         });
 
-                        // STOCK OPNAME 
+                        // STOCK OPNAME
                         soSnap.forEach(d => {
+
                             const item = d.data();
+
                             const code =
                                 String(item.code).trim();
+
                             soMap[code] =
                                 (soMap[code] || 0)
                                 + Number(item.weight || 0);
@@ -7220,7 +7280,6 @@
                 let productionChart;
                 let variantChart;
                 let expenseChart;
-
                 // ==========================
                 // INIT ALL CHARTS
                 // ==========================
@@ -7292,28 +7351,21 @@
                 // INIT FILTER DASHBOARD
                 // ==========================
                 function initDashboardFilter() {
-
                     const m = document.getElementById("dashMonth");
                     const y = document.getElementById("dashYear");
-
                     const months = [
                         "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
                         "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
                     ];
-
                     m.innerHTML = months.map((x, i) =>
                         `<option value="${i + 1}">${x}</option>`
                     ).join("");
-
                     const now = new Date();
-
                     m.value = now.getMonth() + 1;
-
                     let yearHTML = "";
                     for (let i = 2025; i <= 2075; i++) {
                         yearHTML += `<option value="${i}">${i}</option>`;
                     }
-
                     y.innerHTML = yearHTML;
                     y.value = now.getFullYear();
                 }
@@ -7322,49 +7374,37 @@
                 // MAIN DASHBOARD (ONLY SALES TOTAL + CHART)
                 // ==========================
                 async function loadDashboardTotal(useDefault = true) {
-
                     const now = new Date();
-
                     const month = useDefault
                         ? now.getMonth() + 1
                         : parseInt(document.getElementById("dashMonth").value);
-
                     const year = useDefault
                         ? now.getFullYear()
                         : parseInt(document.getElementById("dashYear").value);
-
                     const snap = await getDocs(collection(db, "sales"));
-
                     let totalSales = 0;
                     let chartData = {};
 
                     snap.forEach(doc => {
-
                         const d = doc.data();
                         if (!d.date) return;
-
                         const dt = new Date(d.date + "T00:00:00");
-
                         const m = dt.getMonth() + 1;
                         const y = dt.getFullYear();
-
                         // ==========================
                         // TOTAL SALES FILTER
                         // ==========================
                         if (m === month && y === year) {
                             totalSales += Number(d.value || 0);
                         }
-
                         // ==========================
                         // CHART DATA (ALL TIME GROUPED)
                         // ==========================
                         const key = `${m}-${y}`;
                         chartData[key] = (chartData[key] || 0) + Number(d.value || 0);
                     });
-
                     document.getElementById("dashboardTotal").innerHTML =
                         "Rp " + totalSales.toLocaleString("id-ID");
-
                     updateSalesChart(chartData);
                 }
 
@@ -7372,12 +7412,9 @@
                 // UPDATE SALES CHART
                 // ==========================
                 function updateSalesChart(data) {
-
                     const labels = Object.keys(data);
                     const values = Object.values(data);
-
                     if (!salesChart) return;
-
                     salesChart.data.labels = labels;
                     salesChart.data.datasets[0].data = values;
                     salesChart.update();
@@ -7465,17 +7502,12 @@
                     });
 
                     const jam = now.toLocaleTimeString('id-ID');
-
                     document.getElementById("hari").innerText = hari;
                     document.getElementById("tanggal").innerText = tanggal;
                     document.getElementById("jam").innerText = jam;
                 }
-
                 setInterval(updateDateTime, 1000);
                 updateDateTime();
-
             </script>
-
     </body>
-
 </html>
