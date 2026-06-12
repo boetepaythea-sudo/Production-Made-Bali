@@ -161,13 +161,32 @@
                 cursor: not-allowed;
                 opacity: 1 !important;
             }
+            .marquee-container {
+                width: 70%;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            .marquee-text {
+                display: inline-block;
+                padding-left: 100%;
+                font-size: 24px;
+                font-weight: bold;
+                animation: marquee 15s linear infinite;
+            }
+            @keyframes marquee {
+                from {
+                    transform: translateX(0);
+                }
 
+                to {
+                    transform: translateX(-100%);
+                }
+            }
             #jam {
                 font-size: 18px;
                 color: #facc15;
                 font-weight: bold;
             }
-
             #hari,
             #tanggal {
                 font-size: 14px;
@@ -313,11 +332,17 @@
                     Admin
                 </a>
             </div>
-
             <!-- CONTENT -->
             <div class="content">
-                <div class="topbar d-flex justify-content-between">
-                    <h4>Dashboard Production & Sales of Pia Made Bali</h4>
+                <div class="topbar d-flex justify-content-between align-items-center">
+                    <!-- Text Berjalan -->
+                    <div class="marquee-container">
+                        <div class="marquee-text">
+                            Dashboard Production & Sales of Pia Made Bali | Monitoring Produksi dan Penjualan Secara
+                            Real-Time | Pia Made Bali Oleh-oleh khas Bali masa kini...
+                        </div>
+                    </div>
+
                     <div class="text-end">
                         <div id="hari" class="fw-bold"></div>
                         <div id="tanggal"></div>
