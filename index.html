@@ -161,11 +161,13 @@
                 cursor: not-allowed;
                 opacity: 1 !important;
             }
+
             .marquee-container {
                 width: 70%;
                 overflow: hidden;
                 white-space: nowrap;
             }
+
             .marquee-text {
                 display: inline-block;
                 padding-left: 100%;
@@ -173,6 +175,7 @@
                 font-weight: bold;
                 animation: marquee 15s linear infinite;
             }
+
             @keyframes marquee {
                 from {
                     transform: translateX(0);
@@ -182,11 +185,13 @@
                     transform: translateX(-100%);
                 }
             }
+
             #jam {
                 font-size: 18px;
                 color: #facc15;
                 font-weight: bold;
             }
+
             #hari,
             #tanggal {
                 font-size: 14px;
@@ -267,8 +272,7 @@
                 </a>
                 <div id="produksiSubMenu" style="display:none; padding-left:20px;">
                     <a href="#" onclick="showPage('produksi_input')">- MRP Recipe Production</a>
-                    <a href="#"
-                        onclick="showPage('produksi_hasil');loadProductionOrdersToResultSelect();">-
+                    <a href="#" onclick="showPage('produksi_hasil');loadProductionOrdersToResultSelect();">-
                         Production Data FG</a>
                     <a href="#" onclick="showPage('cogs_data')">- COGS Production Report</a>
                     <a href="#" onclick="showPage('input_waste')">- Waste Data</a>
@@ -335,6 +339,7 @@
             <!-- CONTENT -->
             <div class="content">
                 <div class="topbar d-flex justify-content-between align-items-center">
+
                     <!-- Text Berjalan -->
                     <div class="marquee-container">
                         <div class="marquee-text">
@@ -4183,7 +4188,6 @@
                 async function loadProductionListData() {
                     const selectedMonth = parseInt(document.getElementById("productionMonth").value);
                     const selectedYear = parseInt(document.getElementById("productionYear").value);
-
                     const snap = await getDocs(collection(db, "production_orders"));
 
                     let data = [];
@@ -4270,7 +4274,6 @@
 
                     loadProductionListData();
                 }
-
 
                 /* ================= HASIL PRODUKSI ================= */
                 async function loadProductionOrdersToResultSelect() {
@@ -4399,35 +4402,34 @@
 
                     alert("Hasil produksi berhasil disimpan");
 
-                    // 🔥 RESET FORM (WAJIB)
                     document.getElementById("resProduct").value = "";
                     document.getElementById("resFgPcs").value = "";
                     document.getElementById("resFgBox").value = "";
                     document.getElementById("resDate").value = "";
 
-                    // 🔥 AUTO REFRESH LIST
                     loadProductionResult();
                 }
 
                 async function loadProductionResult() {
                     const start = document.getElementById("prodStartDate").value;
                     const end = document.getElementById("prodEndDate").value;
-
                     const snap = await getDocs(
                         query(collection(db, "production_results"))
                     );
 
                     let data = [];
-
                     snap.forEach(d => {
                         data.push({ id: d.id, ...d.data() });
                     });
 
-                    let html = "";
+                    if (!start || !end) {
+                        alert("Pilih tanggal filter dulu");
+                        return;
+                    }
 
+                    let html = "";
                     data.forEach(d => {
 
-                        // 🔥 FILTER MODEL SALES REPORT (AMAN)
                         if (start && end) {
                             const itemDate = new Date(d.date);
                             const startDate = new Date(start);
@@ -4456,6 +4458,7 @@
                     document.getElementById("productionResultList").innerHTML = html;
                 }
 
+
                 async function deleteProductionResult(id) {
                     if (!confirm("Hapus hasil produksi?")) return;
                     await deleteDoc(doc(db, "production_results", id));
@@ -4470,6 +4473,7 @@
                     snap.forEach(d => {
                         const data = d.data();
                         if (!data.date) return;
+
                         if (start && end) {
                             const itemDate = parseDate(data.date);
                             const startDate = parseDate(start);
