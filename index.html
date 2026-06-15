@@ -7742,40 +7742,38 @@
                     if (storeChart) {
                         storeChart.destroy();
                     }
-
-                    storeChart = new Chart(ctx, {
-                        type: "doughnut",
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: data,
-                                backgroundColor: [
-                                    "#facc15",
-                                    "#fbbf24",
-                                    "#f59e0b",
-                                    "#eab308",
-                                    "#ca8a04",
-                                    "#d97706"
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            cutout: "65%",
-                            plugins: {
-                                legend: { display: true },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function (context) {
-                                            return context.label + " : Rp " +
-                                                context.raw.toLocaleString("id-ID");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+storeChart = new Chart(ctx, {
+    type: "pie",   // WAJIB pie
+    data: {
+        labels: labels,
+        datasets: [{
+            data: data,
+            backgroundColor: [
+                "#facc15",
+                "#fbbf24",
+                "#f59e0b",
+                "#eab308",
+                "#ca8a04",
+                "#d97706"
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: 0,   // 🔥 INI PENTING: pastikan bukan doughnut
+        plugins: {
+            legend: { display: true },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return context.label + " : Rp " +
+                            context.raw.toLocaleString("id-ID");
+                    }
+                }
+            }
+        }
+    }
+});
                 }
 
                 async function refreshDashboard() {
