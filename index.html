@@ -1722,33 +1722,32 @@
                         </div>
                     </div>
                 </div>
-                <!-- ==== LABA RUGI ============ -->
+                <!-- ==== PROFIT & LOSS ============ -->
                 <div id="profitloss" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
                             <i class="fa-solid fa-coins"></i>
-                            Accounitng
+                            Accounting
                         </h3>
                         <div class="section-divider"></div>
                         <h5 class="text-warning mb-3">
                             <i class="fa-solid fa-scale-balanced me-2"></i>
-                            Profit/Loss Summary Report.
+                            Profit and Loss Summary Report.
                         </h5>
                         <div class="section-divider"></div>
                         <!-- FILTER -->
                         <div class="row mb-4">
                             <div class="col-md-3">
-                                <label>Select Start Date</label>
+                                <label>Start Date</label>
                                 <input type="date" id="plStartDate" class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label>Select End Date</label>
-
+                                <label>End Date</label>
                                 <input type="date" id="plEndDate" class="form-control">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-warning w-100" onclick="loadProfitLoss()">
-                                    Load
+                                    Load Data
                                 </button>
                             </div>
                         </div>
@@ -1756,17 +1755,17 @@
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
-                                    <th>Keterangan</th>
+                                    <th>Items</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Total Sales</td>
+                                    <td>Sales Total</td>
                                     <td id="plSales">Rp 0</td>
                                 </tr>
                                 <tr>
-                                    <td>HPP Produksi</td>
+                                    <td>HPP Production</td>
                                     <td id="plCOGS">Rp 0</td>
                                 </tr>
                                 <tr>
@@ -1774,16 +1773,16 @@
                                     <td id="plOverhead">Rp 0</td>
                                 </tr>
                                 <tr>
-                                    <td>Waste Bahan</td>
+                                    <td>Raw Materials Waste</td>
                                     <td id="plWasteMaterial">Rp 0</td>
                                 </tr>
                                 <tr>
-                                    <td>Waste Finished Goods</td>
+                                    <td>Finished Goods Waste</td>
                                     <td id="plWasteFG">Rp 0</td>
                                 </tr>
                                 <tr class="table-warning">
                                     <td>
-                                        <b>Laba Kotor</b>
+                                        <b>Nett profit</b>
                                     </td>
                                     <td id="plGrossProfit">
                                         <b>Rp 0</b>
