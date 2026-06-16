@@ -1096,8 +1096,7 @@
                         </table>
                         <!-- ================= TABLE 2 ================= -->
                         <h5 class="text-warning mt-5 mb-3">
-                            USE OF RAW MATERIALS
-                        </h5>
+                            Use Of Raw Materials Data </h5>
                         <table class="table table-dark table-striped">
                             <thead>
                                 <tr>
@@ -1397,25 +1396,45 @@
                             Save FG Sales
                         </button>
                         <hr>
-                        <!-- DATA -->
-                        <h4 class="text-warning mt-4">
-                            Report FG Sales
-                        </h4>
-                        <table class="table table-dark table-striped mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Store</th>
-                                    <th>Product</th>
-                                    <th>Qty Box</th>
-                                    <th>Qty PCS</th>
-                                    <th>Price</th>
-                                    <th>Totals</th>
-                                    <th>Sales Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="salesFGList"></tbody>
-                        </table>
+                        <!-- TABEL DATA SALES FG -->
+                        <div class="row mt-3">
+                            <h5 class="text-warning mt-3">
+                                Report Data Sales Finished Good
+                            </h5>
+                            <div class="col-md-3">
+                                <label>Bulan</label>
+                                <select id="salesFGMonth" class="form-control" onchange="loadSalesFGTable()">
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Tahun</label>
+                                <select id="salesFGYear" class="form-control" onchange="loadSalesFGTable()">
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Totals Sales FG Value</label>
+                                <div class="px-3 py-2 border border-warning rounded">
+                                    <strong class="text-warning">
+                                        <span id="salesFGTotal">Rp 0</span>
+                                    </strong>
+                                </div>
+                            </div>
+                            <table class="table table-dark table-striped mt-3">
+                                <thead>
+                                    <tr>
+                                        <th>Store</th>
+                                        <th>Product</th>
+                                        <th>Qty Box</th>
+                                        <th>Qty PCS</th>
+                                        <th>Price</th>
+                                        <th>Totals</th>
+                                        <th>Sales Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesFGList"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <!-- INPUT DATA SALES VALUE -->
@@ -1434,8 +1453,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Toko</label>
-                                <select id="salesStore" class="form-control">
-                                </select>
+                                <select id="salesStore" class="form-control"></select>
                             </div>
                             <div class="col-md-4">
                                 <label>Sales Value</label>
@@ -1449,24 +1467,30 @@
                         <button class="btn btn-warning mt-3 w-100" onclick="saveSales()">
                             Save Sales
                         </button>
+                        <hr>
+                        <!-- REPORT SECTION HARUS MASIH DI DALAM CARD -->
+                        <h5 class="text-warning mt-4">
+                            Tabel Report Data Sales Value
+                        </h5>
                         <div class="row mt-3">
                             <div class="col-md-3">
                                 <label>Bulan</label>
-                                <select id="salesMonth" class="form-control" onchange="loadSalesTable()">
-                                </select>
+                                <select id="salesMonth" class="form-control" onchange="loadSalesTable()"></select>
                             </div>
-
                             <div class="col-md-3">
                                 <label>Tahun</label>
-                                <select id="salesYear" class="form-control" onchange="loadSalesTable()">
-                                </select>
+                                <select id="salesYear" class="form-control" onchange="loadSalesTable()"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Totals Sales Value</label>
+                                <div class="px-3 py-2 border border-warning rounded">
+                                    <strong class="text-warning">
+                                        <span id="salesTotal">Rp 0</span>
+                                    </strong>
+                                </div>
                             </div>
                         </div>
-                        <h4 class="mt-3">Data Sales</h4>
-                        <div id="salesTotal" style="margin-bottom:10px; font-size:18px; color:#facc15;">
-                            Total Sales Value : Rp 0
-                        </div>
-                        <table class="table table-dark table-striped">
+                        <table class="table table-dark table-striped mt-3">
                             <thead>
                                 <tr>
                                     <th>Store Code</th>
@@ -1479,8 +1503,7 @@
                             <tbody id="salesList"></tbody>
                         </table>
                     </div>
-                </div>
-
+                </div> <!-- SUMMARY TABEL DATA SALES VALUE -->
                 <div id="marketing_report" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -2303,7 +2326,6 @@
                 }
 
                 /* ================= UOM / UNIT DATA ================= */
-                /* ================= UTIL ================= */
                 function genCode(prefix, size, pad = 3) {
                     return prefix + String(size + 1).padStart(pad, "0");
                 }
@@ -2354,6 +2376,7 @@
 
                         if (snap.empty) {
                             return prefix + "001";
+
 
                         }
 
@@ -2479,7 +2502,6 @@
                     // generate kode otomatis
                     const code = await generateCode("suppliers", "SUP");
                     await addDoc(collection(db, "suppliers"), {
-
                         code,
                         name,
                         address,
@@ -2676,11 +2698,8 @@
                     loadRecipeMaterials();
                     loadRecipeUnits();
 
-                    document.getElementById("recipeMaterial")
-                        .addEventListener("change", calculateRecipePrice);
-
-                    document.getElementById("recipeQty")
-                        .addEventListener("input", calculateRecipePrice);
+                    document.getElementById("recipeMaterial").addEventListener("change", calculateRecipePrice);
+                    document.getElementById("recipeQty").addEventListener("input", calculateRecipePrice);
 
                     loadForecast();
                 }
@@ -2755,15 +2774,9 @@
                 }
 
                 async function addRecipeItem() {
-
-                    const material =
-                        document.getElementById("recipeMaterial").value;
-
-                    const qty =
-                        Number(document.getElementById("recipeQty").value);
-
-                    const unit =
-                        document.getElementById("recipeUnit").value;
+                    const material = document.getElementById("recipeMaterial").value;
+                    const qty = Number(document.getElementById("recipeQty").value);
+                    const unit = document.getElementById("recipeUnit").value;
 
                     if (!material || !qty || !unit) {
                         alert("Lengkapi data bahan");
@@ -2795,7 +2808,6 @@
 
                     document.getElementById("recipeQty").value = "";
                     document.getElementById("recipePrice").value = "";
-
                     renderRecipeTable();
                 }
 
@@ -2825,7 +2837,6 @@
                     });
 
                     document.getElementById("recipeTable").innerHTML = html;
-
                     document.getElementById("priceForecaseTotal").innerHTML =
                         `Rp ${grandTotal.toLocaleString()}`;
                 }
@@ -3165,7 +3176,6 @@
                     });
                     select.innerHTML = html;
                 }
-
                 async function calculatePriceFG() {
                     const productCode =
                         document.getElementById("priceFgProduct").value;
@@ -3185,11 +3195,8 @@
                             const r = recipe.data();
                             if (r.productCode === productCode) {
                                 let avg = 0;
-
                                 materialSnap.forEach(mat => {
-
                                     const m = mat.data();
-
                                     if (
                                         m.name?.toLowerCase().trim() ===
                                         r.material?.toLowerCase().trim()
@@ -3204,11 +3211,7 @@
                         });
                     }
 
-                    document.getElementById(
-                        "priceFgForecastHpp"
-                    ).value =
-                        forecastHpp.toLocaleString();
-
+                    document.getElementById("priceFgForecastHpp").value = forecastHpp.toLocaleString();
                     let materialPrice = 0;
                     if (materialSelect.value) {
                         const selected =
@@ -3220,84 +3223,40 @@
                                 selected.getAttribute("data-price")
                             ) || 0;
                     }
-                    document.getElementById(
-                        "priceFgMaterialPrice"
-                    ).value =
-                        materialPrice.toLocaleString();
-
-                    const qtyPerBox =
-                        Number(
-                            document.getElementById("priceFgQtyBox").value
-                        ) || 0;
-
-                    const forecastBox =
-                        forecastHpp * qtyPerBox;
-                    document.getElementById(
-                        "priceFgForecastBox"
-                    ).value =
-                        forecastBox.toLocaleString();
+                    document.getElementById("priceFgMaterialPrice").value = materialPrice.toLocaleString();
+                    const qtyPerBox = Number(document.getElementById("priceFgQtyBox").value) || 0;
+                    const forecastBox = forecastHpp * qtyPerBox; document.getElementById("priceFgForecastBox").value = forecastBox.toLocaleString();
                     let plasticPrice = 0;
-
-                    const plasticSelect =
-                        document.getElementById("priceFgPlastic");
-
+                    const plasticSelect = document.getElementById("priceFgPlastic");
                     if (plasticSelect && plasticSelect.value) {
-
                         const selected =
                             plasticSelect.options[
                             plasticSelect.selectedIndex
                             ];
-
                         plasticPrice =
                             Number(
                                 selected.getAttribute("data-price")
                             ) || 0;
                     }
 
-                    document.getElementById(
-                        "priceFgPlasticPrice"
-                    ).value =
-                        plasticPrice.toLocaleString();
-
-                    const totalHpp =
-                        forecastBox +
-                        materialPrice +
-                        plasticPrice;
-
-                    document.getElementById(
-                        "priceFgTotalHpp"
-                    ).value =
-                        totalHpp.toLocaleString();
+                    document.getElementById("priceFgPlasticPrice").value = plasticPrice.toLocaleString();
+                    const totalHpp = forecastBox + materialPrice + plasticPrice;
+                    document.getElementById("priceFgTotalHpp").value = totalHpp.toLocaleString();
                 }
 
                 /* ================= SAVE PRICE ================= */
                 async function savePriceFG() {
-                    const productCode =
-                        document.getElementById("priceFgProduct").value;
-                    const qtyPerBox =
-                        Number(
-                            document.getElementById("priceFgQtyBox").value
-                        );
-
-                    const price =
-                        Number(
-                            document.getElementById("priceFgPrice").value
-                        );
-                    const priceStore =
-                        Number(
-                            document.getElementById("priceFgPriceStore").value
-                        );
-
-                    const materialSelect =
-                        document.getElementById("priceFgMaterial");
-
+                    const productCode = document.getElementById("priceFgProduct").value;
+                    const qtyPerBox = Number(document.getElementById("priceFgQtyBox").value);
+                    const price = Number(document.getElementById("priceFgPrice").value);
+                    const priceStore = Number(document.getElementById("priceFgPriceStore").value);
+                    const materialSelect = document.getElementById("priceFgMaterial");
                     const materialName =
                         materialSelect.value
                             ? materialSelect.options[
                                 materialSelect.selectedIndex
                             ].getAttribute("data-name")
                             : "";
-
                     const materialPrice =
                         materialSelect.value
                             ? Number(
@@ -3306,17 +3265,14 @@
                                 ].getAttribute("data-price")
                             )
                             : 0;
-
                     const plasticSelect =
                         document.getElementById("priceFgPlastic");
-
                     const plasticName =
                         plasticSelect.value
                             ? plasticSelect.options[
                                 plasticSelect.selectedIndex
                             ].getAttribute("data-name")
                             : "";
-
                     const plasticPrice =
                         plasticSelect.value
                             ? Number(
@@ -3331,7 +3287,6 @@
                             document.getElementById("priceFgForecastHpp")
                                 .value.replace(/,/g, "")
                         ) || 0;
-
                     const hppTotal =
                         Number(
                             document.getElementById("priceFgTotalHpp")
@@ -3347,8 +3302,6 @@
                         alert("Lengkapi data");
                         return;
                     }
-
-
                     /* ================= PRODUCT NAME ================= */
                     let productName = "";
                     const productSnap =
@@ -3359,7 +3312,6 @@
                             productName = data.name;
                         }
                     });
-
                     /* ================= CHECK EXIST ================= */
                     const priceSnap =
                         await getDocs(collection(db, "price_fg"));
@@ -3370,11 +3322,8 @@
                             existingId = d.id;
                         }
                     });
-
                     /* ================= UPDATE ================= */
-
                     if (existingId) {
-
                         await updateDoc(
                             doc(db, "price_fg", existingId),
                             {
@@ -3427,7 +3376,6 @@
 
                     await loadPriceFGTable();
                 }
-
                 /* ================= LOAD TABLE ================= */
                 async function loadPriceFGTable() {
                     const tbody =
@@ -3439,12 +3387,9 @@
                             orderBy("productCode", "asc")
                         )
                     );
-
                     let html = "";
                     snap.forEach(d => {
-
                         const data = d.data();
-
                         html += `
                         <tr>
                             <td>${data.productCode}</td>
@@ -3472,7 +3417,6 @@
                                     Hapus
                                 </button>
                             </td>
-
                         </tr>
                         `;
                     });
@@ -3488,7 +3432,6 @@
                     </tr>
                     `;
                 }
-
                 /* ================= DELETE ================= */
                 async function deletePriceFG(id) {
                     if (!confirm("Hapus harga jual produk?")) return;
@@ -3499,42 +3442,31 @@
                     await loadPriceFGTable();
                     alert("Harga jual berhasil dihapus");
                 }
-
                 /* ================= PURCHASING ================= */
                 function togglePurchasing() {
                     const menu = document.getElementById("purchasingSubMenu");
                     menu.style.display = (menu.style.display === "block") ? "none" : "block";
                 }
-
                 function initPurchaseFilter() {
-
                     const yearSelect = document.getElementById("filterYear");
                     const currentYear = new Date().getFullYear();
-
                     let html = "";
-
                     for (let year = 2025; year <= currentYear + 50; year++) {
                         html += `<option value="${year}">${year}</option>`;
                     }
-
                     yearSelect.innerHTML = html;
-
                     document.getElementById("filterMonth").value =
                         String(new Date().getMonth() + 1);
-
                     document.getElementById("filterYear").value =
                         String(currentYear);
                 }
-
                 window.addEventListener("load", async () => {
                     initPurchaseFilter();
                     await loadUnits();
                     await loadPurchases();
                     await loadPurchasesData();
                 });
-
                 /* ================= LOAD OPTIONS ================= */
-
                 async function loadPurchaseOptions() {
                     const materialSnap = await getDocs(
                         query(
@@ -3562,8 +3494,8 @@
                 ${d.data().name}
             </option>`;
                     });
-                    document.getElementById("purchaseUnit").innerHTML = unitHtml;
 
+                    document.getElementById("purchaseUnit").innerHTML = unitHtml;
                     const supplierSnap = await getDocs(
                         query(
                             collection(db, "suppliers"),
@@ -3603,7 +3535,6 @@
                     }
                     const materialCode = materialSelect.value;
                     const materialName = materialSelect.options[materialSelect.selectedIndex].dataset.name;
-
                     const qty = Number(document.getElementById("purchaseQty").value);
                     const unit = document.getElementById("purchaseUnit").value;
                     const price = Number(document.getElementById("purchasePrice").value);
@@ -3614,10 +3545,8 @@
                         alert("Lengkapi data purchasing");
                         return;
                     }
-
                     const snap = await getDocs(collection(db, "purchasing"));
                     const code = genCode("PUR", snap.size);
-
                     await addDoc(collection(db, "purchasing"), {
 
                         materialCode,
@@ -3642,7 +3571,6 @@
 
                     await loadPurchases();
                     await loadPurchasesData();
-
                 }
 
                 /* ================= LIST TABLE ================= */
@@ -5251,7 +5179,10 @@
                 /* OPEN PAGE */
                 async function openSalesFGPage() {
                     showPage("salesFinishGood");
+
                     await loadSalesFGStores();
+                    initSalesFGFilter();
+
                     document.getElementById("salesFGTable").innerHTML = "";
                     addSalesFGRow();
                     loadSalesFGTable();
@@ -5451,19 +5382,36 @@
                     loadSalesFGTable();
                 }
 
-                /* LOAD TABLE */
+                /* LOAD TABLE SALES FG */
                 async function loadSalesFGTable() {
-                    const snap =
-                        await getDocs(
-                            collection(db, "sales_fg")
-                        );
+
+                    const selectedMonth = parseInt(document.getElementById("salesFGMonth").value);
+                    const selectedYear = parseInt(document.getElementById("salesFGYear").value);
+
+                    const snap = await getDocs(collection(db, "sales_fg"));
+
+                    let data = [];
+                    snap.forEach(d => {
+                        data.push({ id: d.id, ...d.data() });
+                    });
 
                     let html = "";
-                    snap.forEach(doc => {
-                        const d = doc.data();
+                    let totalFG = 0; // 🔥 TAMBAH TOTAL
+
+                    data.forEach(d => {
+
+                        const dateObj = new Date(d.date);
+                        const month = dateObj.getMonth() + 1;
+                        const year = dateObj.getFullYear();
+
+                        if (month !== selectedMonth || year !== selectedYear) {
+                            return;
+                        }
+
+                        totalFG += Number(d.total || 0); // 🔥 HITUNG TOTAL
+
                         html += `
 <tr>
-
     <td>${d.store}</td>
     <td>${d.productName}</td>
     <td>${d.qtyBox}</td>
@@ -5473,7 +5421,7 @@
     <td>${d.date}</td>
     <td>
         <button class="btn btn-danger btn-sm"
-            onclick="deleteSalesFG('${doc.id}')">
+            onclick="deleteSalesFG('${d.id}')">
             Hapus
         </button>
     </td>
@@ -5481,9 +5429,11 @@
 `;
                     });
 
-                    document.getElementById(
-                        "salesFGList"
-                    ).innerHTML = html;
+                    document.getElementById("salesFGList").innerHTML = html;
+
+                    // 🔥 UPDATE TOTAL DISPLAY
+                    document.getElementById("salesFGTotal").innerHTML =
+                        `Rp ${totalFG.toLocaleString()}`;
                 }
 
                 /* DELETE */
@@ -5496,6 +5446,33 @@
                     );
 
                     loadSalesFGTable();
+                }
+                function initSalesFGFilter() {
+                    const now = new Date();
+
+                    const monthSelect = document.getElementById("salesFGMonth");
+                    const yearSelect = document.getElementById("salesFGYear");
+
+                    const months = [
+                        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                    ];
+
+                    let mHtml = "";
+                    months.forEach((m, i) => {
+                        mHtml += `<option value="${i + 1}">${m}</option>`;
+                    });
+
+                    monthSelect.innerHTML = mHtml;
+                    monthSelect.value = now.getMonth() + 1;
+
+                    let yHtml = "";
+                    for (let y = 2025; y <= 2075; y++) {
+                        yHtml += `<option value="${y}">${y}</option>`;
+                    }
+
+                    yearSelect.innerHTML = yHtml;
+                    yearSelect.value = now.getFullYear();
                 }
 
                 /* ================= SALES VALUE ================= */
@@ -5610,7 +5587,7 @@
                     document.getElementById("salesList").innerHTML = html;
 
                     document.getElementById("salesTotal").innerHTML =
-                        `<b>Total Sales: Rp ${totalSales.toLocaleString()}</b>`;
+                        `Rp ${totalSales.toLocaleString()}`;
                 }
 
                 function initSalesFilter() {
@@ -7275,6 +7252,7 @@
                 window.saveStore = saveStore;
                 window.openMarketingSales = openMarketingSales;
                 window.saveSales = saveSales;
+                window.loadSalesFGTable = loadSalesFGTable;
                 window.loadSalesReport = loadSalesReport;
                 window.deleteStore = deleteStore;
                 window.deleteSales = deleteSales;
@@ -7340,8 +7318,6 @@
                         refreshDashboard();
                     }
                 }
-
-
                 // ==========================
                 // GLOBAL CHART VARIABLES
                 // ==========================
@@ -7523,7 +7499,6 @@
 
                     const month = Number(document.getElementById("dashMonth").value);
                     const year = Number(document.getElementById("dashYear").value);
-
                     const prodSnap = await getDocs(collection(db, "production_results"));
                     const recipeSnap = await getDocs(collection(db, "product_recipes"));
                     const materialSnap = await getDocs(collection(db, "materials"));
@@ -7620,10 +7595,8 @@
                 // BEST SELLING PRODUCT
                 //=============================
                 async function loadVariantChart() {
-
                     const month = Number(document.getElementById("dashMonth").value);
                     const year = Number(document.getElementById("dashYear").value);
-
                     const snap = await getDocs(collection(db, "sales_fg"));
                     let productMap = {};
                     snap.forEach(doc => {
@@ -7647,11 +7620,8 @@
                                 };
 
                             }
-
                             productMap[d.productCode].qty += Number(d.qtyPcs || 0);
-
                         }
-
                     });
 
                     // Urutkan qty terbesar
@@ -7697,10 +7667,8 @@
                 // BEST SALES STORE CHART
                 //=============================
                 async function loadStoreChart() {
-
                     const month = Number(document.getElementById("dashMonth").value);
                     const year = Number(document.getElementById("dashYear").value);
-
                     const snap = await getDocs(collection(db, "sales"));
 
                     let storeMap = {};
@@ -7742,38 +7710,39 @@
                     if (storeChart) {
                         storeChart.destroy();
                     }
-storeChart = new Chart(ctx, {
-    type: "pie",   // WAJIB pie
-    data: {
-        labels: labels,
-        datasets: [{
-            data: data,
-            backgroundColor: [
-                "#facc15",
-                "#fbbf24",
-                "#f59e0b",
-                "#eab308",
-                "#ca8a04",
-                "#d97706"
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        cutout: 0,   // 🔥 INI PENTING: pastikan bukan doughnut
-        plugins: {
-            legend: { display: true },
-            tooltip: {
-                callbacks: {
-                    label: function (context) {
-                        return context.label + " : Rp " +
-                            context.raw.toLocaleString("id-ID");
-                    }
-                }
-            }
-        }
-    }
-});
+
+                    storeChart = new Chart(ctx, {
+                        type: "pie",   // WAJIB pie
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: [
+                                    "#facc15",
+                                    "#fbbf24",
+                                    "#f59e0b",
+                                    "#eab308",
+                                    "#ca8a04",
+                                    "#d97706"
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            cutout: 0,   // 🔥 INI PENTING: pastikan bukan doughnut
+                            plugins: {
+                                legend: { display: true },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            return context.label + " : Rp " +
+                                                context.raw.toLocaleString("id-ID");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
 
                 async function refreshDashboard() {
