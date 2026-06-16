@@ -7041,16 +7041,9 @@
                             .innerHTML =
                             totalData.toLocaleString();
                     } catch (err) {
-                        console.error(err);
-                        alert(
-                            "Gagal load stock card warehouse"
-                        );
+                        console.error("StockCard Error:", err);
                     }
                 }
-
-                window.loadStockCardWarehouse =
-                    loadStockCardWarehouse;
-                loadStockCardWarehouse();
 
                 /* =====================================================
                     PRINT PDF STOCK CARD
@@ -7207,6 +7200,7 @@
                     setStoreCode();
                     loadSalesTable();
                     initDashboard();
+                    loadStockCardWarehouse();
 
                 }
 
@@ -7315,6 +7309,9 @@
                 window.saveSOData = saveSOData;
                 window.loadSOData = loadSOData;
                 window.printSOPDF = printSOPDF;
+
+                window.loadStockCardWarehouse = loadStockCardWarehouse;
+
 
                 // ==========================
                 // FUNCITON OPEN PAGE ALL
@@ -7570,6 +7567,7 @@
                                 Number(material.average || 0);
                         }
                     }
+
                     // ===============================
                     // HITUNG OVERHEAD
                     // ===============================
@@ -7585,6 +7583,7 @@
                             totalOverhead += Number(cost.value || 0);
                         }
                     });
+
                     // ===============================
                     // TOTAL COST PRODUCTION
                     // ===============================
@@ -7592,6 +7591,7 @@
                         totalCOGS + totalOverhead;
                     document.getElementById("dashTotalCostProduction").innerHTML =
                         "Rp " + dashboardTotalProductionCost.toLocaleString("id-ID");
+
                 }
                 //=============================
                 // LOAD DASHBOARD NET PROFIT
@@ -7603,6 +7603,7 @@
                     document.getElementById("dashNettProfit").innerHTML =
                         "Rp " + nett.toLocaleString("id-ID");
                 }
+
                 //=============================
                 // BEST SELLING PRODUCT
                 //=============================
@@ -7674,6 +7675,7 @@
                         }
                     });
                 }
+
                 //=============================
                 // BEST SALES STORE CHART
                 //=============================
@@ -7683,16 +7685,21 @@
                     const snap = await getDocs(collection(db, "sales"));
 
                     let storeMap = {};
+
                     snap.forEach(doc => {
                         const d = doc.data();
+
                         if (!d.date) return;
+
                         const dt = new Date(d.date);
                         const m = dt.getMonth() + 1;
                         const y = dt.getFullYear();
 
                         // filter bulan & tahun dashboard
                         if (m !== month || y !== year) return;
+
                         const key = d.storeName || d.storeCode;
+
                         if (!storeMap[key]) {
                             storeMap[key] = {
                                 name: key,
