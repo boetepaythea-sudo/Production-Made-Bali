@@ -4313,10 +4313,8 @@
 
                     alert("Hasil produksi berhasil disimpan");
 
-                    document.getElementById("resProduct").value = "";
                     document.getElementById("resFgPcs").value = "";
                     document.getElementById("resFgBox").value = "";
-                    document.getElementById("resDate").value = "";
 
                     loadProductionResult();
                 }
@@ -4793,7 +4791,6 @@
 
                     select.innerHTML = html;
 
-                    loadWasteFGTable();
                 }
                 async function saveWasteFG() {
                     const productCode =
@@ -4834,44 +4831,63 @@
                     loadWasteFGTable();
                 }
                 async function loadWasteFGTable() {
-                    const start = document.getElementById("wasteFgStart")?.value;
-                    const end = document.getElementById("wasteFgEnd")?.value;
 
-                    const snap = await getDocs(
-                        query(
-                            collection(db, "waste_fg"),
-                            orderBy("date", "desc")
-                        )
-                    );
+                    const start = document.getElementById("wasteFgStart").value;
+                    const end = document.getElementById("wasteFgEnd").value;
 
-                    let html = "";
+                    const tbody = document.getElementById("wasteFGList");
 
+                    // 🔥 JIKA BELUM PILIH FILTER → KOSONGKAN TABEL
+                    if (!start || !end) {
+                        tbody.innerHTML = "";
+                        document.getElementById("wasteFgTotal").innerHTML = "Total Waste FG : 0";
+                        return;
+                    }
+
+                    const snap = await getDocs(collection(db, "waste_fg"));
+
+                    let data = [];
                     snap.forEach(d => {
-                        const data = d.data();
-
-                        // ✅ FILTER AMAN (STRING COMPARISON)
-                        if (start && end) {
-                            if (data.date < start || data.date > end) return;
-                        }
-
-                        html += `
-        <tr>
-            <td>${data.productCode}</td>
-            <td>${data.productName}</td>
-            <td>${data.qty}</td>
-            <td>${data.date}</td>
-            <td width="120">
-                <button class="btn btn-danger btn-sm w-100" onclick="deleteWasteFG('${d.id}')">
-                    Hapus
-                </button>
-            </td>
-        </tr>
-        `;
+                        data.push({ id: d.id, ...d.data() });
                     });
 
-                    const el = document.getElementById("wasteFGList");
-                    if (el) el.innerHTML = html;
+                    let html = "";
+                    let totalWaste = 0;
+
+                    const startDate = new Date(start);
+                    const endDate = new Date(end);
+
+                    data.forEach(d => {
+
+                        const itemDate = new Date(d.date);
+
+                        // 🔥 FILTER RANGE
+                        if (itemDate < startDate || itemDate > endDate) return;
+
+                        totalWaste += Number(d.qty || 0);
+
+                        html += `
+<tr>
+    <td>${d.productCode}</td>
+    <td>${d.productName}</td>
+    <td>${d.qty}</td>
+    <td>${d.date}</td>
+    <td>
+        <button class="btn btn-danger btn-sm"
+            onclick="deleteWasteFG('${d.id}')">
+            Hapus
+        </button>
+    </td>
+</tr>
+`;
+                    });
+
+                    tbody.innerHTML = html;
+
+                    document.getElementById("wasteFgTotal").innerHTML =
+                        `Total Waste FG : ${totalWaste}`;
                 }
+
                 async function deleteWasteFG(id) {
                     if (!confirm("Hapus waste FG ?")) return;
                     await deleteDoc(
@@ -7554,7 +7570,6 @@
                                 Number(material.average || 0);
                         }
                     }
-
                     // ===============================
                     // HITUNG OVERHEAD
                     // ===============================
@@ -7570,7 +7585,6 @@
                             totalOverhead += Number(cost.value || 0);
                         }
                     });
-
                     // ===============================
                     // TOTAL COST PRODUCTION
                     // ===============================
@@ -7578,7 +7592,6 @@
                         totalCOGS + totalOverhead;
                     document.getElementById("dashTotalCostProduction").innerHTML =
                         "Rp " + dashboardTotalProductionCost.toLocaleString("id-ID");
-
                 }
                 //=============================
                 // LOAD DASHBOARD NET PROFIT
@@ -7590,7 +7603,6 @@
                     document.getElementById("dashNettProfit").innerHTML =
                         "Rp " + nett.toLocaleString("id-ID");
                 }
-
                 //=============================
                 // BEST SELLING PRODUCT
                 //=============================
@@ -7662,7 +7674,6 @@
                         }
                     });
                 }
-
                 //=============================
                 // BEST SALES STORE CHART
                 //=============================
@@ -7672,21 +7683,16 @@
                     const snap = await getDocs(collection(db, "sales"));
 
                     let storeMap = {};
-
                     snap.forEach(doc => {
                         const d = doc.data();
-
                         if (!d.date) return;
-
                         const dt = new Date(d.date);
                         const m = dt.getMonth() + 1;
                         const y = dt.getFullYear();
 
                         // filter bulan & tahun dashboard
                         if (m !== month || y !== year) return;
-
                         const key = d.storeName || d.storeCode;
-
                         if (!storeMap[key]) {
                             storeMap[key] = {
                                 name: key,
