@@ -176,6 +176,39 @@
                 animation: marquee 15s linear infinite;
             }
 
+            .report-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+                margin-top: 25px;
+            }
+
+            .report-card {
+                background: #1f2937;
+                border: 1px solid #facc15;
+                border-radius: 12px;
+                text-align: center;
+                padding: 30px;
+                cursor: pointer;
+                transition: .3s;
+            }
+
+            .report-card:hover {
+                background: #374151;
+                transform: translateY(-5px);
+            }
+
+            .report-card i {
+                color: #facc15;
+                margin-bottom: 15px;
+
+            }
+
+            .report-card h5 {
+                color: white;
+
+            }
+
             @keyframes marquee {
                 from {
                     transform: translateX(0);
@@ -304,6 +337,9 @@
                         </a>
                         <a href="#" onclick="openProfitLoss()">
                             - Profit and loss
+                        </a>
+                        <a href="#" onclick="openAccountingReport()">
+                            - Report
                         </a>
                     </div>
                 </li>
@@ -1792,6 +1828,68 @@
                         </table>
                     </div>
                 </div>
+                <!-- ==== REPORT DATA ============ -->
+                <div id="accounting_report" class="menu-page">
+                    <div class="card-custom">
+                        <h3 class="text-warning mb-4">
+                            <i class="fa-solid fa-file-lines"></i>
+                            Accounting Report
+                        </h3>
+                        <div class="section-divider"></div>
+                        <div id="reportGrid" class="report-grid">
+                            <div class="report-card" onclick="openReport('purchasing')">
+                                <i class="fa-solid fa-cart-shopping fa-3x"></i>
+                                <h5>Purchasing</h5>
+                            </div>
+                            <div class="report-card" onclick="openReport('production')">
+                                <i class="fa-solid fa-industry fa-3x"></i>
+                                <h5>Production</h5>
+                            </div>
+                            <div class="report-card" onclick="openReport('cogs')">
+                                <i class="fa-solid fa-coins fa-3x"></i>
+                                <h5>COGS</h5>
+                            </div>
+                            <div class="report-card" onclick="openReport('profitloss')">
+                                <i class="fa-solid fa-chart-line fa-3x"></i>
+                                <h5>Profit & Loss</h5>
+                            </div>
+                        </div>
+                        <div id="reportArea" style="display:none; margin-top:25px;">
+                            <h4 id="reportTitle" class="text-warning"></h4>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label>Start Date</label>
+                                    <input type="date" id="reportStartDate" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>End Date</label>
+                                    <input type="date" id="reportEndDate" class="form-control">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-warning w-100" onclick="loadSelectedReport()">
+                                        Load Data
+                                    </button>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-danger w-100" onclick="exportReportPDF()">
+                                        Export PDF
+                                    </button>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-danger w-100" onclick="backToReportData()">
+                                        Back To Report
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-dark table-striped">
+                                <thead id="reportHead">
+                                </thead>
+                                <tbody id="reportBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- ================= WAREHOUSE MENU ================= -->
                 <div id="uploadStockAwal" class="menu-page">
@@ -2137,10 +2235,24 @@
                 }
 
                 async function showMaster(type) {
+                    /*====HAK AKSES MASTER DATA====*/
+                    const user = auth.currentUser;
+
+                    if (!user) {
+                        alert("Silakan login terlebih dahulu.");
+                        return;
+                    }
+
+                    const username = user.email.split("@")[0].toLowerCase().trim();
+                    if (username !== "user") {
+                        alert("You do not have access to Master Data!");
+                        return;
+                    }
+
+                    /* ================= SATUAN ================= */
                     currentMaster = type;
                     let html = "";
 
-                    /* ================= SATUAN ================= */
                     if (type === "satuan") {
                         html = `
         <h5 class="mb-3 text-warning">
@@ -2680,7 +2792,17 @@
                 }
 
                 /* ================= RECIPE ================= */
+                /* ==LOCK ACCES INPUT DATA==== */
                 async function showProductionRecipe() {
+                    const user = auth.currentUser;
+                    if (!user) return;
+                    const username = user.email.split("@")[0].toLowerCase().trim();
+
+                    if (username !== "user") {
+                        alert("You do not have access to Master Data!");
+                        return;
+                    }
+
                     showPage('forecastproduk');
                     recipeItems = [];
                     document.getElementById("recipeTable").innerHTML = "";
@@ -3072,6 +3194,16 @@
 
                 /* ================= OPEN PAGE ================= */
                 async function showPriceProduct() {
+
+                    /* ========LOCK ACCESS INPUT DATA========== */
+                    const user = auth.currentUser;
+                    if (!user) return;
+                    const username = user.email.split("@")[0].toLowerCase().trim();
+                    if (username !== "user") {
+                        alert("You do not have access to Master Data!");
+                        return;
+                    }
+
                     showPage("pricefg");
                     await loadPriceFGProducts();
                     await loadPriceFGMaterials();
@@ -5642,11 +5774,26 @@
                     await loadSalesReport();
                     alert("Sales berhasil dihapus");
                 }
-
-                /* SALES REPORT */
+                /* =========================================================
+                 TABEL DATA SUMMARY SALES REPORT
+                ========================================================= */
                 async function loadSalesReport() {
                     const start = document.getElementById("salesStartDate").value;
                     const end = document.getElementById("salesEndDate").value;
+
+                    // ===============================
+                    // BELUM PILIH TANGGAL
+                    // ===============================
+                    if (!start || !end) {
+                        document.getElementById("salesReportList").innerHTML = "";
+
+                        const totalEl = document.getElementById("salesReportTotal");
+                        if (totalEl) {
+                            totalEl.innerHTML = "Total Sales: Rp 0";
+                        }
+
+                        return;
+                    }
 
                     const snap = await getDocs(collection(db, "sales"));
 
@@ -5691,7 +5838,6 @@
 
                     document.getElementById("salesReportList").innerHTML = html;
 
-                    // 🔥 OPTIONAL: total di report
                     const totalEl = document.getElementById("salesReportTotal");
                     if (totalEl) {
                         totalEl.innerHTML = `Total Sales: Rp ${total.toLocaleString()}`;
@@ -5702,12 +5848,9 @@
                 ACCOUNTING
                 ========================================================= */
                 function toggleAccounting() {
-
                     const menu =
                         document.getElementById("accountingSubMenu");
-
                     if (!menu) return;
-
                     menu.style.display =
                         menu.style.display === "block"
                             ? "none"
@@ -6152,6 +6295,77 @@
                     document.getElementById("plGrossProfit").innerHTML =
                         `Rp ${grossProfit.toLocaleString()}`;
                 }
+                /* ==========FUNCTION OPEN REPORT ACCOUNTING======= */
+                let currentReport = "";
+
+                function openAccountingReport() {
+                    showPage("accounting_report");
+
+                }
+                function openReport(type) {
+                    currentReport = type;
+                    document.getElementById("reportArea").style.display = "block";
+                    if (type == "purchasing") {
+                        document.getElementById("reportTitle").innerHTML = "Purchasing Report";
+                    }
+                }
+                function loadSelectedReport() {
+                    if (currentReport == "purchasing") {
+                        loadPurchasingReport();
+                    }
+                }
+                /* ==========PURCHASE REPORT=========== */
+                async function loadPurchasingReport() {
+                    const start = document.getElementById("reportStartDate").value;
+                    const end = document.getElementById("reportEndDate").value;
+                    if (!start || !end) {
+                        alert("Pilih Start Date dan End Date");
+                        return;
+
+                    }
+                    const snap = await getDocs(collection(db, "purchasing"));
+                    let html = "";
+                    document.getElementById("reportHead").innerHTML = `
+
+                    <tr>
+                    <th>Material Code</th>
+                    <th>Material Name</th>
+                    <th>Qty</th>
+                    <th>Unit</th>
+                    <th>Purchase Price</th>
+                    <th>Average</th>
+                    <th>Supplier</th>
+                    <th>Date</th>
+                    </tr>
+
+                    `;
+
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.date < start || d.date > end) return;
+                        const qty = Number(d.qty || 0);
+                        const price = Number(d.price || 0);
+                        const avg = price / (qty || 1);
+                        html += `
+
+                        <tr>
+                        <td>${d.materialCode}</td>
+                        <td>${d.materialName}</td>
+                        <td>${qty}</td>
+                        <td>${d.unit}</td>
+                        <td>Rp ${price.toLocaleString("id-ID")}</td>
+                        <td>Rp ${avg.toLocaleString("id-ID")}</td>
+                        <td>${d.supplier}</td>
+                        <td>${d.date}</td>
+                        </tr>
+
+                        `;
+
+                    });
+                    document.getElementById("reportBody").innerHTML = html;
+                }
+
+
                 /* ================= TOGGLE GUDANG ================= */
                 function toggleGudang() {
 
@@ -7302,6 +7516,11 @@
                 window.saveProductionCost = saveProductionCost;
                 window.loadProductionCostReport = loadProductionCostReport;
 
+                window.openAccountingReport = openAccountingReport;
+                window.openReport = openReport;
+                window.loadSelectedReport = loadSelectedReport;
+                window.loadPurchasingReport = loadPurchasingReport;
+
                 window.toggleGudang = toggleGudang;
                 window.readSOExcel = readSOExcel;
                 window.saveSOData = saveSOData;
@@ -7629,7 +7848,6 @@
                                     name: d.productName,
                                     qty: 0
                                 };
-
                             }
                             productMap[d.productCode].qty += Number(d.qtyPcs || 0);
                         }
@@ -7761,10 +7979,7 @@
                     await loadDashboardSales();
                     await loadDashboardProduction();
                     await loadDashboardCostProduction();
-
-                    // pastikan data sudah ready baru hitung profit
                     loadDashboardNetProfit();
-
                     await loadProductionChart();
                     await loadVariantChart();
                     await loadStoreChart();
