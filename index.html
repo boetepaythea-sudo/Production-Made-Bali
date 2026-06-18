@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +7,6 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
         <style>
             body {
                 margin: 0;
@@ -308,7 +306,6 @@
                     <a href="#" onclick="showPage('produksi_input')">- MRP Recipe Production</a>
                     <a href="#" onclick="showPage('produksi_hasil');loadProductionOrdersToResultSelect();">-
                         Production Data FG</a>
-                    <a href="#" onclick="showPage('cogs_data')">- COGS Production Report</a>
                     <a href="#" onclick="showPage('input_waste')">- Waste Data</a>
                 </div>
 
@@ -753,7 +750,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label>UOM/Units</label>
-                                <select id="purchaseUnit" class="form-control"></select>
+                                <input type="text" id="purchaseUnit" class="form-control auto-field" readonly>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -1084,80 +1081,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ================= COGS DATA ================= -->
-                <div id="cogs_data" class="menu-page">
-                    <div class="card-custom">
-                        <h3 class="text-warning mb-4">
-                            <i class="fa-solid fa-industry"></i>
-                            Production MRP
-                        </h3>
-                        <div class="section-divider"></div>
-                        <h5 class="text-warning mb-3">
-                            <i class="fa-solid fa-calculator"></i>
-                            Report Data COGS Production
-                        </h5>
-                        <div class="section-divider"></div>
-                        <!-- FILTER -->
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <label>Start Date</label>
-                                <input type="date" id="cogsStartDate" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label>End Date</label>
-                                <input type="date" id="cogsEndDate" class="form-control">
-                            </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button class="btn btn-warning w-100" onclick="loadCOGSData()">
-                                    FILTER DATA
-                                </button>
-                            </div>
-                        </div>
-                        <!-- ================= TABLE 1 ================= -->
-                        <h5 class="text-warning mb-3">
-                            Tabel Data Finish Good
-                        </h5>
-                        <table class="table table-dark table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Product Code</th>
-                                    <th>Product Name</th>
-                                    <th>Qty Pcs</th>
-                                    <th>Qty Box</th>
-                                    <th>Production Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cogsFGTable"></tbody>
-                        </table>
-                        <!-- ================= TABLE 2 ================= -->
-                        <h5 class="text-warning mt-5 mb-3">
-                            Use Of Raw Materials Data </h5>
-                        <table class="table table-dark table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Materials Code</th>
-                                    <th>Materials Name</th>
-                                    <th>UOM</th>
-                                    <th>Weight</th>
-                                    <th>Average Price</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cogsMaterialTable"></tbody>
-                        </table>
-                        <!-- TOTAL -->
-                        <div class="text-end mt-4">
-
-                            <h4 class="text-warning">
-                                TOTAL COGS :
-                                <span id="cogsTotalValue">
-                                    Rp 0
-                                </span>
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ================= INPUT WASTE MENU ================= -->
                 <div id="input_waste" class="menu-page">
                     <h3 class="text-warning mb-4">
@@ -1828,7 +1751,7 @@
                         </table>
                     </div>
                 </div>
-                <!-- ==== REPORT DATA ============ -->
+                <!-- ================= ACCOUNTING REPORT MENU ================= -->
                 <div id="accounting_report" class="menu-page">
                     <div class="card-custom">
                         <h3 class="text-warning mb-4">
@@ -1836,6 +1759,8 @@
                             Accounting Report
                         </h3>
                         <div class="section-divider"></div>
+
+                        <!-- REPORT GRID -->
                         <div id="reportGrid" class="report-grid">
                             <div class="report-card" onclick="openReport('purchasing')">
                                 <i class="fa-solid fa-cart-shopping fa-3x"></i>
@@ -1854,43 +1779,88 @@
                                 <h5>Profit & Loss</h5>
                             </div>
                         </div>
-                        <div id="reportArea" style="display:none; margin-top:25px;">
-                            <h4 id="reportTitle" class="text-warning"></h4>
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label>Start Date</label>
-                                    <input type="date" id="reportStartDate" class="form-control">
-                                </div>
-                                <div class="col-md-3">
-                                    <label>End Date</label>
-                                    <input type="date" id="reportEndDate" class="form-control">
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button class="btn btn-warning w-100" onclick="loadSelectedReport()">
-                                        Load Data
-                                    </button>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button class="btn btn-danger w-100" onclick="exportReportPDF()">
-                                        Export PDF
-                                    </button>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button class="btn btn-danger w-100" onclick="backToReportData()">
-                                        Back To Report
-                                    </button>
-                                </div>
-                            </div>
-                            <table class="table table-dark table-striped">
-                                <thead id="reportHead">
-                                </thead>
-                                <tbody id="reportBody">
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
+                <!-- ================= REPORT DETAIL PAGE ================= -->
+                <div id="report_detail" class="menu-page" style="display:none;">
+                    <div class="card-custom">
+                        <!-- TITLE -->
+                        <h3 id="reportTitle" class="text-warning mb-4">
+                            Report Detail
+                        </h3>
+                        <div class="section-divider"></div>
+                        <!-- FILTER -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label>Start Date</label>
+                                <input type="date" id="reportStartDate" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>End Date</label>
+                                <input type="date" id="reportEndDate" class="form-control">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-warning w-100" onclick="loadSelectedReport()">
+                                    Load Data
+                                </button>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-danger w-100" onclick="exportReportPDF()">
+                                    Export PDF
+                                </button>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-secondary w-100" onclick="backToReportMenu()">
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                        <!-- TABLE -->
+                        <table class="table table-dark table-striped">
+                            <thead id="reportHead"></thead>
+                            <tbody id="reportBody"></tbody>
+                        </table>
+                    </div>
 
+                    <!-- TABLE REPORT PRODUCTION-->
+                    <div id="productionReportArea" style="display:none;">
+                        <h5 class="text-warning">Finished Goods Produced</h5>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Product Name</th>
+                                    <th>Total FG (PCS)</th>
+                                    <th>PCS / Box</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productionFGTable"></tbody>
+                        </table>
+                        <h5 class="text-warning mt-4">Material Usage</h5>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Material Code</th>
+                                    <th>Material Name</th>
+                                    <th>Unit</th>
+                                    <th>Qty Used</th>
+                                    <th>Average Price</th>
+                                    <th>Usage Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productionMaterialTable"></tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-4">
+                        <h4 class="text-warning">
+                            Total Material Usage Value :
+                            <span id="productionTotalUsage">
+                                Rp 0
+                            </span>
+                        </h4>
+                    </div>
+                </div>
                 <!-- ================= WAREHOUSE MENU ================= -->
                 <div id="uploadStockAwal" class="menu-page">
                     <div class="card-custom">
@@ -3596,8 +3566,10 @@
                     await loadPurchases();
                     await loadPurchasesData();
                 });
+
                 /* ================= LOAD OPTIONS ================= */
                 async function loadPurchaseOptions() {
+                    // ================= MATERIAL =================
                     const materialSnap = await getDocs(
                         query(
                             collection(db, "materials"),
@@ -3607,25 +3579,20 @@
 
                     let materialHtml = `<option value="">Select Materials</option>`;
                     materialSnap.forEach(d => {
+                        const data = d.data();
                         materialHtml += `
-                        <option
-                            value="${d.data().code}"
-                            data-name="${d.data().name}">
-                            ${d.data().code} - ${d.data().name}
-                        </option>`;
+            <option
+                value="${data.code}"
+                data-name="${data.name}"
+                data-unit="${data.unit}">
+                ${data.code} - ${data.name}
+            </option>
+        `;
                     });
+
                     document.getElementById("purchaseMaterial").innerHTML = materialHtml;
 
-                    const unitSnap = await getDocs(collection(db, "units"));
-                    let unitHtml = `<option value="">Select UOM</option>`;
-                    unitSnap.forEach(d => {
-                        unitHtml += `
-            <option value="${d.data().name}">
-                ${d.data().name}
-            </option>`;
-                    });
-
-                    document.getElementById("purchaseUnit").innerHTML = unitHtml;
+                    // ================= SUPPLIER =================
                     const supplierSnap = await getDocs(
                         query(
                             collection(db, "suppliers"),
@@ -3638,9 +3605,23 @@
                         supplierHtml += `
             <option value="${d.data().name}">
                 ${d.data().name}
-            </option>`;
+            </option>
+        `;
                     });
+
                     document.getElementById("purchaseSupplier").innerHTML = supplierHtml;
+
+                    // ================= AUTO UOM =================
+                    const materialSelect = document.getElementById("purchaseMaterial");
+                    materialSelect.onchange = function () {
+                        const selected = this.options[this.selectedIndex];
+                        if (!selected.value) {
+                            document.getElementById("purchaseUnit").value = "";
+                            return;
+                        }
+                        document.getElementById("purchaseUnit").value =
+                            selected.dataset.unit || "";
+                    };
                 }
 
                 /* ================= AVERAGE ================= */
@@ -3695,7 +3676,6 @@
                     document.getElementById("purchaseQty").value = "";
                     document.getElementById("purchasePrice").value = "";
                     document.getElementById("purchaseUnit").value = "";
-                    document.getElementById("purchaseDate").value = "";
                     document.getElementById("purchaseAverage").value = "";
                     document.getElementById("purchaseSupplier").value = "";
 
@@ -3897,7 +3877,7 @@
                             collection(db, "purchasing"),
                             where("date", ">=", startDate),
                             where("date", "<=", endDate),
-                            orderBy("date", "desc")
+                            orderBy("date", "asc")
                         );
 
                     } else {
@@ -4006,8 +3986,53 @@
                         }
                     });
 
+                    // ================= NAMA FILE PDF =================
+                    let fileName = "Purchase Order";
+
+                    const bulan = [
+                        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                    ];
+
+                    if (startDate && endDate) {
+
+                        // Format input date = YYYY-MM-DD
+                        const [startYear, startMonth, startDay] = startDate.split("-");
+                        const [endYear, endMonth, endDay] = endDate.split("-");
+
+                        // Jika bulan & tahun sama
+                        if (startMonth === endMonth && startYear === endYear) {
+
+                            fileName += ` ${bulan[parseInt(startMonth, 10) - 1]} ${startYear}`;
+
+                        }
+
+                        // Jika tahun sama tetapi beda bulan
+                        else if (startYear === endYear) {
+
+                            fileName += ` ${bulan[parseInt(startMonth, 10) - 1]} - ${bulan[parseInt(endMonth, 10) - 1]} ${startYear}`;
+
+                        }
+
+                        // Jika beda tahun
+                        else {
+
+                            fileName += ` ${startDay}-${startMonth}-${startYear}`;
+                            fileName += ` s.d. `;
+                            fileName += `${endDay}-${endMonth}-${endYear}`;
+
+                        }
+
+                    } else {
+
+                        // Jika tidak memakai filter
+                        const today = new Date();
+
+                        fileName += ` ${bulan[today.getMonth()]} ${today.getFullYear()}`;
+                    }
+
                     // ================= SAVE PDF =================
-                    doc.save("Purchase-Order.pdf");
+                    doc.save(`${fileName}.pdf`);
                 }
 
                 // ================= GLOBAL =================
@@ -4220,7 +4245,6 @@
 
                     document.getElementById("prodProduct").value = "";
                     document.getElementById("prodQty").value = "";
-                    document.getElementById("prodDate").value = "";
 
                 }
 
@@ -4746,148 +4770,6 @@
                     doc.save(`Forecast-Produksi-${bulan}.pdf`);
                 }
                 window.exportForecastPDF = exportForecastPDF;
-
-                /* ================= LOAD COGS DATA ================= */
-                async function loadCOGSData() {
-
-                    const start = document.getElementById("cogsStartDate").value;
-                    const end = document.getElementById("cogsEndDate").value;
-
-                    const fgTable = document.getElementById("cogsFGTable");
-                    const materialTable = document.getElementById("cogsMaterialTable");
-
-                    const totalEl = document.getElementById("cogsTotalValue");
-
-                    fgTable.innerHTML = "";
-                    materialTable.innerHTML = "";
-                    totalEl.innerHTML = "Rp 0";
-
-                    // ================= LOAD DATA =================
-                    const prodSnap = await getDocs(query(collection(db, "production_results")));
-                    const recipeSnap = await getDocs(collection(db, "product_recipes"));
-                    const materialSnap = await getDocs(collection(db, "materials"));
-
-                    // ================= GROUP FG =================
-                    let fgMap = {};
-
-                    if (!start || !end) {
-                        alert("Pilih tanggal filter dulu");
-                        return;
-                    }
-
-                    prodSnap.forEach(docu => {
-                        const prod = docu.data();
-                        // FILTER TANGGAL
-                        if (start && end) {
-                            if (prod.date < start || prod.date > end) return;
-                        }
-
-                        const key = prod.productCode;
-                        if (!fgMap[key]) {
-                            fgMap[key] = {
-                                productCode: prod.productCode,
-                                productName: prod.productName,
-                                qty: 0,
-                                qtyPerBox: prod.fgBox,
-                                date: prod.date
-                            };
-                        }
-
-                        // PAKAI FG PCS
-                        fgMap[key].qty += Number(prod.fgPcs || 0);
-                    });
-
-                    // ================= RENDER FG =================
-                    Object.values(fgMap)
-                        .sort((a, b) => a.productCode.localeCompare(b.productCode))
-                        .forEach(item => {
-                            fgTable.innerHTML += `
-        <tr>
-            <td>${item.productCode}</td>
-            <td>${item.productName}</td>
-            <td>${item.qty}</td>
-            <td>${item.qtyPerBox}</td>
-            <td>${item.date}</td>
-        </tr>
-        `;
-                        });
-
-                    // ================= MATERIAL USAGE =================
-                    let materialUsage = {};
-                    let totalCOGS = 0;
-                    for (const fg of Object.values(fgMap)) {
-                        // AMBIL RECIPE PRODUK
-                        const recipes = recipeSnap.docs
-                            .map(d => d.data())
-                            .filter(r => r.productCode === fg.productCode);
-
-                        for (const recipe of recipes) {
-                            // CARI MATERIAL
-                            const material = materialSnap.docs
-                                .map(d => d.data())
-                                .find(m =>
-                                    m.name.toLowerCase().trim() ===
-                                    recipe.material.toLowerCase().trim()
-                                );
-
-                            if (!material) continue;
-                            const materialCode = material.code;
-                            const materialPrice = Number(material.average || 0);
-
-                            // PEMAKAIAN
-                            const usedQty =
-                                Number(recipe.qty || 0) *
-                                Number(fg.qty || 0);
-
-                            const totalValue =
-                                usedQty * materialPrice;
-                            totalCOGS += totalValue;
-                            // GROUP MATERIAL
-                            if (!materialUsage[materialCode]) {
-
-                                materialUsage[materialCode] = {
-                                    code: material.code,
-                                    name: material.name,
-                                    unit: material.unit,
-                                    qty: 0,
-                                    average: materialPrice,
-                                    value: 0
-                                };
-                            }
-
-                            materialUsage[materialCode].qty += usedQty;
-                            materialUsage[materialCode].value += totalValue;
-                        }
-                    }
-
-                    // ================= RENDER MATERIAL =================
-                    Object.values(materialUsage)
-                        .sort((a, b) =>
-                            a.code.localeCompare(b.code, undefined, {
-                                numeric: true,
-                                sensitivity: "base"
-                            })
-                        )
-                        .forEach(mat => {
-
-                            materialTable.innerHTML += `
-        <tr>
-            <td>${mat.code}</td>
-            <td>${mat.name}</td>
-            <td>${mat.unit}</td>
-            <td>${mat.qty.toFixed(2)}</td>
-            <td>Rp ${mat.average.toLocaleString()}</td>
-            <td>Rp ${mat.value.toLocaleString()}</td>
-        </tr>
-        `;
-                        });
-
-                    // ================= TOTAL =================
-                    totalEl.innerHTML =
-                        `Rp ${totalCOGS.toLocaleString()}`;
-
-                    LoadCOGSData();
-                }
 
                 /* =========================================================
                 WASTE FG
@@ -5848,14 +5730,17 @@
                 ACCOUNTING
                 ========================================================= */
                 function toggleAccounting() {
-                    const menu =
-                        document.getElementById("accountingSubMenu");
-                    if (!menu) return;
-                    menu.style.display =
-                        menu.style.display === "block"
-                            ? "none"
-                            : "block";
+
+                    const menu = document.getElementById("accountingSubMenu");
+                    if (!menu) {
+                        console.error("accountingSubMenu tidak ditemukan");
+                        return;
+                    }
+
+                    const isHidden = getComputedStyle(menu).display === "none";
+                    menu.style.display = isHidden ? "block" : "none";
                 }
+
                 /* =========================================================
                 COST PRODUCTION
                 ========================================================= */
@@ -5945,81 +5830,36 @@
                     }
 
                     const costData = [
-
                         {
-                            code: "COST001",
-                            name: "Biaya Gaji Karyawan",
-                            value: Number(
-                                document.getElementById("costSalary").value || 0
-                            )
-                        },
-
-                        {
-                            code: "COST002",
-                            name: "Biaya Listrik PLN",
-                            value: Number(
-                                document.getElementById("costElectric").value || 0
-                            )
-                        },
-
-                        {
-                            code: "COST003",
-                            name: "Biaya Gas",
-                            value: Number(
-                                document.getElementById("costGas").value || 0
-                            )
-                        },
-
-                        {
-                            code: "COST004",
-                            name: "Biaya Telepon / Internet",
-                            value: Number(
-                                document.getElementById("costInternet").value || 0
-                            )
+                            code: "COST001", name: "Biaya Gaji Karyawan", value: Number(document.getElementById("costSalary").value || 0)
                         },
                         {
-                            code: "COST005",
-                            name: "Biaya Air Produksi",
-                            value: Number(
-                                document.getElementById("costAir").value || 0
-                            )
+                            code: "COST002", name: "Biaya Listrik PLN", value: Number(document.getElementById("costElectric").value || 0)
                         },
                         {
-                            code: "COST006",
-                            name: "Biaya Bahan Bakar Minyak / BBM",
-                            value: Number(
-                                document.getElementById("costBahanBakar").value || 0
-                            )
+                            code: "COST003", name: "Biaya Gas", value: Number(document.getElementById("costGas").value || 0)
                         },
                         {
-                            code: "COST007",
-                            name: "Biaya Alat Tulis Kantor",
-                            value: Number(
-                                document.getElementById("costAlatTulis").value || 0
-                            )
+                            code: "COST004", name: "Biaya Telepon / Internet", value: Number(document.getElementById("costInternet").value || 0)
                         },
                         {
-                            code: "COST008",
-                            name: "Biaya Kemanan",
-                            value: Number(
-                                document.getElementById("costKeamanan").value || 0
-                            )
+                            code: "COST005", name: "Biaya Air Produksi", value: Number(document.getElementById("costAir").value || 0)
                         },
                         {
-                            code: "COST009",
-                            name: "Biaya Kebersihan Sampah",
-                            value: Number(
-                                document.getElementById("costSampah").value || 0
-                            )
+                            code: "COST006", name: "Biaya Bahan Bakar Minyak / BBM", value: Number(document.getElementById("costBahanBakar").value || 0)
                         },
                         {
-                            code: "COST010",
-                            name: "Biaya Overhead Lainnya",
-                            value: Number(
-                                document.getElementById("costOverhead").value || 0
-                            )
+                            code: "COST007", name: "Biaya Alat Tulis Kantor", value: Number(document.getElementById("costAlatTulis").value || 0)
+                        },
+                        {
+                            code: "COST008", name: "Biaya Kemanan", value: Number(document.getElementById("costKeamanan").value || 0)
+                        },
+                        {
+                            code: "COST009", name: "Biaya Kebersihan Sampah", value: Number(document.getElementById("costSampah").value || 0)
+                        },
+                        {
+                            code: "COST010", name: "Biaya Overhead Lainnya", value: Number(document.getElementById("costOverhead").value || 0)
                         }
-
                     ];
 
                     let hasData = false;
@@ -6296,79 +6136,768 @@
                         `Rp ${grossProfit.toLocaleString()}`;
                 }
                 /* ==========FUNCTION OPEN REPORT ACCOUNTING======= */
+
                 let currentReport = "";
 
                 function openAccountingReport() {
                     showPage("accounting_report");
-
                 }
+
+                window.openAccountingReport = openAccountingReport;
                 function openReport(type) {
                     currentReport = type;
-                    document.getElementById("reportArea").style.display = "block";
-                    if (type == "purchasing") {
-                        document.getElementById("reportTitle").innerHTML = "Purchasing Report";
+
+                    document.getElementById("productionReportArea").style.display =
+                        type === "production" ? "block" : "none";
+
+                    document.querySelector(".table.table-dark").style.display =
+                        type === "production" ? "none" : "table";
+
+                    // set judul report
+                    const title = document.getElementById("reportTitle");
+
+                    if (type === "purchasing") {
+                        title.innerHTML = "Purchasing Report";
                     }
+
+                    else if (type === "production") {
+                        title.innerHTML = "Production Report";
+                    }
+
+                    else if (type === "cogs") {
+                        title.innerHTML = "COGS Report";
+                    }
+
+                    else if (type === "profitloss") {
+                        title.innerHTML = "Profit & Loss Report";
+                    }
+
+                    // pindah halaman detail report
+                    showPage("report_detail");
+                }
+
+                function backToReportMenu() {
+                    showPage("accounting_report");
+
+                    // reset table
+                    document.getElementById("reportHead").innerHTML = "";
+                    document.getElementById("reportBody").innerHTML = "";
                 }
                 function loadSelectedReport() {
-                    if (currentReport == "purchasing") {
+                    if (currentReport === "purchasing") {
                         loadPurchasingReport();
                     }
+                    else if (currentReport === "production") {
+                        loadProductionReport();
+                    }
+                    else if (currentReport === "cogs") {
+                        loadCOGSReport();
+                    }
+                    else if (currentReport === "profitloss") {
+                        loadProfitLossReport();
+                    }
                 }
+                async function exportReportPDF() {
+                    if (currentReport === "purchasing") {
+                        return exportPurchasingPDF();
+                    }
+                    if (currentReport === "production") {
+                        return exportProductionPDF();
+                    }
+                    if (currentReport === "cogs") {
+                        return exportCOGSPDF();
+                    }
+                    if (currentReport === "profitloss") {
+                        return exportProfitLossPDF();
+                    }
+                }
+
+                window.exportReportPDF = exportReportPDF;
+
                 /* ==========PURCHASE REPORT=========== */
                 async function loadPurchasingReport() {
+
                     const start = document.getElementById("reportStartDate").value;
                     const end = document.getElementById("reportEndDate").value;
+
                     if (!start || !end) {
                         alert("Pilih Start Date dan End Date");
                         return;
-
                     }
-                    const snap = await getDocs(collection(db, "purchasing"));
+
+                    const snap = await getDocs(
+                        query(
+                            collection(db, "purchasing"),
+                            orderBy("date", "asc")
+                        )
+                    );
                     let html = "";
+
                     document.getElementById("reportHead").innerHTML = `
-
-                    <tr>
-                    <th>Material Code</th>
-                    <th>Material Name</th>
-                    <th>Qty</th>
-                    <th>Unit</th>
-                    <th>Purchase Price</th>
-                    <th>Average</th>
-                    <th>Supplier</th>
-                    <th>Date</th>
-                    </tr>
-
-                    `;
+        <tr>
+            <th>Material Code</th>
+            <th>Material Name</th>
+            <th>Qty</th>
+            <th>Unit</th>
+            <th>Purchase Price</th>
+            <th>Average</th>
+            <th>Supplier</th>
+            <th>Date</th>
+        </tr>
+    `;
 
                     snap.forEach(doc => {
+
                         const d = doc.data();
+
+                        // filter date
                         if (d.date < start || d.date > end) return;
+
                         const qty = Number(d.qty || 0);
                         const price = Number(d.price || 0);
                         const avg = price / (qty || 1);
+
                         html += `
-
-                        <tr>
-                        <td>${d.materialCode}</td>
-                        <td>${d.materialName}</td>
-                        <td>${qty}</td>
-                        <td>${d.unit}</td>
-                        <td>Rp ${price.toLocaleString("id-ID")}</td>
-                        <td>Rp ${avg.toLocaleString("id-ID")}</td>
-                        <td>${d.supplier}</td>
-                        <td>${d.date}</td>
-                        </tr>
-
-                        `;
-
+            <tr>
+                <td>${d.materialCode}</td>
+                <td>${d.materialName}</td>
+                <td>${qty}</td>
+                <td>${d.unit}</td>
+                <td>Rp ${price.toLocaleString("id-ID")}</td>
+                <td>Rp ${avg.toLocaleString("id-ID")}</td>
+                <td>${d.supplier}</td>
+                <td>${d.date}</td>
+            </tr>
+        `;
                     });
+
                     document.getElementById("reportBody").innerHTML = html;
                 }
+                /* ================= EXPORT PURCHASE PDF ================= */
+                async function exportPurchasingPDF() {
+                    const purchaseTable =
+                        document.querySelectorAll(
+                            "#reportBody tr"
+                        );
+                    if (purchaseTable.length === 0) {
+                        alert(
+                            "Data Purchasing belum di Load. Silakan Load Data terlebih dahulu sebelum Export PDF"
+                        );
+                        return;
+                    }
 
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF("landscape", "pt", "a4");
 
-                /* ================= TOGGLE GUDANG ================= */
+                    // ================= FILTER DATE =================
+                    const startDate = document.getElementById("reportStartDate").value;
+                    const endDate = document.getElementById("reportEndDate").value;
+
+                    let q;
+
+                    if (startDate && endDate) {
+
+                        q = query(
+                            collection(db, "purchasing"),
+                            where("date", ">=", startDate),
+                            where("date", "<=", endDate),
+                            orderBy("date", "asc")
+                        );
+
+                    } else {
+
+                        q = query(
+                            collection(db, "purchasing"),
+                            orderBy("date", "asc")
+                        );
+                    }
+
+                    const snap = await getDocs(q);
+
+                    if (snap.empty) {
+                        alert("Data kosong");
+                        return;
+                    }
+
+                    // ================= PRINT DATE =================
+                    const today = new Date();
+                    const printDate =
+                        today.getDate().toString().padStart(2, "0") + "/" +
+                        (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
+                        today.getFullYear();
+
+                    // ================= TOTAL =================
+                    let totalPrice = 0;
+                    const rows = [];
+                    let no = 1;
+                    snap.forEach(d => {
+                        const item = d.data();
+                        const qty = Number(item.qty || 0);
+                        const price = Number(item.price || 0);
+                        const avg = price / (qty || 1);
+
+                        totalPrice += price;
+
+                        rows.push([
+                            no++,
+                            item.materialCode,
+                            item.materialName,
+                            qty,
+                            item.unit,
+                            "Rp " + price.toLocaleString("id-ID"),
+                            "Rp " + avg.toLocaleString("id-ID"),
+                            item.supplier,
+                            item.date
+                        ]);
+                    });
+
+                    // ================= TITLE =================
+                    doc.setFontSize(16);
+                    doc.text("PURCHASE ORDER RAW MATERILAS REPORT", 40, 40);
+
+                    doc.setFontSize(11);
+                    doc.text(
+                        `PERIODE: ${startDate || "-"} s.d ${endDate || "-"}`,
+                        40,
+                        60
+                    );
+
+                    doc.text(`Print Date: ${printDate}`, 650, 60);
+
+                    doc.setFontSize(12);
+                    doc.text(
+                        `Total Purchase: Rp ${totalPrice.toLocaleString("id-ID")}`,
+                        40,
+                        80
+                    );
+
+                    // ================= TABLE =================
+                    doc.autoTable({
+                        startY: 100,
+                        head: [[
+                            "No",
+                            "Kode",
+                            "Material Name",
+                            "Qty",
+                            "UOM",
+                            "Purchase Price",
+                            "Average",
+                            "Supplier",
+                            "Date"
+                        ]],
+                        body: rows,
+                        theme: "grid",
+                        styles: { fontSize: 9 },
+                        headStyles: { fillColor: [255, 193, 7] }
+                    });
+
+                    // ================= FILE NAME =================
+                    let fileName = "Purchasing Report";
+
+                    const bulan = [
+                        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                    ];
+
+                    if (startDate && endDate) {
+                        const [sy, sm] = startDate.split("-");
+                        const [ey, em] = endDate.split("-");
+                        if (sy === ey && sm === em) {
+                            fileName += ` ${bulan[parseInt(sm) - 1]} ${sy}`;
+                        } else if (sy === ey) {
+                            fileName += ` ${bulan[parseInt(sm) - 1]} - ${bulan[parseInt(em) - 1]} ${sy}`
+                        } else {
+                            fileName += ` ${startDate} s.d ${endDate}`;
+                        }
+                    } else {
+                        fileName += ` ${bulan[today.getMonth()]} ${today.getFullYear()}`;
+                    }
+                    // ================= SAVE =================
+                    doc.save(`${fileName}.pdf`);
+                }
+
+                window.exportReportPDF = exportReportPDF;
+
+                // =======================================================
+                // ========== FUNCTION REPORT PRODUCTION DATA =============
+                // =======================================================
+                /* ================= PRODUCTION REPORT ================= */
+                async function loadProductionReport() {
+
+                    const start =
+                        document.getElementById("reportStartDate").value;
+
+                    const end =
+                        document.getElementById("reportEndDate").value;
+
+                    if (!start || !end) {
+                        alert("Pilih Start Date dan End Date");
+                        return;
+                    }
+
+                    const fgTable =
+                        document.getElementById("productionFGTable");
+
+                    const materialTable =
+                        document.getElementById("productionMaterialTable");
+
+                    const totalUsageEl =
+                        document.getElementById("productionTotalUsage");
+
+                    fgTable.innerHTML = "";
+                    materialTable.innerHTML = "";
+                    totalUsageEl.innerHTML = "Rp 0";
+
+                    try {
+
+                        // ================= LOAD DATA =================
+
+                        const prodSnap = await getDocs(
+                            collection(db, "production_results")
+                        );
+
+                        const recipeSnap = await getDocs(
+                            collection(db, "product_recipes")
+                        );
+
+                        const materialSnap = await getDocs(
+                            collection(db, "materials")
+                        );
+
+                        // ================= GROUP FG =================
+
+                        let fgMap = {};
+
+                        prodSnap.forEach(docu => {
+
+                            const prod = docu.data();
+
+                            // FILTER DATE
+                            if (prod.date < start || prod.date > end)
+                                return;
+
+                            const key = prod.productCode;
+
+                            if (!fgMap[key]) {
+
+                                fgMap[key] = {
+                                    productCode: prod.productCode,
+                                    productName: prod.productName,
+                                    qty: 0,
+                                    qtyPerBox: prod.fgBox,
+                                    date: prod.date
+                                };
+                            }
+
+                            fgMap[key].qty += Number(
+                                prod.fgPcs || 0
+                            );
+                        });
+
+                        // ================= RENDER FG =================
+
+                        Object.values(fgMap)
+                            .sort((a, b) =>
+                                a.productCode.localeCompare(
+                                    b.productCode
+                                )
+                            )
+                            .forEach(item => {
+
+                                fgTable.innerHTML += `
+                <tr>
+                    <td>${item.productCode}</td>
+                    <td>${item.productName}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.qtyPerBox}</td>
+                    <td>${item.date}</td>
+                </tr>
+            `;
+                            });
+
+                        // ================= MATERIAL USAGE =================
+
+                        let materialUsage = {};
+                        let totalUsageValue = 0;
+
+                        for (const fg of Object.values(fgMap)) {
+
+                            const recipes = recipeSnap.docs
+                                .map(d => d.data())
+                                .filter(r =>
+                                    r.productCode ===
+                                    fg.productCode
+                                );
+
+                            for (const recipe of recipes) {
+
+                                const material =
+                                    materialSnap.docs
+                                        .map(d => d.data())
+                                        .find(m =>
+                                            m.name
+                                                .toLowerCase()
+                                                .trim() ===
+                                            recipe.material
+                                                .toLowerCase()
+                                                .trim()
+                                        );
+
+                                if (!material) continue;
+
+                                const materialPrice =
+                                    Number(
+                                        material.average || 0
+                                    );
+
+                                const usedQty =
+                                    Number(recipe.qty || 0) *
+                                    Number(fg.qty || 0);
+
+                                const usageValue =
+                                    usedQty * materialPrice;
+
+                                totalUsageValue +=
+                                    usageValue;
+
+                                if (
+                                    !materialUsage[
+                                    material.code
+                                    ]
+                                ) {
+
+                                    materialUsage[
+                                        material.code
+                                    ] = {
+                                        code: material.code,
+                                        name: material.name,
+                                        unit: material.unit,
+                                        qty: 0,
+                                        average:
+                                            materialPrice,
+                                        value: 0
+                                    };
+                                }
+
+                                materialUsage[
+                                    material.code
+                                ].qty += usedQty;
+
+                                materialUsage[
+                                    material.code
+                                ].value += usageValue;
+                            }
+                        }
+
+                        // ================= RENDER MATERIAL =================
+
+                        Object.values(materialUsage)
+                            .sort((a, b) =>
+                                a.code.localeCompare(
+                                    b.code,
+                                    undefined,
+                                    {
+                                        numeric: true,
+                                        sensitivity:
+                                            "base"
+                                    }
+                                )
+                            )
+                            .forEach(mat => {
+
+                                materialTable.innerHTML += `
+                <tr>
+                    <td>${mat.code}</td>
+                    <td>${mat.name}</td>
+                    <td>${mat.unit}</td>
+                    <td>${mat.qty.toFixed(2)}</td>
+                    <td>
+                        Rp ${mat.average.toLocaleString("id-ID")}
+                    </td>
+                    <td>
+                        Rp ${mat.value.toLocaleString("id-ID")}
+                    </td>
+                </tr>
+            `;
+                            });
+
+                        // ================= TOTAL =================
+
+                        totalUsageEl.innerHTML =
+                            `Rp ${totalUsageValue.toLocaleString("id-ID")}`;
+
+                    } catch (error) {
+
+                        console.error(
+                            "Error load production report:",
+                            error
+                        );
+
+                        alert(
+                            "Gagal load Production Report"
+                        );
+                    }
+                }
+
+                async function exportProductionPDF() {
+
+                    const fgTable =
+                        document.querySelectorAll(
+                            "#productionFGTable tr"
+                        );
+                    const materialTable =
+                        document.querySelectorAll(
+                            "#productionMaterialTable tr"
+                        );
+                    if (
+                        fgTable.length === 0 &&
+                        materialTable.length === 0
+                    ) {
+                        alert(
+                            "Data Production belum di Load. Silakan Load Data terlebih dahulu sebelum Export PDF"
+                        );
+                        return;
+                    }
+                    if (fgTable.length === 0) {
+                        alert(
+                            "Data Finished Goods kosong. Silakan Load Data terlebih dahulu"
+                        );
+
+                        return;
+                    }
+                    if (materialTable.length === 0) {
+                        alert(
+                            "Data Material Usage kosong. Silakan Load Data terlebih dahulu"
+                        );
+
+                        return;
+                    }
+
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF("landscape", "pt", "a4");
+
+                    const startDate =
+                        document.getElementById("reportStartDate").value;
+
+                    const endDate =
+                        document.getElementById("reportEndDate").value;
+
+                    const today = new Date();
+
+                    const printDate =
+                        today.getDate().toString().padStart(2, "0") + "/" +
+                        (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
+                        today.getFullYear();
+
+                    // ================= TITLE =================
+
+                    doc.setFontSize(16);
+                    doc.text(
+                        "PRODUCTION REPORT",
+                        40,
+                        40
+                    );
+
+                    doc.setFontSize(11);
+
+                    doc.text(
+                        `PERIODE: ${startDate || "-"} s.d ${endDate || "-"}`,
+                        40,
+                        60
+                    );
+
+                    doc.text(
+                        `Print Date: ${printDate}`,
+                        650,
+                        60
+                    );
+
+                    // ==================================================
+                    // FG TABLE
+                    // ==================================================
+
+                    const fgRows = [];
+
+                    document
+                        .querySelectorAll("#productionFGTable tr")
+                        .forEach((row, index) => {
+
+                            const td =
+                                row.querySelectorAll("td");
+
+                            fgRows.push([
+                                index + 1,
+                                td[0]?.innerText || "",
+                                td[1]?.innerText || "",
+                                td[2]?.innerText || "",
+                                td[3]?.innerText || "",
+                                td[4]?.innerText || ""
+                            ]);
+                        });
+
+                    doc.setFontSize(12);
+
+                    doc.text(
+                        "Finished Goods Production",
+                        40,
+                        95
+                    );
+
+                    doc.autoTable({
+                        startY: 105,
+                        head: [[
+                            "No",
+                            "Product Code",
+                            "Product Name",
+                            "FG Qty",
+                            "PCS / Box",
+                            "Date"
+                        ]],
+                        body: fgRows,
+                        theme: "grid",
+                        styles: {
+                            fontSize: 9
+                        },
+                        headStyles: {
+                            fillColor: [255, 193, 7]
+                        }
+                    });
+
+                    // ==================================================
+                    // MATERIAL TABLE
+                    // ==================================================
+
+                    const materialRows = [];
+
+                    document
+                        .querySelectorAll("#productionMaterialTable tr")
+                        .forEach((row, index) => {
+
+                            const td =
+                                row.querySelectorAll("td");
+
+                            materialRows.push([
+                                index + 1,
+                                td[0]?.innerText || "",
+                                td[1]?.innerText || "",
+                                td[2]?.innerText || "",
+                                td[3]?.innerText || "",
+                                td[4]?.innerText || "",
+                                td[5]?.innerText || ""
+                            ]);
+                        });
+
+                    let nextY =
+                        doc.lastAutoTable.finalY + 30;
+
+                    doc.text(
+                        "Material Usage",
+                        40,
+                        nextY
+                    );
+
+                    doc.autoTable({
+                        startY: nextY + 10,
+                        head: [[
+                            "No",
+                            "Material Code",
+                            "Material Name",
+                            "Unit",
+                            "Qty Used",
+                            "Average Price",
+                            "Usage Value"
+                        ]],
+                        body: materialRows,
+                        theme: "grid",
+                        styles: {
+                            fontSize: 9
+                        },
+                        headStyles: {
+                            fillColor: [255, 193, 7]
+                        }
+                    });
+
+                    // ==================================================
+                    // TOTAL MATERIAL USAGE
+                    // ==================================================
+
+                    const totalUsage =
+                        document.getElementById(
+                            "productionTotalUsage"
+                        ).innerText;
+
+                    nextY =
+                        doc.lastAutoTable.finalY + 20;
+
+                    doc.setFontSize(12);
+
+                    doc.text(
+                        `Total Material Usage : ${totalUsage}`,
+                        40,
+                        nextY
+                    );
+
+                    // ==================================================
+                    // FILE NAME
+                    // ==================================================
+
+                    let fileName =
+                        "Production Report";
+
+                    const bulan = [
+                        "Januari", "Februari", "Maret",
+                        "April", "Mei", "Juni",
+                        "Juli", "Agustus", "September",
+                        "Oktober", "November", "Desember"
+                    ];
+
+                    if (startDate && endDate) {
+
+                        const [sy, sm] =
+                            startDate.split("-");
+
+                        const [ey, em] =
+                            endDate.split("-");
+
+                        if (sy === ey && sm === em) {
+
+                            fileName +=
+                                ` ${bulan[parseInt(sm) - 1]} ${sy}`;
+
+                        } else if (sy === ey) {
+
+                            fileName +=
+                                ` ${bulan[parseInt(sm) - 1]} - ${bulan[parseInt(em) - 1]} ${sy}`;
+
+                        } else {
+
+                            fileName +=
+                                ` ${startDate} s.d ${endDate}`;
+                        }
+
+                    } else {
+
+                        fileName +=
+                            ` ${bulan[today.getMonth()]} ${today.getFullYear()}`;
+                    }
+
+                    doc.save(`${fileName}.pdf`);
+                }
+
+                function loadCOGSReport() {
+                    document.getElementById("reportHead").innerHTML = "<tr><th>COGS Report</th></tr>";
+                    document.getElementById("reportBody").innerHTML = "<tr><td>Coming Soon</td></tr>";
+                }
+
+                function loadProfitLossReport() {
+                    document.getElementById("reportHead").innerHTML = "<tr><th>Profit & Loss Report</th></tr>";
+                    document.getElementById("reportBody").innerHTML = "<tr><td>Coming Soon</td></tr>";
+                }
+
+                /* =================================================== */
+                /* ============= STOCK CARD WAREHOUSE =============== */
+                /* =================================================== */
                 function toggleGudang() {
-
                     const menu =
                         document.getElementById("gudangSubMenu");
 
@@ -6378,8 +6907,9 @@
                             : "block";
                 }
                 /* ================= GLOBAL STOCK AWAL ================= */
+                /* ================= READ STOCK AWAL EXCEL ============= */
                 let stockAwalExcelData = [];
-                /* ================= READ STOCK AWAL EXCEL ================= */
+
                 async function readStockAwalExcel() {
                     const file =
                         document.getElementById("stockAwalFile").files[0];
@@ -6454,24 +6984,16 @@
                                 stockAwalExcelData.push(row);
                                 html += `
                     <tr>
-
                         <td>${row.code}</td>
                         <td>${row.name}</td>
                         <td>${row.unit}</td>
-                        <td>
-                            ${Number(row.weight).toLocaleString()}
-                        </td>
-                        <td>
-                            Rp ${Number(row.average).toLocaleString()}
-                        </td>
-                        <td>
-                            Rp ${Number(row.value).toLocaleString()}
-                        </td>
+                        <td>${Number(row.weight).toLocaleString()} </td>        
+                        <td>Rp ${Number(row.average).toLocaleString()}</td>
+                        <td>Rp ${Number(row.value).toLocaleString()} </td> 
                         <td>${row.stockDate}</td>
 
                     </tr>
                 `;
-
                             });
                             document.getElementById("stockAwalTable")
                                 .innerHTML = html;
@@ -6491,6 +7013,7 @@
                 }
 
                 window.readStockAwalExcel = readStockAwalExcel;
+
                 /* ================= SAVE STOCK AWAL ================= */
                 async function saveStockAwalData() {
                     if (stockAwalExcelData.length === 0) {
@@ -6539,8 +7062,9 @@
                 window.saveStockAwalData = saveStockAwalData;
 
                 /* ================= GLOBAL SO ================= */
-                let soExcelData = [];
                 /* ================= READ EXCEL ================= */
+                let soExcelData = [];
+
                 async function readSOExcel() {
                     const file =
                         document.getElementById("soFile").files[0];
@@ -6624,13 +7148,10 @@
                                     );
                                     return;
                                 }
-                                const average =
-                                    Number(material.average || 0);
-                                const value =
-                                    average * weight;
+                                const average = Number(material.average || 0);
+                                const value = average * weight;
                                 // TOTAL
-                                grandTotal += value;
-                                totalData++;
+                                grandTotal += value; totalData++;
                                 // ROW
                                 const row = {
 
@@ -6650,44 +7171,24 @@
                     <td>${row.code}</td>
                     <td>${row.name}</td>
                     <td>${row.unit}</td>
-                    <td>
-                        ${Number(row.weight)
-                                        .toLocaleString()}
-                    </td>
-                    <td>
-                        Rp ${Number(row.average)
-                                        .toLocaleString()}
-                    </td>
-                    <td>
-                        Rp ${Number(row.value)
-                                        .toLocaleString()}
-                    </td>
+                    <td>${Number(row.weight).toLocaleString()} </td>
+                    <td>Rp ${Number(row.average).toLocaleString()}</td>   
+                    <td>Rp ${Number(row.value).toLocaleString()}</td>
                     <td>${row.soDate}</td>
                 </tr>
             `;
                             });
-
                             // TABLE
-                            document.getElementById("soTable")
-                                .innerHTML = html;
+                            document.getElementById("soTable").innerHTML = html;
                             // TOTAL VALUE
-                            document.getElementById("soTotalValue")
-                                .innerHTML =
-                                "Rp " +
-                                grandTotal.toLocaleString();
-
+                            document.getElementById("soTotalValue").innerHTML = "Rp " + grandTotal.toLocaleString();
                             // TOTAL DATA
-                            document.getElementById("soTotalData")
-                                .innerHTML =
-                                totalData.toLocaleString();
+                            document.getElementById("soTotalData").innerHTML = totalData.toLocaleString();
                             alert(
-                                "Excel berhasil dibaca : " +
-                                totalData +
-                                " data"
+                                "Excel berhasil dibaca : " + totalData + " data"
                             );
                         } catch (err) {
-                            console.error(err);
-                            alert("Gagal membaca excel");
+                            console.error(err); alert("Gagal membaca excel");
                         }
                     };
                     reader.readAsArrayBuffer(file);
@@ -6719,7 +7220,6 @@
                     alert(
                         "Stock Opname berhasil disimpan"
                     );
-
                     loadSOData();
                 }
                 window.saveSOData = saveSOData;
@@ -6914,7 +7414,9 @@
                 }
                 window.printSOPDF = printSOPDF;
 
-                /* ================= LOAD STOCK CARD WAREHOUSE ================= */
+                /* =================================================== */
+                /* ================= LOAD STOCK CARD WAREHOUSE =========== */
+                /* =================================================== */
                 async function loadStockCardWarehouse() {
                     try {
                         const start =
@@ -7495,7 +7997,6 @@
                 window.openProfitLoss = openProfitLoss;
                 window.loadProfitLoss = loadProfitLoss;
 
-                window.loadCOGSData = loadCOGSData;
                 window.showPriceProduct = showPriceProduct;
                 window.savePriceFG = savePriceFG;
                 window.loadPriceFGTable = loadPriceFGTable;
@@ -7516,10 +8017,14 @@
                 window.saveProductionCost = saveProductionCost;
                 window.loadProductionCostReport = loadProductionCostReport;
 
-                window.openAccountingReport = openAccountingReport;
+
                 window.openReport = openReport;
-                window.loadSelectedReport = loadSelectedReport;
                 window.loadPurchasingReport = loadPurchasingReport;
+                window.backToReportMenu = backToReportMenu;
+                window.loadSelectedReport = loadSelectedReport;
+                window.loadProductionReport = loadProductionReport;
+                window.loadCOGSReport = loadCOGSReport;
+                window.loadProfitLossReport = loadProfitLossReport;
 
                 window.toggleGudang = toggleGudang;
                 window.readSOExcel = readSOExcel;
