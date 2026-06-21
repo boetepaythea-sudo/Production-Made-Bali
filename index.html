@@ -1866,11 +1866,13 @@
                                         <th>Material Name</th>
                                         <th>UOM/Unit</th>
                                         <th>Average</th>
-                                        <th>SO BB Awal</th>
+                                        <th>Start SO BB</th>
                                         <th>Purchase Order Material</th>
-                                        <th>Usage Material Produksi</th>
                                         <th>Waste Material</th>
-                                        <th>Last Stock Material</th>
+                                        <th>Last SO BB</th>
+                                        <th>Usage Material Produksi</th>
+                                        <th>Cogs Production</th>
+                                        <th>Different</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cogsQtyTable">
@@ -1886,11 +1888,13 @@
                                         <th>Material Name</th>
                                         <th>UOM/Unit</th>
                                         <th>Average</th>
-                                        <th>SO BB Awal</th>
+                                        <th>Start SO BB</th>
                                         <th>Purchase Order Material</th>
-                                        <th>Usage Material Produksi</th>
                                         <th>Waste Material</th>
-                                        <th>Last Stock Material</th>
+                                        <th>Last SO BB</th>
+                                        <th>Usage Material Produksi</th>
+                                        <th>Cogs Production</th>
+                                        <th>Different</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cogsValueTable">
@@ -6616,20 +6620,23 @@
                         // ================= LOAD COGS REPORT ==============
                         // =================================================
                         async function loadCOGSReport() {
-                            const start =
-                                document.getElementById("reportStartDate").value;
-                            const end =
-                                document.getElementById("reportEndDate").value;
+
+                            const start = document.getElementById("reportStartDate").value;
+                            const end = document.getElementById("reportEndDate").value;
+
                             if (!start || !end) {
 
                                 alert("Pilih Start Date dan End Date");
                                 return;
 
                             }
-                            const qtyTable =
-                                document.getElementById("cogsQtyTable");
-                            const valueTable =
-                                document.getElementById("cogsValueTable");
+
+                            // PERBAIKAN
+                            const startDate = new Date(start);
+                            const endDate = new Date(end);
+
+                            const qtyTable = document.getElementById("cogsQtyTable");
+                            const valueTable = document.getElementById("cogsValueTable");
 
                             qtyTable.innerHTML = "";
                             valueTable.innerHTML = "";
@@ -6637,79 +6644,218 @@
                             // =========================
                             // TOTAL VALUE
                             // =========================
-
                             let totalStockAwalValue = 0;
                             let totalPOValue = 0;
-                            let totalUsageValue = 0;
                             let totalWasteValue = 0;
-                            let totalLastStockValue = 0;
+                            let totalStockAkhirValue = 0;
+                            let totalUsageProductionValue = 0;
+                            let totalCogsValue = 0;
+                            let totalDifferentValue = 0;
 
                             try {
+
                                 // =========================
                                 // MASTER MATERIAL
                                 // =========================
                                 const materialSnap =
                                     await getDocs(
-                                        query(collection(db, "materials"), orderBy("code", "asc")
+                                        query(
+                                            collection(db, "materials"),
+                                            orderBy("code", "asc")
                                         )
                                     );
-                                // AMBIL NEW STOCK TERAKHIR
-                                const stockSnap = await getDocs(collection(db, "stock_card"));
 
+                                // =========================
+                                // STOCK CARD
+                                // =========================
+                                const stockSnap =
+                                    await getDocs(
+                                        query(
+                                            collection(db, "stock_opname"),
+                                            orderBy("soDate", "asc")
+                                        )
+                                    );
+
+                                // =========================
+                                // STOCK AWAL
+                                // =========================
                                 let stockAwalMap = {};
+
                                 stockSnap.forEach(d => {
                                     const item = d.data();
-                                    const date = new Date(item.date);
-                                    if (date < new Date(start)) { const code = String(item.code).trim(); stockAwalMap[code] = Number(item.newStock || 0); }
+                                    const code = String(item.code).trim();
+                                    const date = new Date(item.soDate);
+
+                                    if (date < startDate) {
+
+                                        if (
+                                            !stockAwalMap[code] ||
+                                            date > stockAwalMap[code].date
+                                        ) {
+
+                                            stockAwalMap[code] = {
+                                                qty: Number(item.weight || 0),
+                                                date: date
+                                            };
+
+                                        }
+                                    }
 
                                 });
+
+                                // =========================
                                 // PURCHASE ORDER
-                                const poSnap = await getDocs(
-                                    query(collection(db, "purchasing"), where("date", ">=", start), where("date", "<=", end))
-                                );
+                                // =========================
+                                const poSnap =
+                                    await getDocs(
+                                        query(
+                                            collection(db, "purchasing"),
+                                            where("date", ">=", start),
+                                            where("date", "<=", end)
+                                        )
+                                    );
 
                                 let poMap = {};
+
                                 poSnap.forEach(d => {
+
                                     const item = d.data();
-                                    const code = String(item.materialCode || "").trim();
-                                    poMap[code] = (poMap[code] || 0) + Number(item.qty || 0);
-                                });
-                                // PRODUKSI MATERIAL USAGE
-                                const produksiSnap =
-                                    await getDocs(
-                                        query(collection(db, "production_orders"), where("date", ">=", start), where("date", "<=", end)
-                                        )
-                                    );
-                                const recipeSnap = await getDocs(collection(db, "product_recipes"));
+                                    const code =
+                                        String(item.materialCode || "").trim();
 
-                                let produksiMap = {};
-                                produksiSnap.forEach(d => {
-                                    const prod = d.data();
-                                    const productCode = String(prod.productCode).trim();
-                                    const qtyProduction = Number(prod.qtyProduction || 0);
+                                    poMap[code] =
+                                        (poMap[code] || 0) +
+                                        Number(item.qty || 0);
 
-                                    recipeSnap.forEach(r => {
-                                        const recipe = r.data();
-                                        if (String(recipe.productCode).trim() === productCode
-                                        ) {
-                                            const materialName = String(recipe.material).trim();
-                                            produksiMap[materialName] =
-                                                (produksiMap[materialName] || 0) + (qtyProduction * Number(recipe.qty || 0));
-                                        }
-                                    });
                                 });
 
-                                // WASTE ==============
+                                // =========================
+                                // WASTE
+                                // =========================
                                 const wasteSnap =
                                     await getDocs(
-                                        query(collection(db, "waste_material"), where("date", ">=", start), where("date", "<=", end)
+                                        query(
+                                            collection(db, "waste_material"),
+                                            where("date", ">=", start),
+                                            where("date", "<=", end)
                                         )
                                     );
+
                                 let wasteMap = {};
                                 wasteSnap.forEach(d => {
                                     const item = d.data();
                                     const name = String(item.materialName).trim();
-                                    wasteMap[name] = (wasteMap[name] || 0) + Number(item.qty || 0);
+                                    wasteMap[name] =
+                                        (wasteMap[name] || 0) +
+                                        Number(item.qty || 0);
+
+                                });
+
+                                // =========================
+                                // STOCK AKHIR
+                                // =========================
+                                let stockAkhirMap = {};
+                                stockSnap.forEach(d => {
+
+                                    const item = d.data();
+                                    const code = String(item.code).trim();
+                                    const soDate = item.soDate;
+
+                                    if (
+                                        soDate >= start &&
+                                        soDate <= end
+                                    ) {
+
+                                        if (
+                                            !stockAkhirMap[code] ||
+                                            soDate > stockAkhirMap[code].soDate
+                                        ) {
+
+                                            stockAkhirMap[code] = {
+                                                qty: Number(item.weight || 0),
+                                                soDate: soDate
+                                            };
+                                        }
+                                    }
+
+                                });
+
+                                // =========================
+                                // PRODUKSI BERDASARKAN RECIPE
+                                // =========================
+                                const produksiSnap =
+                                    await getDocs(
+                                        query(
+                                            collection(db, "production_orders"),
+                                            where("date", ">=", start),
+                                            where("date", "<=", end)
+                                        )
+                                    );
+                                const recipeSnap =
+                                    await getDocs(collection(db, "product_recipes")
+                                    );
+                                let produksiMap = {};
+                                // =========================
+                                // MATERIAL PRODUKSI
+                                // =========================
+                                produksiSnap.forEach(prodDoc => {
+                                    const prod = prodDoc.data();
+                                    const productCode = String(prod.productCode || "").trim();
+                                    const qtyProduction = Number(prod.qtyProduction || 0);
+
+                                    recipeSnap.forEach(recipeDoc => {
+                                        const recipe = recipeDoc.data();
+
+                                        if (
+                                            String(recipe.productCode || "").trim()
+                                            === productCode
+                                        ) {
+                                            const materialName =
+                                                String(recipe.material || "").trim();
+                                            produksiMap[materialName] =
+                                                (produksiMap[materialName] || 0)
+                                                +
+                                                (
+                                                    qtyProduction *
+                                                    Number(recipe.qty || 0)
+                                                );
+                                        }
+                                    });
+                                });
+                                // =========================
+                                // BOX PRODUKSI
+                                // =========================
+                                const priceFgSnap =
+                                    await getDocs(collection(db, "price_fg")
+                                    );
+                                const productionResultSnap =
+                                    await getDocs(
+                                        query(
+                                            collection(db, "production_results"),
+                                            where("date", ">=", start),
+                                            where("date", "<=", end)
+                                        )
+                                    );
+                                productionResultSnap.forEach(resultDoc => {
+                                    const result = resultDoc.data();
+                                    const productCode = String(result.productCode || "").trim();
+                                    const fgBox = Number(result.fgBox || 0);
+
+                                    priceFgSnap.forEach(priceDoc => {
+                                        const price = priceDoc.data();
+
+                                        if (
+                                            String(price.productCode || "").trim()
+                                            === productCode
+                                        ) {
+                                            const boxName =
+                                                String(price.materialName || "").trim();
+                                            produksiMap[boxName] =
+                                                (produksiMap[boxName] || 0)
+                                                +
+                                                fgBox;
+                                        }
+                                    });
                                 });
                                 // =========================
                                 // GENERATE TABLE
@@ -6717,91 +6863,105 @@
                                 materialSnap.forEach(d => {
                                     const mat = d.data();
                                     const average = Number(mat.average || 0);
-                                    const stockAwal = stockAwalMap[mat.code] || 0;
+                                    const stockAwal = stockAwalMap[mat.code]?.qty || 0;
                                     const purchase = poMap[mat.code] || 0;
-                                    const usage = produksiMap[mat.name] || 0;
                                     const waste = wasteMap[mat.name] || 0;
+                                    const stockAkhir = stockAkhirMap[mat.code]?.qty || 0;
+                                    const cogs = produksiMap[mat.name] || 0;
+
                                     // =========================
-                                    // LAST STOCK
+                                    // PERHITUNGAN
                                     // =========================
-                                    const lastStock = stockAwal + purchase - usage - waste;
+                                    const usageProduction = stockAwal + purchase - waste - stockAkhir;
+                                    const different = usageProduction - cogs;
+
                                     // =========================
                                     // TABLE QTY
                                     // =========================
                                     qtyTable.innerHTML += `
-
-                    <tr>
-                    <td>${mat.code}</td>
-                    <td>${mat.name}</td>
-                    <td>${mat.unit}</td>
-                    <td>Rp ${average.toLocaleString("id-ID")}</td>
-                    <td>${stockAwal.toLocaleString()}</td>
-                    <td>${purchase.toLocaleString()}</td>
-                    <td>${usage.toLocaleString()}</td>
-                    <td>${waste.toLocaleString()}</td>
-                    <td>${lastStock.toLocaleString()}</td>
-                    </tr>
-
-                    `;
+            <tr>
+                <td>${mat.code}</td>
+                <td>${mat.name}</td>
+                <td>${mat.unit}</td>
+                <td>Rp ${average.toLocaleString("id-ID")}</td>
+                <td>${stockAwal.toLocaleString()}</td>
+                <td>${purchase.toLocaleString()}</td>
+                <td>${waste.toLocaleString()}</td>
+                <td>${stockAkhir.toLocaleString()}</td>
+                <td>${usageProduction.toLocaleString()}</td>
+                <td>${cogs.toLocaleString()}</td>
+                <td>${different.toLocaleString()}</td>
+            </tr>
+            `;
 
                                     // =========================
-                                    // HITUNG VALUE
+                                    // VALUE
                                     // =========================
                                     const valStockAwal = stockAwal * average;
                                     const valPurchase = purchase * average;
-                                    const valUsage = usage * average;
                                     const valWaste = waste * average;
-                                    const valLastStock = lastStock * average;
+                                    const valStockAkhir = stockAkhir * average;
+                                    const valUsageProduction = usageProduction * average;
+                                    const valCogs = cogs * average;
+                                    const valDifferent = different * average;
                                     totalStockAwalValue += valStockAwal;
                                     totalPOValue += valPurchase;
-                                    totalUsageValue += valUsage;
                                     totalWasteValue += valWaste;
-                                    totalLastStockValue += valLastStock;
+                                    totalStockAkhirValue += valStockAkhir;
+                                    totalUsageProductionValue += valUsageProduction;
+                                    totalCogsValue += valCogs;
+                                    totalDifferentValue += valDifferent;
+
                                     // =========================
                                     // TABLE VALUE
                                     // =========================
                                     valueTable.innerHTML += `
-                    <tr>
-                    <td>${mat.code}</td>
-                    <td>${mat.name}</td>
-                    <td>${mat.unit}</td>
-                    <td>Rp ${average.toLocaleString("id-ID")}</td>
-                    <td>Rp ${valStockAwal.toLocaleString("id-ID")}</td>
-                    <td>Rp ${valPurchase.toLocaleString("id-ID")}</td>
-                    <td>Rp ${valUsage.toLocaleString("id-ID")}</td>
-                    <td>Rp ${valWaste.toLocaleString("id-ID")}</td>
-                    <td>Rp ${valLastStock.toLocaleString("id-ID")}</td>
-                    </tr>
-                    `;
+            <tr>
+                <td>${mat.code}</td>
+                <td>${mat.name}</td>
+                <td>${mat.unit}</td>
+                <td>Rp ${average.toLocaleString("id-ID")}</td>
+                <td>Rp ${valStockAwal.toLocaleString("id-ID")}</td>
+                <td>Rp ${valPurchase.toLocaleString("id-ID")}</td>
+                <td>Rp ${valWaste.toLocaleString("id-ID")}</td>
+                <td>Rp ${valStockAkhir.toLocaleString("id-ID")}</td>
+                <td>Rp ${valUsageProduction.toLocaleString("id-ID")}</td>
+                <td>Rp ${valCogs.toLocaleString("id-ID")}</td>
+                <td>Rp ${valDifferent.toLocaleString("id-ID")}</td>
+            </tr>
+            `;
 
                                 });
+
                                 // =========================
-                                // TOTAL ROW VALUE
+                                // TOTAL
                                 // =========================
                                 valueTable.innerHTML += `
-                    <tr class="table-warning text-dark fw-bold">
-                    <td colspan="4">TOTAL</td>
-                    <td>Rp ${totalStockAwalValue.toLocaleString("id-ID")}</td>                               
-                    <td>Rp ${totalPOValue.toLocaleString("id-ID")}</td>                           
-                    <td>Rp ${totalUsageValue.toLocaleString("id-ID")}</td>
-                    <td>Rp ${totalWasteValue.toLocaleString("id-ID")}</td>
-                    <td>Rp ${totalLastStockValue.toLocaleString("id-ID")}</td>
-                    </tr>
+        <tr class="table-warning text-dark fw-bold">
+            <td colspan="4">TOTAL</td>
+            <td>Rp ${totalStockAwalValue.toLocaleString("id-ID")}</td>
+            <td>Rp ${totalPOValue.toLocaleString("id-ID")}</td>
+            <td>Rp ${totalWasteValue.toLocaleString("id-ID")}</td>
+            <td>Rp ${totalStockAkhirValue.toLocaleString("id-ID")}</td>
+            <td>Rp ${totalUsageProductionValue.toLocaleString("id-ID")}</td>
+            <td>Rp ${totalCogsValue.toLocaleString("id-ID")}</td>
+            <td>Rp ${totalDifferentValue.toLocaleString("id-ID")}</td>
+        </tr>
+        `;
 
-                    `;
                             }
                             catch (error) {
+
                                 console.error("COGS ERROR :", error);
                                 alert("Gagal Load COGS");
+
                             }
+
                         }
                         // ================= EXPORT COGS PDF ===============
                         async function exportCOGSPDF() {
-                            const start =
-                                document.getElementById("reportStartDate").value;
-                            const end =
-                                document.getElementById("reportEndDate").value;
-
+                            const start = document.getElementById("reportStartDate").value;
+                            const end = document.getElementById("reportEndDate").value;
                             // =========================
                             // VALIDASI DATE
                             // ========================
@@ -6872,7 +7032,6 @@
                                     fillColor: [255, 193, 7], // KUNING
                                     textColor: 0,
                                     fontStyle: "bold"
-
                                 }
 
                             });
@@ -6891,9 +7050,7 @@
                         /* ============= STOCK CARD WAREHOUSE =============== */
                         /* =================================================== */
                         function toggleGudang() {
-                            const menu =
-                                document.getElementById("gudangSubMenu");
-
+                            const menu = document.getElementById("gudangSubMenu");
                             menu.style.display =
                                 menu.style.display === "block"
                                     ? "none"
@@ -6904,14 +7061,13 @@
                         let stockAwalExcelData = [];
 
                         async function readStockAwalExcel() {
-                            const file =
-                                document.getElementById("stockAwalFile").files[0];
+                            const file = document.getElementById("stockAwalFile").files[0];
                             if (!file) {
                                 alert("Pilih file excel");
                                 return;
                             }
-                            const stockDate =
-                                document.getElementById("stockAwalDate").value;
+
+                            const stockDate = document.getElementById("stockAwalDate").value;
                             if (!stockDate) {
                                 alert("Pilih tanggal stock awal");
                                 return;
@@ -6919,16 +7075,10 @@
                             const reader = new FileReader();
                             reader.onload = async function (e) {
                                 try {
-                                    const data =
-                                        new Uint8Array(e.target.result);
-                                    const workbook =
-                                        XLSX.read(data, { type: "array" });
-                                    const sheet =
-                                        workbook.Sheets[
-                                        workbook.SheetNames[0]
-                                        ];
-                                    const json =
-                                        XLSX.utils.sheet_to_json(sheet);
+                                    const data = new Uint8Array(e.target.result);
+                                    const workbook = XLSX.read(data, { type: "array" });
+                                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                                    const json = XLSX.utils.sheet_to_json(sheet);
                                     const materialSnap =
                                         await getDocs(
                                             collection(db, "materials")
@@ -7054,22 +7204,17 @@
 
                         window.saveStockAwalData = saveStockAwalData;
 
-                        /* ================= GLOBAL SO ================= */
+                        /* ================= UPLOAD NEW SO MATERIALS ================= */
                         /* ================= READ EXCEL ================= */
                         let soExcelData = [];
 
                         async function readSOExcel() {
-                            const file =
-                                document.getElementById("soFile").files[0];
-
+                            const file = document.getElementById("soFile").files[0];
                             if (!file) {
                                 alert("Pilih file excel");
                                 return;
                             }
-
-                            // VALIDASI TANGGAL
-                            const soDate =
-                                document.getElementById("soDate").value;
+                            const soDate = document.getElementById("soDate").value;
                             if (!soDate) {
                                 alert("Pilih tanggal SO");
                                 return;
@@ -7079,14 +7224,9 @@
 
                                 try {
 
-                                    const data =
-                                        new Uint8Array(e.target.result);
-                                    const workbook =
-                                        XLSX.read(data, { type: "array" });
-                                    const sheet =
-                                        workbook.Sheets[
-                                        workbook.SheetNames[0]
-                                        ];
+                                    const data = new Uint8Array(e.target.result);
+                                    const workbook = XLSX.read(data, { type: "array" });
+                                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
                                     const json =
                                         XLSX.utils.sheet_to_json(sheet);
                                     if (json.length === 0) {
@@ -7190,8 +7330,8 @@
 
                         /* ================= SAVE SO ================= */
                         async function saveSOData() {
-                            const soDate =
-                                document.getElementById("soDate").value;
+                            const soDate = document.getElementById("soDate").value;
+
                             if (!soDate) {
                                 alert("Pilih tanggal SO");
                                 return;
@@ -7217,12 +7357,9 @@
 
                         /* ================= LOAD SO DATA ================= */
                         async function loadSOData() {
-                            const start =
-                                document.getElementById("filterSOStart")
-                                    .value;
-                            const end =
-                                document.getElementById("filterSOEnd")
-                                    .value;
+                            const start = document.getElementById("filterSOStart").value;
+                            const end = document.getElementById("filterSOEnd").value;
+
                             let q;
                             // FILTER
                             if (start && end) {
@@ -7263,19 +7400,11 @@
                             });
 
                             // TABLE
-                            document.getElementById("soTable")
-                                .innerHTML = html;
-
+                            document.getElementById("soTable").innerHTML = html;
                             // TOTAL VALUE
-                            document.getElementById("soTotalValue")
-                                .innerHTML =
-                                "Rp " +
-                                grandTotal.toLocaleString();
-
+                            document.getElementById("soTotalValue").innerHTML = "Rp " + grandTotal.toLocaleString();
                             // TOTAL DATA
-                            document.getElementById("soTotalData")
-                                .innerHTML =
-                                totalData.toLocaleString();
+                            document.getElementById("soTotalData").innerHTML = totalData.toLocaleString();
                         }
                         window.loadSOData = loadSOData;
 
@@ -7392,7 +7521,7 @@
                         window.printSOPDF = printSOPDF;
 
                         /* =================================================== */
-                        /* ================= LOAD STOCK CARD WAREHOUSE =========== */
+                        /* ============= LOAD STOCK CARD WAREHOUSE =========== */
                         /* =================================================== */
                         async function loadStockCardWarehouse() {
                             try {
