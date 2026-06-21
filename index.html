@@ -1480,28 +1480,33 @@
                             <label>Select date</label>
                         </div>
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <input type="date" id="salesStartDate" class="form-control">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <input type="date" id="salesEndDate" class="form-control">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <button class="btn btn-warning w-100" onclick="loadSalesReport()">
                                     Filter
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-danger w-100" onclick="exportSalesPDF()">
+                                    <i class="fa fa-file-pdf"></i> Export PDF
                                 </button>
                             </div>
                         </div>
                         <div id="salesReportTotal" style="margin-bottom:10px; font-size:18px; color:#facc15;">
                             Total Sales: Rp 0
                         </div>
-                        <table class="table table-dark">
+                        <table id="salesReportExportTable" class="table table-dark">
                             <thead>
                                 <tr>
-                                    <th>Kode Toko</th>
-                                    <th>Nama Toko</th>
+                                    <th>Store Code</th>
+                                    <th>Store Name</th>
                                     <th>Sales</th>
-                                    <th>Tanggal</th>
+                                    <th>Sales Date</th>
                                 </tr>
                             </thead>
                             <tbody id="salesReportList"></tbody>
@@ -5641,17 +5646,14 @@
                             });
 
                             document.getElementById("salesList").innerHTML = html;
-
                             document.getElementById("salesTotal").innerHTML =
                                 `Rp ${totalSales.toLocaleString()}`;
                         }
 
                         function initSalesFilter() {
                             const now = new Date();
-
                             const monthSelect = document.getElementById("salesMonth");
                             const yearSelect = document.getElementById("salesYear");
-
                             const months = [
                                 "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                                 "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -5666,7 +5668,6 @@
                             monthSelect.value = now.getMonth() + 1;
 
                             let yHtml = "";
-
                             for (let y = 2025; y <= 2075; y++) {
                                 yHtml += `<option value="${y}">${y}</option>`;
                             }
@@ -5747,7 +5748,45 @@
                                 totalEl.innerHTML = `Total Sales: Rp ${total.toLocaleString()}`;
                             }
                         }
+                        async function exportSalesPDF() {
+                            const start = document.getElementById("salesStartDate").value;
+                            const end = document.getElementById("salesEndDate").value;
 
+                            if (!start || !end) {
+                                alert("Pilih Start Date dan End Date terlebih dahulu");
+                                return;
+                            }
+
+                            const { jsPDF } = window.jspdf;
+                            const pdf = new jsPDF("p", "mm", "a4");
+
+                            pdf.setFontSize(16);
+                            pdf.text("Report Sales Pia Made Bali", 14, 15);
+
+                            pdf.setFontSize(10);
+                            pdf.text(`Periode : ${start} - ${end}`, 14, 22);
+
+                            pdf.autoTable({
+                                html: "#salesReportExportTable",
+                                startY: 30,
+                                theme: "grid",
+                                styles: {
+                                    fontSize: 9
+                                },
+                                headStyles: {
+                                    fillColor: [255, 193, 7],
+                                    textColor: 0,
+                                    fontStyle: "bold"
+                                }
+                            });
+
+                            const totalSales = document.getElementById("salesReportTotal").innerText;
+
+                            pdf.setFontSize(11);
+                            pdf.text(totalSales, 14, pdf.lastAutoTable.finalY + 10);
+
+                            pdf.save(`Report_Sales_${start}_${end}.pdf`);
+                        }
                         /* =========================================================
                         ACCOUNTING
                         ========================================================= */
