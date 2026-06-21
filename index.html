@@ -6443,40 +6443,112 @@
             `;
                                     });
 
-                                // ================= MATERIAL USAGE =================
 
+                                // ================= MATERIAL USAGE =================
                                 let materialUsage = {};
                                 let totalUsageValue = 0;
-
+                                // ================= LOAD PRICE FG UNTUK BOX =================
+                                const priceFgSnap =
+                                    await getDocs(
+                                        collection(db, "price_fg")
+                                    );
+                                // ================= MATERIAL DARI RECIPE =================
                                 for (const fg of Object.values(fgMap)) {
-                                    const recipes = recipeSnap.docs.map(d => d.data()).filter(r => r.productCode === fg.productCode);
+                                    const recipes =
+                                        recipeSnap.docs
+                                            .map(d => d.data())
+                                            .filter(r =>
+                                                String(r.productCode).trim()
+                                                === String(fg.productCode).trim()
+                                            );
+
+
                                     for (const recipe of recipes) {
-                                        const material = materialSnap.docs.map(d => d.data()).find(m => m.name.toLowerCase().trim() === recipe.material.toLowerCase().trim());
+                                        const material =
+                                            materialSnap.docs
+                                                .map(d => d.data())
+                                                .find(m =>
+                                                    String(m.name).trim().toLowerCase()
+                                                    === String(recipe.material).trim().toLowerCase()
+                                                );
+
 
                                         if (!material) continue;
                                         const materialPrice = Number(material.average || 0);
                                         const usedQty = Number(recipe.qty || 0) * Number(fg.qty || 0);
                                         const usageValue = usedQty * materialPrice;
+
                                         totalUsageValue += usageValue;
-
                                         if (!materialUsage[material.code]) {
-
-                                            materialUsage[
-                                                material.code
-                                            ] = {
+                                            materialUsage[material.code] = {
                                                 code: material.code,
                                                 name: material.name,
                                                 unit: material.unit,
                                                 qty: 0,
-                                                average:
-                                                    materialPrice,
+                                                average: materialPrice,
                                                 value: 0
+
                                             };
+
                                         }
                                         materialUsage[material.code].qty += usedQty;
                                         materialUsage[material.code].value += usageValue;
                                     }
                                 }
+
+                                // ================= MATERIAL BOX DARI HASIL PRODUKSI =================
+                                prodSnap.forEach(prodDoc => {
+                                    const prod = prodDoc.data();
+                                    if (
+                                        prod.date < start ||
+                                        prod.date > end
+                                    ) return;
+                                    const productCode = String(prod.productCode || "").trim();
+                                    const fgBox = Number(prod.fgBox || 0);
+
+                                    priceFgSnap.forEach(priceDoc => {
+                                        const price =
+                                            priceDoc.data();
+                                        if (
+
+                                            String(price.productCode || "").trim()
+                                            === productCode
+
+                                        ) {
+
+                                            const boxName =
+                                                String(price.materialName || "").trim();
+                                            const boxMaterial =
+                                                materialSnap.docs
+                                                    .map(d => d.data())
+                                                    .find(m =>
+                                                        String(m.name).trim().toLowerCase()
+                                                        === boxName.toLowerCase()
+                                                    );
+
+                                            if (!boxMaterial) return;
+                                            const boxPrice = Number(boxMaterial.average || 0);
+                                            const boxValue = fgBox * boxPrice;
+
+                                            totalUsageValue += boxValue;
+                                            if (!materialUsage[boxMaterial.code]) {
+                                                materialUsage[boxMaterial.code] = {
+
+                                                    code: boxMaterial.code,
+                                                    name: boxMaterial.name,
+                                                    unit: boxMaterial.unit,
+                                                    qty: 0,
+                                                    average: boxPrice,
+                                                    value: 0
+
+                                                };
+
+                                            }
+                                            materialUsage[boxMaterial.code].qty += fgBox;
+                                            materialUsage[boxMaterial.code].value += boxValue;
+                                        }
+                                    });
+                                });
 
                                 // ================= RENDER MATERIAL =================
                                 Object.values(materialUsage)
