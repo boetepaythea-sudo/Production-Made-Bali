@@ -1870,9 +1870,9 @@
                                         <th>Purchase Order Material</th>
                                         <th>Waste Material</th>
                                         <th>Last SO BB</th>
-                                        <th>Usage Material Produksi</th>
+                                        <th>Usage Material Production</th>
                                         <th>Cogs Production</th>
-                                        <th>Different</th>
+                                        <th>Qty Different</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cogsQtyTable">
@@ -1892,9 +1892,9 @@
                                         <th>Purchase Order Material</th>
                                         <th>Waste Material</th>
                                         <th>Last SO BB</th>
-                                        <th>Usage Material Produksi</th>
+                                        <th>Usage Material Production</th>
                                         <th>Cogs Production</th>
-                                        <th>Different</th>
+                                        <th>Value Different</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cogsValueTable">
@@ -4672,9 +4672,14 @@
                             const prodSnap = await getDocs(collection(db, "production_results"));
                             const recipeSnap = await getDocs(collection(db, "product_recipes"));
                             const materialSnap = await getDocs(collection(db, "materials"));
+                            const priceFgSnap = await getDocs(collection(db, "price_fg"));
+
+
+
                             const materialMap = {};
                             const startDate = parseDate(start);
                             const endDate = parseDate(end);
+
                             prodSnap.forEach(prod => {
 
                                 const p = prod.data();
@@ -4720,6 +4725,42 @@
                                     materialMap[key].weight += weight;
                                     materialMap[key].price += price;
                                 });
+
+                                // ===============================
+                                // TAMBAHAN PEMAKAIAN BOX
+                                // ===============================
+                                const productCode = String(p.productCode || "").trim();
+                                const fgBox = Number(p.fgBox || 0);
+                                priceFgSnap.forEach(priceDoc => {
+
+                                    const priceData = priceDoc.data();
+                                    if (
+                                        String(priceData.productCode || "").trim()
+                                        !==
+                                        productCode
+                                    ) return;
+
+                                    const boxName = String(priceData.materialName || "").trim();
+                                    const boxMaterial = materialSnap.docs.map(m => m.data()).find(m => String(m.name).trim().toLowerCase() === boxName.toLowerCase());
+                                    if (!boxMaterial) return;
+                                    const key = boxMaterial.code;
+                                    const weight = fgBox;
+                                    const price = weight * Number(boxMaterial.average || 0);
+                                    if (!materialMap[key]) {
+                                        materialMap[key] = {
+                                            code: boxMaterial.code,
+                                            name: boxMaterial.name,
+                                            unit: boxMaterial.unit,
+                                            weight: 0,
+                                            price: 0
+
+                                        };
+
+                                    }
+
+                                    materialMap[key].weight += weight;
+                                    materialMap[key].price += price;
+                                });
                             });
 
                             forecastProductionData = Object.values(materialMap);
@@ -4731,7 +4772,6 @@
                             let grandTotal = 0;
 
                             forecastProductionData.forEach(item => {
-
                                 grandTotal += item.price;
 
                                 html += `
