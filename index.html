@@ -8740,11 +8740,12 @@
                             // ===============================
                             // TOTAL COST PRODUCTION
                             // ===============================
-                            dashboardTotalProductionCost =
-                                totalCOGS + totalOverhead;
+                            dashboardTotalProductionCost = totalCOGS + totalOverhead;
                             document.getElementById("dashTotalCostProduction").innerHTML =
-                                "Rp " + dashboardTotalProductionCost.toLocaleString("id-ID");
-
+                                "Rp " + dashboardTotalProductionCost.toLocaleString("id-ID", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                         }
                         //=============================
                         // LOAD DASHBOARD NET PROFIT
@@ -8754,7 +8755,10 @@
                                 dashboardTotalSales -
                                 dashboardTotalProductionCost;
                             document.getElementById("dashNettProfit").innerHTML =
-                                "Rp " + nett.toLocaleString("id-ID");
+                                "Rp " + nett.toLocaleString("id-ID", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                         }
 
                         //=============================
