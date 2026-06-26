@@ -1974,6 +1974,30 @@
                             </table>
                         </div>
                     </div>
+                    <!-- ================= DATA STOCK AWAL TERSIMPAN ================= -->
+                    <div class="mt-4">
+                        <h5 class="text-success">
+                            <i class="fa-solid fa-database"></i>
+                            Last Stock Materials Data
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Material</th>
+                                        <th>UOM</th>
+                                        <th>Weight</th>
+                                        <th>Average Price</th>
+                                        <th>Value</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockAwalSavedTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <!-- ================= UPLOAD STOCK OPNAME ================= -->
                 <div id="uploadSO" class="menu-page">
@@ -2006,14 +2030,29 @@
                         </div>
                         <!-- FILTER TANGGAL -->
                         <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label>Start Date</label>
-                                <input type="date" id="filterSOStart" class="form-control">
+                            <div class="col-md-3">
+                                <label>Month</label>
+                                <select id="filterSOMonth" class="form-select">
+                                    <option value="">All Month</option>
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
                             </div>
-                            <div class="col-md-4">
-                                <label>End Date</label>
-                                <input type="date" id="filterSOEnd" class="form-control">
+                            <div class="col-md-3">
+                                <label>Year</label>
+                                <select id="filterSOYear" class="form-select"></select>
                             </div>
+
                             <div class="col-md-2 d-flex align-items-end">
                                 <button class="btn btn-info w-100" onclick="loadSOData()">
                                     View Data
@@ -5646,14 +5685,17 @@
                             });
 
                             document.getElementById("salesList").innerHTML = html;
+
                             document.getElementById("salesTotal").innerHTML =
                                 `Rp ${totalSales.toLocaleString()}`;
                         }
 
                         function initSalesFilter() {
                             const now = new Date();
+
                             const monthSelect = document.getElementById("salesMonth");
                             const yearSelect = document.getElementById("salesYear");
+
                             const months = [
                                 "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                                 "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -5668,6 +5710,7 @@
                             monthSelect.value = now.getMonth() + 1;
 
                             let yHtml = "";
+
                             for (let y = 2025; y <= 2075; y++) {
                                 yHtml += `<option value="${y}">${y}</option>`;
                             }
@@ -5748,7 +5791,9 @@
                                 totalEl.innerHTML = `Total Sales: Rp ${total.toLocaleString()}`;
                             }
                         }
+
                         async function exportSalesPDF() {
+
                             const start = document.getElementById("salesStartDate").value;
                             const end = document.getElementById("salesEndDate").value;
 
@@ -5787,6 +5832,7 @@
 
                             pdf.save(`Report_Sales_${start}_${end}.pdf`);
                         }
+
                         /* =========================================================
                         ACCOUNTING
                         ========================================================= */
@@ -7320,10 +7366,7 @@
                                 // ===============================
                                 // HAPUS DATA LAMA STOCK CARD
                                 // ===============================
-                                const oldSnap =
-                                    await getDocs(
-                                        collection(db, "stock_card")
-                                    );
+                                const oldSnap = await getDocs(collection(db, "stock_card"));
 
                                 for (const docItem of oldSnap.docs) {
                                     await deleteDoc(
@@ -7344,6 +7387,7 @@
                                         }
                                     );
                                 }
+
                                 alert(
                                     "Stock awal berhasil refresh stock card"
                                 );
@@ -7353,11 +7397,67 @@
                             }
                         }
 
+                        await loadStockAwalTable();
                         window.saveStockAwalData = saveStockAwalData;
+
+                        /* ================= LOAD STOCK AWAL TABLE ================= */
+                        async function loadStockAwalTable() {
+                            try {
+                                const snap = await getDocs(
+                                    query(
+                                        collection(db, "stock_card"),
+                                        orderBy("code", "asc")
+                                    )
+                                );
+
+                                let html = "";
+                                let grandTotal = 0;
+                                let totalData = 0;
+
+                                snap.forEach(doc => {
+                                    const item = doc.data();
+                                    // hanya Opening Stock
+                                    if (item.type !== "OPENING") return;
+                                    grandTotal += Number(item.value || 0);
+                                    totalData++;
+
+                                    html += `
+                <tr>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.unit}</td>
+                    <td class="text-end">
+                        ${Number(item.weight).toLocaleString()}
+                    </td>
+                    <td class="text-end">
+                        Rp ${Number(item.average).toLocaleString()}
+                    </td>
+                    <td class="text-end">
+                        Rp ${Number(item.value).toLocaleString()}
+                    </td>
+                    <td>${item.stockDate}</td>
+                </tr>
+            `;
+
+                                });
+                                document.getElementById("stockAwalSavedTable").innerHTML = html;
+                                console.log(
+                                    "Opening Stock Loaded :",
+                                    totalData,
+                                    "Rows"
+                                );
+
+
+                            } catch (err) {
+                                console.error("Load Stock Awal Error :", err);
+                            }
+                        }
+                        window.loadStockAwalTable = loadStockAwalTable;
 
                         /* ================= UPLOAD NEW SO MATERIALS ================= */
                         /* ================= READ EXCEL ================= */
                         let soExcelData = [];
+                        let soDataLoaded = false;
 
                         async function readSOExcel() {
                             const file = document.getElementById("soFile").files[0];
@@ -7505,130 +7605,184 @@
                             loadSOData();
                         }
                         window.saveSOData = saveSOData;
+                        /* ================= LOAD YEAR ================= */
+                        function loadSOYears() {
+                            const select = document.getElementById("filterSOYear");
+                            const currentYear = new Date().getFullYear();
+
+                            let html = '<option value="">All Year</option>';
+                            for (let y = 2025; y <= 2075; y++) {
+                                html += `<option value="${y}">${y}</option>`;
+                            }
+                            select.innerHTML = html;
+
+                        }
+
+                        loadSOYears();
+                        document.getElementById("filterSOMonth").addEventListener("change", () => {
+                            soDataLoaded = false;
+                        });
+
+                        document.getElementById("filterSOYear").addEventListener("change", () => {
+                            soDataLoaded = false;
+                        });
 
                         /* ================= LOAD SO DATA ================= */
                         async function loadSOData() {
-                            const start = document.getElementById("filterSOStart").value;
-                            const end = document.getElementById("filterSOEnd").value;
 
-                            let q;
-                            // FILTER
-                            if (start && end) {
-                                q = query(
-                                    collection(db, "stock_opname"),
-                                    where("soDate", ">=", start),
-                                    where("soDate", "<=", end),
-                                    orderBy("soDate", "desc")
-                                );
-
-                            } else {
-
-                                q = query(
-                                    collection(db, "stock_opname"),
-                                    orderBy("soDate", "desc")
-                                );
-                            }
+                            const month = document.getElementById("filterSOMonth").value;
+                            const year = document.getElementById("filterSOYear").value;
+                            const q = query(
+                                collection(db, "stock_opname")
+                            );
 
                             const snap = await getDocs(q);
+                            let data = [];
+                            snap.forEach(d => {
+
+                                const item = d.data();
+                                // soDate format : YYYY-MM-DD
+                                const parts = item.soDate.split("-");
+                                const itemYear = parts[0];
+                                const itemMonth = parts[1];
+
+                                if (year && itemYear !== year) return;
+                                if (month && itemMonth !== month) return;
+                                data.push(item);
+
+                            });
+                            data.sort((a, b) =>
+                                a.code.localeCompare(b.code, undefined, {
+                                    numeric: true,
+                                    sensitivity: "base"
+                                })
+                            );
+
                             let html = "";
                             let grandTotal = 0;
                             let totalData = 0;
-                            snap.forEach(d => {
-                                const item = d.data(); grandTotal += Number(item.value || 0); totalData++;
+
+                            data.forEach(item => {
+
+                                grandTotal += Number(item.value || 0);
+                                totalData++;
+
                                 html += `
         <tr>
-
             <td>${item.code}</td>
             <td>${item.name}</td>
             <td>${item.unit}</td>
             <td>${Number(item.weight).toLocaleString()}</td>
-            <td>Rp ${Number(item.average).toLocaleString()} </td>
-            <td>Rp ${Number(item.value).toLocaleString()} </td>
+            <td>Rp ${Number(item.average).toLocaleString()}</td>
+            <td>Rp ${Number(item.value).toLocaleString()}</td>
             <td>${item.soDate}</td>
-
         </tr>
         `;
-                            });
 
-                            // TABLE
+                            });
                             document.getElementById("soTable").innerHTML = html;
-                            // TOTAL VALUE
-                            document.getElementById("soTotalValue").innerHTML = "Rp " + grandTotal.toLocaleString();
-                            // TOTAL DATA
-                            document.getElementById("soTotalData").innerHTML = totalData.toLocaleString();
+                            document.getElementById("soTotalValue").innerHTML =
+                                "Rp " + grandTotal.toLocaleString();
+                            document.getElementById("soTotalData").innerHTML =
+                                totalData.toLocaleString();
+
+                            // Data sudah berhasil ditampilkan
+                            soDataLoaded = true;
                         }
+
                         window.loadSOData = loadSOData;
 
                         /* ================= PRINT PDF ================= */
                         async function printSOPDF() {
-                            const { jsPDF } = window.jspdf;
-                            const doc =
-                                new jsPDF(
-                                    "landscape",
-                                    "pt",
-                                    "a4"
-                                );
-                            const start =
-                                document.getElementById("filterSOStart")
-                                    .value;
-                            const end =
-                                document.getElementById("filterSOEnd")
-                                    .value;
-                            let q;
-
-                            if (start && end) {
-
-                                q = query(
-                                    collection(db, "stock_opname"),
-                                    where("soDate", ">=", start),
-                                    where("soDate", "<=", end),
-                                    orderBy("soDate", "desc")
-                                );
-
-                            } else {
-
-                                q = query(
-                                    collection(db, "stock_opname"),
-                                    orderBy("soDate", "desc")
-                                );
+                            if (!soDataLoaded) {
+                                alert("Silakan klik View Data terlebih dahulu.");
+                                return;
                             }
 
+                            const { jsPDF } = window.jspdf;
+                            const doc = new jsPDF(
+                                "landscape",
+                                "pt",
+                                "a4"
+                            );
+
+                            const month = document.getElementById("filterSOMonth").value;
+                            const year = document.getElementById("filterSOYear").value;
+                            const q = query(
+                                collection(db, "stock_opname")
+                            );
+
                             const snap = await getDocs(q);
+                            let data = [];
+                            snap.forEach(d => {
+
+                                const item = d.data();
+                                const parts = item.soDate.split("-");
+                                const itemYear = parts[0];
+                                const itemMonth = parts[1];
+
+                                if (year && itemYear !== year) return;
+                                if (month && itemMonth !== month) return;
+
+                                data.push(item);
+
+                            });
+
+                            // Urutkan berdasarkan Code Material
+                            data.sort((a, b) =>
+                                a.code.localeCompare(b.code, undefined, {
+                                    numeric: true,
+                                    sensitivity: "base"
+                                })
+                            );
+
                             let rows = [];
                             let grandTotal = 0;
-                            snap.forEach(d => {
-                                const item = d.data();
-                                grandTotal +=
-                                    Number(item.value || 0);
+
+                            data.forEach(item => {
+                                grandTotal += Number(item.value || 0);
                                 rows.push([
                                     item.code,
                                     item.name,
                                     item.unit,
-                                    Number(item.weight)
-                                        .toLocaleString(),
-                                    "Rp " +
-                                    Number(item.average)
-                                        .toLocaleString(),
-                                    "Rp " +
-                                    Number(item.value)
-                                        .toLocaleString(),
+                                    Number(item.weight).toLocaleString(),
+                                    "Rp " + Number(item.average).toLocaleString(),
+                                    "Rp " + Number(item.value).toLocaleString(),
                                     item.soDate
                                 ]);
+
                             });
 
-                            // HEADER
-                            doc.setFontSize(16);
+                            // ================= HEADER =================
 
+                            const monthNames = ["", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+
+                            let periode = "ALL DATA";
+
+                            if (month && year) {
+                                periode = `${monthNames[parseInt(month)]} ${year}`;
+
+                            } else if (year) {
+                                periode = year;
+
+                            } else if (month) {
+                                periode = monthNames[parseInt(month)];
+
+                            }
+
+                            doc.setFontSize(16);
+                            doc.setFont(undefined, "bold");
                             doc.text(
-                                "LIST STOCK OPNAME",
+                                `LIST STOCK OPNAME - ${periode}`,
                                 40,
                                 40
                             );
 
+                            doc.setFont(undefined, "normal");
                             doc.setFontSize(11);
 
                             doc.text(
-                                `PERIODE ${start || "-"} S.D ${end || "-"}`,
+                                `PERIOD : ${periode}`,
                                 40,
                                 60
                             );
@@ -7639,35 +7793,50 @@
                                 80
                             );
 
-                            // PRINT DATE
                             const now = new Date();
-                            const printDate =
-                                now.toLocaleDateString("id-ID");
                             doc.text(
-                                `Print Date : ${printDate}`,
+                                `Print Date : ${now.toLocaleDateString("id-ID")}`,
                                 650,
                                 80
                             );
 
-                            // TABLE
+                            // ================= TABLE =================
                             doc.autoTable({
                                 startY: 100,
                                 head: [[
-                                    "Kode",
-                                    "Nama Bahan",
+                                    "Code",
+                                    "Material",
                                     "UOM",
                                     "Weight",
                                     "Average Price",
                                     "Value",
-                                    "Tanggal SO"
+                                    "SO Date"
                                 ]],
                                 body: rows,
+
                                 theme: "grid",
+
                                 styles: {
                                     fontSize: 9
+                                },
+
+                                headStyles: {
+                                    fillColor: [40, 167, 69],
+                                    textColor: [255, 255, 255],
+                                    halign: "center"
+                                },
+
+                                columnStyles: {
+                                    0: { halign: "center" },
+                                    2: { halign: "center" },
+                                    3: { halign: "right" },
+                                    4: { halign: "right" },
+                                    5: { halign: "right" },
+                                    6: { halign: "center" }
                                 }
+
                             });
-                            doc.save("Stock-Opname.pdf");
+                            doc.save(`Stock-Opname-${periode}.pdf`);
                         }
                         window.printSOPDF = printSOPDF;
 
@@ -7920,16 +8089,20 @@
 
                                 // STOCK OPNAME
                                 soSnap.forEach(d => {
-
                                     const item = d.data();
+                                    const code = String(item.code || "").trim();
+                                    const soDate = item.soDate;
+                                    const weight = Number(item.weight || 0);
 
-                                    const code =
-                                        String(item.code).trim();
-
-                                    soMap[code] =
-                                        (soMap[code] || 0)
-                                        + Number(item.weight || 0);
-
+                                    if (
+                                        !soMap[code] ||
+                                        soDate > soMap[code].date
+                                    ) {
+                                        soMap[code] = {
+                                            date: soDate,
+                                            weight: weight
+                                        };
+                                    }
                                 });
 
                                 // ====================================================
@@ -7960,7 +8133,7 @@
 
                                     // SO AKHIR
                                     const qtySOAkhir =
-                                        soMap[code] || 0;
+                                        soMap[code]?.weight || 0;
 
                                     // SELISIH
                                     const qtySelisih =
@@ -8289,6 +8462,7 @@
                         window.saveSOData = saveSOData;
                         window.loadSOData = loadSOData;
                         window.printSOPDF = printSOPDF;
+
 
                         window.loadStockCardWarehouse = loadStockCardWarehouse;
 
