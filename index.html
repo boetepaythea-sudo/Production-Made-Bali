@@ -4324,12 +4324,9 @@
                             });
 
                             alert("Produksi tersimpan");
-
                             await loadProductionListData();
-
                             document.getElementById("prodProduct").value = "";
                             document.getElementById("prodQty").value = "";
-
                         }
 
 
@@ -4515,9 +4512,7 @@
                             await loadProductionOrdersToResultSelect();
                             await loadProductionResult();
                         }
-
                         async function saveProductionResult() {
-
                             const productCode = document.getElementById("resProduct").value;
                             const fgPcs = document.getElementById("resFgPcs").value;
                             const fgBox = document.getElementById("resFgBox").value;
@@ -5202,13 +5197,11 @@
                         }
 
                         /* ================= MARKETING CODE ================= */
-
                         function toggleMarketing() {
                             const menu = document.getElementById("marketingSubMenu");
                             if (!menu) return;
                             menu.style.display = (menu.style.display === "block") ? "none" : "block";
                         }
-
                         /* ================= STORE CODE ================= */
                         async function generateStoreCode() {
                             const snap = await getDocs(
@@ -5309,13 +5302,8 @@
                         /* OPEN PAGE */
                         async function openSalesFGPage() {
                             showPage("salesFinishGood");
-
-                            await loadSalesFGStores();
-                            initSalesFGFilter();
-
                             document.getElementById("salesFGTable").innerHTML = "";
                             addSalesFGRow();
-                            loadSalesFGTable();
                         }
 
                         /* LOAD STORE */
@@ -8391,6 +8379,9 @@
                             loadForecast();
                             loadStores();
                             setStoreCode();
+                            initSalesFGFilter();
+                            loadSalesFGStores();
+                            loadSalesFGTable();
                             loadSalesTable();
                             initDashboard();
                             loadStockCardWarehouse();
