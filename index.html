@@ -5319,7 +5319,8 @@
 
                         /* LOAD STORE */
                         async function loadSalesFGStores() {
-                            const snap = await getDocs(collection(db, "stores"));
+                            const q = query(collection(db, "stores"),orderBy("code", "asc") );
+                            const snap = await getDocs(q);
                             let html = `<option value="">Select Store</option>`; snap.forEach(doc => {
 
                                 const d = doc.data();
@@ -5340,10 +5341,7 @@
                         async function addSalesFGRow() {
                             salesFGRowIndex++;
                             const rowId = `salesfgrow${salesFGRowIndex}`;
-                            const q = query(
-                                collection(db, "price_fg"),
-                                orderBy("productCode", "asc")
-                            );
+                            const q = query( collection(db, "price_fg"), orderBy("productCode", "asc") );
                             const productSnap = await getDocs(q);
                             let productOptions = `<option value="">Select Product</option>`; productSnap.forEach(doc => {
 
