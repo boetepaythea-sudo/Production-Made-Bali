@@ -5039,7 +5039,7 @@
 
                             let materialHtml = `
     <option value="">
-        Pilih Bahan
+        Select Material
     </option>
     `;
 
@@ -5303,7 +5303,8 @@
                         async function openSalesFGPage() {
                             showPage("salesFinishGood");
                             document.getElementById("salesFGTable").innerHTML = "";
-                            addSalesFGRow();
+
+                            await addSalesFGRow();
                         }
 
                         /* LOAD STORE */
@@ -5363,16 +5364,17 @@
             class="form-control salesfg-pcs auto-field"
             value="0"
             readonly>
-
     </td>
     <td>
-        <input type="number"
+        <input type="text"
             class="form-control salesfg-price auto-field"
+            value="Rp. 0"
             readonly>
     </td>
     <td>
         <input type="text"
             class="form-control salesfg-total auto-field"
+             value="Rp. 0"
             readonly>
     </td>
     <td>
@@ -6848,17 +6850,13 @@
                             );
 
                         }
-
                         // =================================================
                         // ================= LOAD COGS REPORT ==============
                         // =================================================
                         async function loadCOGSReport() {
-
                             const start = document.getElementById("reportStartDate").value;
                             const end = document.getElementById("reportEndDate").value;
-
                             if (!start || !end) {
-
                                 alert("Pilih Start Date dan End Date");
                                 return;
 
@@ -6884,7 +6882,6 @@
                             let totalUsageProductionValue = 0;
                             let totalCogsValue = 0;
                             let totalDifferentValue = 0;
-
                             try {
 
                                 // =========================
@@ -6913,7 +6910,6 @@
                                 // STOCK AWAL
                                 // =========================
                                 let stockAwalMap = {};
-
                                 stockSnap.forEach(d => {
                                     const item = d.data();
                                     const code = String(item.code).trim();
@@ -6949,17 +6945,13 @@
                                     );
 
                                 let poMap = {};
-
                                 poSnap.forEach(d => {
-
                                     const item = d.data();
                                     const code =
                                         String(item.materialCode || "").trim();
-
                                     poMap[code] =
                                         (poMap[code] || 0) +
                                         Number(item.qty || 0);
-
                                 });
 
                                 // =========================
@@ -7165,7 +7157,6 @@
             `;
 
                                 });
-
                                 // =========================
                                 // TOTAL
                                 // =========================
@@ -7184,12 +7175,9 @@
 
                             }
                             catch (error) {
-
                                 console.error("COGS ERROR :", error);
                                 alert("Gagal Load COGS");
-
                             }
-
                         }
                         // ================= EXPORT COGS PDF ===============
                         async function exportCOGSPDF() {
@@ -7387,7 +7375,6 @@
                             };
                             reader.readAsArrayBuffer(file);
                         }
-
                         window.readStockAwalExcel = readStockAwalExcel;
 
                         /* ================= SAVE STOCK AWAL ================= */
@@ -7396,14 +7383,8 @@
                                 alert("Data kosong");
                                 return;
                             }
-
                             try {
-
-                                // ===============================
-                                // HAPUS DATA LAMA STOCK CARD
-                                // ===============================
                                 const oldSnap = await getDocs(collection(db, "stock_card"));
-
                                 for (const docItem of oldSnap.docs) {
                                     await deleteDoc(
                                         doc(db, "stock_card", docItem.id)
@@ -7432,10 +7413,7 @@
                                 alert("Gagal save stock awal");
                             }
                         }
-
-
                         window.saveStockAwalData = saveStockAwalData;
-
                         /* ================= LOAD STOCK AWAL TABLE ================= */
                         async function loadStockAwalTable() {
                             try {
@@ -7452,7 +7430,7 @@
 
                                 snap.forEach(doc => {
                                     const item = doc.data();
-                                    // hanya Opening Stock
+                                   
                                     if (item.type !== "OPENING") return;
                                     grandTotal += Number(item.value || 0);
                                     totalData++;
@@ -7462,15 +7440,9 @@
                     <td>${item.code}</td>
                     <td>${item.name}</td>
                     <td>${item.unit}</td>
-                    <td class="text-end">
-                        ${Number(item.weight).toLocaleString()}
-                    </td>
-                    <td class="text-end">
-                        Rp ${Number(item.average).toLocaleString()}
-                    </td>
-                    <td class="text-end">
-                        Rp ${Number(item.value).toLocaleString()}
-                    </td>
+                    <td class="text-end"> ${Number(item.weight).toLocaleString()}  </td>
+                    <td class="text-end">Rp ${Number(item.average).toLocaleString()} </td>                
+                    <td class="text-end"> Rp ${Number(item.value).toLocaleString()}</td>
                     <td>${item.stockDate}</td>
                 </tr>
             `;
@@ -7510,7 +7482,6 @@
                             reader.onload = async function (e) {
 
                                 try {
-
                                     const data = new Uint8Array(e.target.result);
                                     const workbook = XLSX.read(data, { type: "array" });
                                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -7520,7 +7491,6 @@
                                         alert("Excel kosong");
                                         return;
                                     }
-
                                     // LOAD MASTER MATERIAL
                                     const materialSnap =
                                         await getDocs(
@@ -7570,11 +7540,8 @@
                                         }
                                         const average = Number(material.average || 0);
                                         const value = average * weight;
-                                        // TOTAL
                                         grandTotal += value; totalData++;
-                                        // ROW
                                         const row = {
-
                                             code: material.code,
                                             name: material.name,
                                             unit: material.unit,
@@ -7583,9 +7550,7 @@
                                             value,
                                             soDate
                                         };
-
                                         soExcelData.push(row);
-
                                         html += `
                 <tr>
                     <td>${row.code}</td>
@@ -7598,11 +7563,8 @@
                 </tr>
             `;
                                     });
-                                    // TABLE
                                     document.getElementById("soTable").innerHTML = html;
-                                    // TOTAL VALUE
                                     document.getElementById("soTotalValue").innerHTML = "Rp " + grandTotal.toLocaleString();
-                                    // TOTAL DATA
                                     document.getElementById("soTotalData").innerHTML = totalData.toLocaleString();
                                     alert(
                                         "Excel berhasil dibaca : " + totalData + " data"
@@ -7698,7 +7660,6 @@
                             let html = "";
                             let grandTotal = 0;
                             let totalData = 0;
-
                             data.forEach(item => {
 
                                 grandTotal += Number(item.value || 0);
@@ -7791,20 +7752,14 @@
                             });
 
                             // ================= HEADER =================
-
                             const monthNames = ["", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
                             let periode = "ALL DATA";
-
                             if (month && year) {
                                 periode = `${monthNames[parseInt(month)]} ${year}`;
-
-                            } else if (year) {
-                                periode = year;
-
-                            } else if (month) {
-                                periode = monthNames[parseInt(month)];
-
+                            } else if (year) { periode = year;           
+                            } else if (month) {periode = monthNames[parseInt(month)];
+                                
                             }
 
                             doc.setFontSize(16);
@@ -7817,7 +7772,6 @@
 
                             doc.setFont(undefined, "normal");
                             doc.setFontSize(11);
-
                             doc.text(
                                 `PERIOD : ${periode}`,
                                 40,
@@ -7836,7 +7790,6 @@
                                 650,
                                 80
                             );
-
                             // ================= TABLE =================
                             doc.autoTable({
                                 startY: 100,
@@ -7946,7 +7899,6 @@
                                 // =========================
                                 // LOAD PRODUCT RECIPES
                                 // =========================
-
                                 const recipeSnap =
                                     await getDocs(
                                         collection(db, "product_recipes")
@@ -7995,9 +7947,7 @@
                                 // =========================
                                 // LOAD STOCK OPNAME
                                 // =========================
-
                                 let soQuery;
-
                                 if (start && end) {
 
                                     soQuery = query(
@@ -8018,7 +7968,6 @@
                                 // ====================================================
                                 // MAPPING
                                 // ====================================================
-
                                 let stockAwalMap = {};
                                 let poMap = {};
                                 let produksiMap = {};
@@ -8050,7 +7999,6 @@
                                         + Number(item.qty || 0);
 
                                 });
-
                                 // =========================
                                 // PRODUKSI BERDASARKAN RECIPE
                                 // =========================
@@ -8069,7 +8017,6 @@
                                             String(recipe.productCode).trim()
                                             === productCode
                                         ) {
-
                                             const materialName =
                                                 String(recipe.material || "").trim();
                                             // qty recipe per pcs
@@ -8082,7 +8029,6 @@
                                             produksiMap[materialName] =
                                                 (produksiMap[materialName] || 0)
                                                 + totalUsage;
-
                                         }
                                     });
                                 });
@@ -8488,7 +8434,6 @@
                         window.saveProductionCost = saveProductionCost;
                         window.loadProductionCostReport = loadProductionCostReport;
 
-
                         window.openReport = openReport;
                         window.loadPurchasingReport = loadPurchasingReport;
                         window.backToReportMenu = backToReportMenu;
@@ -8532,7 +8477,6 @@
                         let productionChart = null;
                         let variantChart = null;
                         let storeChart = null;
-
                         let dashboardTotalSales = 0;
                         let dashboardTotalProductionCost = 0;
 
@@ -8815,7 +8759,6 @@
                                 const d = doc.data();
                                 if (!d.date) return;
                                 const arr = d.date.split("-");
-
                                 const itemYear = Number(arr[0]);
                                 const itemMonth = Number(arr[1]);
 
@@ -8883,19 +8826,15 @@
                             const snap = await getDocs(collection(db, "sales"));
 
                             let storeMap = {};
-
                             snap.forEach(doc => {
                                 const d = doc.data();
 
                                 if (!d.date) return;
-
                                 const dt = new Date(d.date);
                                 const m = dt.getMonth() + 1;
                                 const y = dt.getFullYear();
 
-                                // filter bulan & tahun dashboard
                                 if (m !== month || y !== year) return;
-
                                 const key = d.storeName || d.storeCode;
 
                                 if (!storeMap[key]) {
