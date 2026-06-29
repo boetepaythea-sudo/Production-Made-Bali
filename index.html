@@ -5340,7 +5340,11 @@
                         async function addSalesFGRow() {
                             salesFGRowIndex++;
                             const rowId = `salesfgrow${salesFGRowIndex}`;
-                            const productSnap = await getDocs(collection(db, "price_fg"));
+                            const q = query(
+                                collection(db, "price_fg"),
+                                orderBy("productCode", "asc")
+                            );
+                            const productSnap = await getDocs(q);
                             let productOptions = `<option value="">Select Product</option>`; productSnap.forEach(doc => {
 
                                 const d = doc.data();
