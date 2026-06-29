@@ -5368,17 +5368,19 @@
     </td>
     <td>
         <input type="number"
-            class="form-control salesfg-pcs"
-            value="0">
+            class="form-control salesfg-pcs auto-field"
+            value="0"
+            readonly>
+
     </td>
     <td>
         <input type="number"
-            class="form-control salesfg-price"
+            class="form-control salesfg-price auto-field"
             readonly>
     </td>
     <td>
         <input type="text"
-            class="form-control salesfg-total"
+            class="form-control salesfg-total auto-field"
             readonly>
     </td>
     <td>
@@ -5413,30 +5415,44 @@
                             const snap = await getDocs(collection(db, "price_fg"));
 
                             let price = 0;
+                            let qtyPerBox = 0;
+
                             snap.forEach(doc => {
                                 const data = doc.data();
-                                if (data.productCode === productCode) {
 
-                                    price =
-                                        Number(data.price || 0);
+                                if (data.productCode === productCode) {
+                                    price = Number(data.price || 0);
+                                    qtyPerBox = Number(data.qtyPerBox || 0);
                                 }
                             });
 
+                            // simpan qtyPerBox di row
+                            row.dataset.qtyPerBox = qtyPerBox;
                             /* AUTO SET PRICE */
                             priceInput.value = price;
                             /* AUTO HITUNG TOTAL */
-                            calculateSalesFGTotal(
-                                row.querySelector(".salesfg-box")
-                            );
+                            calculateSalesFGTotal(row.querySelector(".salesfg-box"));
                         }
 
                         /* CALCULATE TOTAL */
                         function calculateSalesFGTotal(inputEl) {
+
                             const row = inputEl.closest("tr");
+
                             const qtyBox = Number(row.querySelector(".salesfg-box").value || 0);
                             const price = Number(row.querySelector(".salesfg-price").value || 0);
-                            const total = qtyBox * price; row.querySelector(".salesfg-total").value = "Rp " + total.toLocaleString();
 
+                            // AMBIL qtyPerBox yang disimpan saat pilih produk
+                            const qtyPerBox = Number(row.dataset.qtyPerBox || 0);
+
+                            // Hitung Qty PCS otomatis
+                            const qtyPcs = qtyBox * qtyPerBox;
+                            row.querySelector(".salesfg-pcs").value = qtyPcs;
+
+                            // Hitung Total Harga
+                            const total = qtyBox * price;
+                            row.querySelector(".salesfg-total").value =
+                                "Rp " + total.toLocaleString();
                         }
 
                         /* SAVE */
@@ -7396,6 +7412,8 @@
                                 alert("Gagal save stock awal");
                             }
                         }
+
+
                         window.saveStockAwalData = saveStockAwalData;
 
                         /* ================= LOAD STOCK AWAL TABLE ================= */
@@ -7603,6 +7621,7 @@
                             loadSOData();
                         }
                         window.saveSOData = saveSOData;
+
                         /* ================= LOAD YEAR ================= */
                         function loadSOYears() {
                             const select = document.getElementById("filterSOYear");
@@ -8344,7 +8363,6 @@
                             initDashboard();
                             loadStockCardWarehouse();
                             loadStockAwalTable();
-
                         }
 
                         window.addEventListener("DOMContentLoaded", async () => {
@@ -8741,6 +8759,7 @@
                             // TOTAL COST PRODUCTION
                             // ===============================
                             dashboardTotalProductionCost = totalCOGS + totalOverhead;
+
                             document.getElementById("dashTotalCostProduction").innerHTML =
                                 "Rp " + dashboardTotalProductionCost.toLocaleString("id-ID", {
                                     minimumFractionDigits: 2,
