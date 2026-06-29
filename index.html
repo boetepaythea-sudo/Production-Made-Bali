@@ -5596,15 +5596,13 @@
                             yearSelect.innerHTML = yHtml;
                             yearSelect.value = now.getFullYear();
                         }
-
                         /* ================= SALES VALUE ================= */
                         async function openMarketingSales() {
                             showPage("marketing_sales");
-
                             initSalesFilter();
-
                             // dropdown store
-                            const snap = await getDocs(collection(db, "stores"));
+                            const q = query(collection(db, "stores"), orderBy("code", "asc"));
+                            const snap = await getDocs(q);
                             let html = `<option value="">Select Store</option>`;
                             snap.forEach(d => {
                                 const data = d.data();
