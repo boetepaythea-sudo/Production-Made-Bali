@@ -1382,7 +1382,8 @@
                             <table class="table table-dark table-striped mt-3">
                                 <thead>
                                     <tr>
-                                        <th>Store</th>
+                                        <th>Store Code</th>
+                                        <th>Store Name</th>
                                         <th>Product</th>
                                         <th>Qty Box</th>
                                         <th>Qty PCS</th>
@@ -5319,7 +5320,7 @@
 
                         /* LOAD STORE */
                         async function loadSalesFGStores() {
-                            const q = query(collection(db, "stores"),orderBy("code", "asc") );
+                            const q = query(collection(db, "stores"), orderBy("code", "asc"));
                             const snap = await getDocs(q);
                             let html = `<option value="">Select Store</option>`; snap.forEach(doc => {
 
@@ -5341,8 +5342,9 @@
                         async function addSalesFGRow() {
                             salesFGRowIndex++;
                             const rowId = `salesfgrow${salesFGRowIndex}`;
-                            const q = query( collection(db, "price_fg"), orderBy("productCode", "asc") );
+                            const q = query(collection(db, "price_fg"), orderBy("productCode", "asc"));
                             const productSnap = await getDocs(q);
+
                             let productOptions = `<option value="">Select Product</option>`; productSnap.forEach(doc => {
 
                                 const d = doc.data();
@@ -5510,31 +5512,62 @@
                             const selectedMonth = parseInt(document.getElementById("salesFGMonth").value);
                             const selectedYear = parseInt(document.getElementById("salesFGYear").value);
 
+                            // ===========================
+                            // LOAD MASTER STORE
+                            // ===========================
+                            const storeSnap = await getDocs(collection(db, "stores"));
+
+                            const storeMap = {};
+
+                            storeSnap.forEach(doc => {
+                                const s = doc.data();
+
+                                storeMap[s.code] = s.name;
+                            });
+
+                            // ===========================
+                            // LOAD SALES FG
+                            // ===========================
                             const snap = await getDocs(collection(db, "sales_fg"));
 
                             let data = [];
+
                             snap.forEach(d => {
-                                data.push({ id: d.id, ...d.data() });
+                                data.push({
+                                    id: d.id,
+                                    ...d.data()
+                                });
+                            });
+
+                            // ===========================
+                            // SORT BERDASARKAN KODE STORE
+                            // ===========================
+                            data.sort((a, b) => {
+
+                                const numA = parseInt((a.store || "").replace("ST", "")) || 0;
+                                const numB = parseInt((b.store || "").replace("ST", "")) || 0;
+
+                                return numA - numB;
                             });
 
                             let html = "";
-                            let totalFG = 0; // 🔥 TAMBAH TOTAL
+                            let totalFG = 0;
 
                             data.forEach(d => {
 
                                 const dateObj = new Date(d.date);
+
                                 const month = dateObj.getMonth() + 1;
                                 const year = dateObj.getFullYear();
 
-                                if (month !== selectedMonth || year !== selectedYear) {
-                                    return;
-                                }
+                                if (month !== selectedMonth || year !== selectedYear) return;
 
-                                totalFG += Number(d.total || 0); // 🔥 HITUNG TOTAL
+                                totalFG += Number(d.total || 0);
 
                                 html += `
 <tr>
     <td>${d.store}</td>
+    <td>${storeMap[d.store] || "-"}</td>
     <td>${d.productName}</td>
     <td>${d.qtyBox}</td>
     <td>${d.qtyPcs}</td>
@@ -5553,7 +5586,6 @@
 
                             document.getElementById("salesFGList").innerHTML = html;
 
-                            // 🔥 UPDATE TOTAL DISPLAY
                             document.getElementById("salesFGTotal").innerHTML =
                                 `Rp ${totalFG.toLocaleString()}`;
                         }
@@ -5596,11 +5628,11 @@
                             yearSelect.innerHTML = yHtml;
                             yearSelect.value = now.getFullYear();
                         }
+
                         /* ================= SALES VALUE ================= */
                         async function openMarketingSales() {
                             showPage("marketing_sales");
                             initSalesFilter();
-                            // dropdown store
                             const q = query(collection(db, "stores"), orderBy("code", "asc"));
                             const snap = await getDocs(q);
                             let html = `<option value="">Select Store</option>`;
